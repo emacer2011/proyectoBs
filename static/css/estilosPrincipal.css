@@ -1,0 +1,14 @@
+#Cabecera{
+        border-radius:"15px";
+        font:"22px italic arial";
+        height:"150px";
+        width:"90%";
+        background-color:rgba(200,255,255,0.5);
+    }
+    
+#BarraIzquierda{
+    width:"20%";
+    height:"500px";
+    
+    
+}
