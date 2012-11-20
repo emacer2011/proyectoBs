@@ -101,3 +101,15 @@ legend {
   border: 0;
   border-bottom: 1px solid #e5e5e5;
 }
+
+
+table {
+	width: 100%;
+	border: 1px solid #cef;
+	text-align: left; }
+th {
+	font-weight: bold;
+	background-color: #acf;
+	border-bottom: 1px solid #cef; }
+td,th {
+	padding: 4px 5px; }

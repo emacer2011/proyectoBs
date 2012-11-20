@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block contenedor %}
+    
+
+
+<table cellpadding="0" cellspacing="0">
+    {% for deposito in depositos %}
+
+    <tr> <td>{{deposito.direccion}} </td><td>{{deposito.telefono}}</td></tr>
+    {% endfor %}
+</table>
+
+
+
+
+{% endblock %}

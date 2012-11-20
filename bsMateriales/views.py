@@ -21,4 +21,9 @@ def altaDeposito(request):
         deposito.save()
         mensaje='Deposito dado de alta con direccion: '+deposito.direccion
         estado='alert alert-success'
-    return render_to_response('gstDeposito/altaDeposito.html',{'estado':estado, 'rubros':rubros, 'mensaje': mensaje},context_instance=RequestContext(request)) 
+    return render_to_response('gstDeposito/altaDeposito.html',{'estado':estado, 'rubros':rubros, 'mensaje': mensaje},context_instance=RequestContext(request))
+
+def listarDeposito(request):
+    """docstring for listarDeposito"""
+    depositos = Deposito.objects.all()
+    return render_to_response('gstDeposito/listarDeposito.html',{'depositos':depositos},context_instance=RequestContext(request)) 

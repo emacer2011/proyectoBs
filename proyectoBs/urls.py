@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^$', 'bsMateriales.views.index'),
     url(r'^altaDeposito/$', 'bsMateriales.views.altaDeposito'),
+    url(r'^listarDeposito/$', 'bsMateriales.views.listarDeposito'),
     url(r'^admin/', include(admin.site.urls)),
 )
 if settings.DEBUG and settings.STATIC_ROOT:
