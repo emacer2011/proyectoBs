@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block cabecera %}
+    
+{% endblock %}
+
+{% block mensaje %}
+    <div class="{{estado}}">
+        {{mensaje}}
+    </div>
+{% endblock %}
+
+{% block contenedor %}
+    <form class="form-horizontal" method="POST" action="">  
+        <fieldset>  
+          <legend>Complete los siguientes campos</legend>
+          <div class="control-group">  
+            <label class="control-label" for="input01" > Direccion </label>  
+            <div class="controls">  
+              <input type="text" class="input-xlarge" id="direccionDeposito" name="direccionDeposito">  
+            </div>  
+          </div >  
+          <div class="control-group">  
+            <label class="control-label" for="select01"> Rubro </label>
+            <div class="controls">
+              <select id="rubroDeposito" name="rubroDeposito">
+                {% for rubro in rubros %}
+						<option value="{{rubro.pk}}">{{rubro}}</option>
+					    <p>{{rubro.nombre}},{{rubro.pk}}</p>
+				{% endfor %}
+              </select>  
+            </div>  
+          </div>  
+          <div class="control-group">  
+            <label class="control-label" for="input01">Telefono</label>  
+            <div class="controls">  
+              <input type="text" class="input-xlarge" id="telefonoDeposito" name="telefonoDeposito">  
+            </div>  
+          </div>
+            <button type="submit" class="btn btn-primary" align="right">Guardar</button>  
+        </fieldset>  
+</form>
+{% endblock %}

@@ -43,7 +43,7 @@
         <li class="dropdown">
         <a data-toggle="dropdown" class="dropdown-toggle" href="#">Gst. Deposito <b class="caret"></b></a>
         <ul class="dropdown-menu">
-            <li><a href="#">Alta Deposito</a></li>
+            <li><a href="/altaDeposito">Alta Deposito</a></li>
             <li><a href="#">Baja Deposito</a></li>
             <li><a href="#">Modificacion Deposito</a></li>
             <li><a href="#">Listar Depositos</a></li>
@@ -65,14 +65,15 @@
 
 
 
-<div id="BarraIzquierda">
-        {% block menu %}
-            
-        {% endblock %}
+<div id="BarraMensaje">
+    {% block mensaje %}
+        
+    {% endblock %}
 </div>
 
 
-<div id="Contenedor">        
+<div id="Contenedor">
+        
         {% block contenedor %}
             
         {% endblock %}
