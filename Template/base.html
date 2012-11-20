@@ -1,15 +1,35 @@
 <html>
 <head>
-         <link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-        {% block cabecera %}
-        {% endblock %}
+         <link href="static/bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">
+         <link rel="stylesheet" href="static/css/estilosPrincipal.css" type="text/css">
+         <script language="javascript" type="text/javascript" src="static/bootstrap/js/bootstrap.js"></script>
 </head>
-<body background="static/bootstrap/img/glyphicons-halflings.png"> 
+<body id="Cuerpo"> 
+
     
-    <input id="boton" type="button" value="gioshgoufdsihguifdsohgfduisoghuisfdofuisghfdsiu" >
-        {% block cuerpo %}
+    
+
+<div id="Cabecera">
+        {% block cabecera %}
+        
+        {% endblock %}
+    
+</div>
+
+
+
+<div id="BarraIzquierda">
+        {% block menu %}
             
         {% endblock %}
+</div>
+
+
+<div id="Contenedor">        
+        {% block contenedor %}
+            
+        {% endblock %}
+</div>
        
 </body>
 
