@@ -4,7 +4,7 @@
 
 #Cabecera{
         border-radius: 15px;
-        font:22px italic arial;
+        font:40px italic arial;
         height: 150px;
         width: 90%;
         background-color:#6699FF;
@@ -12,6 +12,15 @@
         margin-left:55px;
         text-align:center;
         vertical-align:text-center;
+        background-image:url(/static/img/Logo.png);
+        background-repeat:no-repeat;
+        position:top-left;
+    }
+    
+#logo{
+     
+
+
     }
     
 #BarraMensaje{
@@ -31,7 +40,6 @@
     }
     
 #Contenedor{
-    
         float:left;
         width:90%;
         height:500px;
@@ -40,6 +48,16 @@
         border-radius:20px;
         margin-left:55px;
     }
+    
+    
+.form-horizontal .control-label {
+  width:350px;
+    }
+
+.form-horizontal .controls{
+        margin-left:400px;    
+    }
+
 
 .sidebar-nav {
     padding: 9px 0;

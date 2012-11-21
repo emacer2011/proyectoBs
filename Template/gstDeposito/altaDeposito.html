@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block cabecera %}
-    
+    Seccion: <br>Alta de Depósitos    
 {% endblock %}
 
 {% block mensaje %}
@@ -12,14 +12,16 @@
 
 {% block contenedor %}
     <form class="form-horizontal" method="POST" action="">  
-        <fieldset>  
-          <legend>Complete los siguientes campos</legend>
-          <div class="control-group">  
-            <label class="control-label" for="input01" > Direccion </label>  
+
+      <fieldset>
+        <legend>Complete los siguientes campos</legend>
+        <div class="control-group">  
+            <label class="control-label" for="input01"> Direccion </label>  
+
             <div class="controls">  
               <input type="text" class="input-xlarge" id="direccionDeposito" name="direccionDeposito">  
             </div>  
-          </div >  
+        </div >  
           <div class="control-group">  
             <label class="control-label" for="select01"> Rubro </label>
             <div class="controls">
@@ -37,7 +39,10 @@
               <input type="text" class="input-xlarge" id="telefonoDeposito" name="telefonoDeposito">  
             </div>  
           </div>
-            <button type="submit" class="btn btn-primary" align="right">Guardar</button>  
+    <div align="center">
+            <button type="submit" class="btn btn-primary">Guardar</button>          
+    </div>
+
         </fieldset>  
 </form>
 {% endblock %}
