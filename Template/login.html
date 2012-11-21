@@ -1,0 +1,28 @@
+<HTML> 
+<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+
+<HEAD> 
+
+
+<TITLE>BS Materiales</TITLE> 
+<link rel="StyleSheet" href="template/static/MenuesCompletos.css" type="text/css" >
+
+</HEAD> 
+<BODY id="body"> 
+
+
+
+<br><br><br>
+{{estado}}<br>
+<form class="form-signin" action="/login/" method="post">{% csrf_token %}
+{% if next %}
+<input type="hidden" name="next" value="{{ next }}" />
+{% endif %}
+usuario:
+<input type="text" name="username" value="{{ username}}" /><br />
+contraseña:
+<input type="password" name="password" value="" /><br />
+<input type="submit" value="Log In" />
+</form>
+</BODY> 
+</HTML> 

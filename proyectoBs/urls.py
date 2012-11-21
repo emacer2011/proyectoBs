@@ -16,6 +16,8 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^$', 'bsMateriales.views.index'),
     url(r'^altaDeposito/$', 'bsMateriales.views.altaDeposito'),
+    url(r'^login/$', 'bsMateriales.views.login_user'),
+    url(r'^deslogear/$', 'bsMateriales.views.deslogear'),
     url(r'^listarDeposito/$', 'bsMateriales.views.listarDeposito'),
     url(r'^admin/', include(admin.site.urls)),
 )
