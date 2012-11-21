@@ -7,13 +7,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 
-@login_required(login_url='/login')
-def index(request):
-    """docstring for index"""
-    return render_to_response('menuPrincipal.html',context_instance=RequestContext(request)) 
-    
 def login_user(request):
-    state = ""
+    estado = ""
+    mensaje = ""
     username = password = ''
     next = request.REQUEST.get("next")
     if request.POST:
@@ -27,15 +23,23 @@ def login_user(request):
                     return HttpResponseRedirect(next)
                 return HttpResponseRedirect("/")
             else:
-                state = "Cuenta Inactiva"
+                estado = "Cuenta Inactiva"
         else:
-            state = " nombre de usuario o contraseña incorrecta."
+            estado ='alert alert-error'
+            mensaje =" nombre de usuario o contraseña incorrecta."
     
     if (request.REQUEST.get("next")!=None):
-                    state="Por favor iniciar sesion para poder continuar..."
+                    estado='alert alert-error'
+                    mensaje="Por favor iniciar sesion para poder continuar..."
     
-    return render_to_response('login.html',{'estado':state, 'next': next},context_instance=RequestContext(request))    
-    
+    return render_to_response('login.html',{'mensaje':mensaje, 'estado':estado, 'next': next},context_instance=RequestContext(request))    
+
+
+@login_required(login_url='/login')
+def index(request):
+    """docstring for index"""
+    return render_to_response('menuPrincipal.html',context_instance=RequestContext(request)) 
+        
 @login_required(login_url='/login')
 def deslogear(request):
     logout(request)

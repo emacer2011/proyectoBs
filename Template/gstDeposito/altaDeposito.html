@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
+
+
 {% block cabecera %}
+    <script language="javascript" type="text/javascript" src="/static/js/deposito.js"></script>
     Seccion: <br>Alta de Depósitos    
 {% endblock %}
 
@@ -11,7 +14,7 @@
 {% endblock %}
 
 {% block contenedor %}
-    <form class="form-horizontal" method="POST" action="">  
+    <form class="form-horizontal" method="POST" action="" onSubmit="return validaDeposito(this)">  
 
       <fieldset>
         <legend>Complete los siguientes campos</legend>
