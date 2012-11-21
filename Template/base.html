@@ -8,58 +8,60 @@
 <body id="Cuerpo"> 
     
 <div class="navbar navbar-fixed-top">
-<div class="navbar-inner">
-<div class="container-fluid">
-    <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-    </a>
-    <a href="#" class="brand">Bs Materiales</a>
-    
-    
-    <div class="nav-collapse">
-    <ul class="nav">
-        <!-- VENTA -->
-        <li><a href="#">Venta</a></li>
-        <!-- ENTREGA DE MATERIALES -->
-        <li><a href="#">Entrega de Materiales</a></li>
-        <!-- GESTION PRODUCTO -->
-        <li class="dropdown">
-        <a data-toggle="dropdown" class="dropdown-toggle" href="#"> <b class="caret"></b> Gst. Producto</a>
-        <ul class="dropdown-menu">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a href="/" class="brand">Bs Materiales</a>
             
-            <li><a href="#">Alta Producto</a></li>
-            <li><a href="#">Baja Producto</a></li>
-            <li><a href="#">Modificar Producto</a></li>
-            <li><a href="#">Listar Producto</a></li>
-        </ul>
-        </li>
-    </ul>
-    
-    <!-- GESTION DEPOSITO -->
-    <div class="nav-collapse">
-    <ul class="nav">
-        <li class="dropdown">
-        <a data-toggle="dropdown" class="dropdown-toggle" href="#"><b class="caret"></b>Gst. Deposito</a>
-        <ul class="dropdown-menu">
-            <li><a href="/altaDeposito">Alta Deposito</a></li>
-            <li><a href="#">Baja Deposito</a></li>
-            <li><a href="#">Modificacion Deposito</a></li>
-            <li><a href="/listarDeposito">Listar Depositos</a></li>
-        </ul>
-        </li>
-    </ul>
-    <ul class="nav pull-right">
-            <li><a href="/deslogear">Cerrar Sesion({{user}})</a></li>
+            
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <!-- VENTA -->
+                    <li><a href="/venta">Venta</a></li>
+                    <!-- ENTREGA DE MATERIALES -->
+                    <li><a href="/entregaMateriales">Entrega de Materiales</a></li>
+                    <!-- GESTION PRODUCTO -->
+                    <li class="dropdown">
+                    <a data-toggle="dropdown" class="dropdown-toggle"> <b class="caret"></b> Gst. Producto</a>
+                    <ul class="dropdown-menu">
+                        
+                        <li><a href="#">Alta Producto</a></li>
+                        <li><a href="#">Baja Producto</a></li>
+                        <li><a href="#">Modificar Producto</a></li>
+                        <li><a href="#">Listar Producto</a></li>
+                    </ul>
+                    </li>
+                </ul>
+                
+                <!-- GESTION DEPOSITO -->
+                <div class="nav-collapse">
+                    <ul class="nav">
+                        <li class="dropdown">
+                        <a data-toggle="dropdown" class="dropdown-toggle"><b class="caret"></b>Gst. Deposito</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/altaDeposito">Alta Deposito</a></li>
+                            <li><a href="#">Baja Deposito</a></li>
+                            <li><a href="#">Modificacion Deposito</a></li>
+                            <li><a href="/listarDeposito">Listar Depositos</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav pull-right">
+                            <li><a href="/deslogear">Cerrar Sesion({{user}})</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-</div>
-</div>
-</div>
-
 
 <div id="Cabecera">
     
+        <br>
         {% block cabecera %}
         
         {% endblock %}
@@ -80,8 +82,8 @@
         {% block contenedor %}
             
         {% endblock %}
+    <br> <br>
 </div>
-       
 </body>
 
 <html>

@@ -33,17 +33,17 @@ def login_user(request):
                     mensaje="Por favor iniciar sesion para poder continuar..."
     
     return render_to_response('login.html',{'mensaje':mensaje, 'estado':estado, 'next': next},context_instance=RequestContext(request))    
+        
+@login_required(login_url='/login')
+def deslogear(request):
+    logout(request)
+    return HttpResponseRedirect("/login")
 
 
 @login_required(login_url='/login')
 def index(request):
     """docstring for index"""
     return render_to_response('menuPrincipal.html',context_instance=RequestContext(request)) 
-        
-@login_required(login_url='/login')
-def deslogear(request):
-    logout(request)
-    return HttpResponseRedirect("/login")
 
 @login_required(login_url='/login')
 def altaDeposito(request):
@@ -66,3 +66,11 @@ def listarDeposito(request):
     """docstring for listarDeposito"""
     depositos = Deposito.objects.all()
     return render_to_response('gstDeposito/listarDeposito.html',{'depositos':depositos},context_instance=RequestContext(request)) 
+
+# =========
+# = Venta =
+# =========
+
+def venta(request):
+    """docstring for venta"""
+    return render_to_response('venta.html',context_instance=RequestContext(request)) 

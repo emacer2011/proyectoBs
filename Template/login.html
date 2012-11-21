@@ -1,28 +1,28 @@
 <HTML> 
-<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
-
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8">
 <HEAD> 
-
-
-<TITLE>BS Materiales</TITLE> 
-<link rel="StyleSheet" href="template/static/MenuesCompletos.css" type="text/css" >
-
+    <TITLE>BS Materiales</TITLE> 
+    <link rel="StyleSheet" href="static/css/estilosPrincipal.css" type="text/css" >
+    <link href="static/bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">
 </HEAD> 
-<BODY id="body"> 
+<BODY id="CuerpoLogin"> 
+    <div class="{{estado}}">
+        {{mensaje}}
+    </div>
 
-
-
-<br><br><br>
-{{estado}}<br>
-<form class="form-signin" action="/login/" method="post">{% csrf_token %}
-{% if next %}
-<input type="hidden" name="next" value="{{ next }}" />
-{% endif %}
-usuario:
-<input type="text" name="username" value="{{ username}}" /><br />
-contraseña:
-<input type="password" name="password" value="" /><br />
-<input type="submit" value="Log In" />
-</form>
+    <br><br><br>
+    <div class="container">
+    <form class="form-signin" action="/login/" method="post">{% csrf_token %}
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}" />
+        {% endif %}
+        <h2 class="form-signin-heading">Iniciar Sesion</h2>
+        <input type="text" class="input-block-level" name="username" placeholder="Nombre de Usuario" value="{{username}}" /><br />
+        <input type="password" class="input-block-level" name="password" placeholder="Contraseña" value="" /><br />
+        <div align="center">
+            <input type="submit" class="btn btn-large btn-primary" value="Log In"/>
+        </div> 
+    </form>
+    </div>
 </BODY> 
 </HTML> 

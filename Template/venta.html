@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block cabecera %}
+    Venta Productos
+{% endblock %}
+
+{% block contenedor %}
+    <div id="CabeceraNotaVenta">
+
+    </div>
+    
+    <div id="CabeceraNVTablas">
+        <form class="navbar-search pull-left">
+            <input type="text" class="search-query" style="height:27px" placeholder="Producto"><br><br>
+        </form>
+            <table class="table table-striped">
+                <thead>
+                <tr><th class="table-head">Producto</th>
+                    <th class="table-head">Descripci&oacuten</th>
+                    <th class="table-head">Cantidad</th>
+                    <th class="table-head">Precio</th>
+                </tr>    
+                </thead>
+            </table>
+
+</div>
+    
+    <div id="CabeceraNVTablas">
+        <form class="navbar-search pull-left">
+            <input type="text" class="search-query" style="height:27px" placeholder="Producto"><br><br>
+        </form>
+        <table class="table table-striped">
+            <thead>
+                <tr><th class="table-headVenta">Producto</th>
+                    <th class="table-headVenta">Descripci&oacuten</th>
+                    <th class="table-headVenta">Cantidad</th>
+                    <th class="table-headVenta">Precio</th>
+                </tr>    
+            </thead>
+        </table>
+    </div>
+    
+    <div id="SubContenedor" style="OVERFLOW: auto">
+        <table class="table table-striped" border="0" cellspacing="5" cellpadding="5">
+            <tbody>
+                <tr>
+                    <td>Data</td><td>Data</td><td>Data</td><td>Data</td>
+                </tr>
+            </tbody>
+            
+        </table>
+    </div>
+    
+    <div id="SubContenedor" style="OVERFLOW: auto">
+           <table class="table table-striped" border="0" cellspacing="5" cellpadding="5">
+            <tbody>
+                <tr>
+                    <td>Data</td><td>Data</td><td>Data</td><td>Data</td>
+                </tr>    
+            </tbody>
+            
+        </table>
+    </div>
+{% endblock %}

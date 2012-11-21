@@ -4,7 +4,7 @@
 
 {% block cabecera %}
     <script language="javascript" type="text/javascript" src="/static/js/deposito.js"></script>
-    Seccion: <br>Alta de Depósitos    
+    Alta de Depósitos    
 {% endblock %}
 
 {% block mensaje %}
@@ -14,38 +14,40 @@
 {% endblock %}
 
 {% block contenedor %}
-    <form class="form-horizontal" method="POST" action="" onSubmit="return validaDeposito(this)">  
+<div class="container">
 
-      <fieldset>
-        <legend>Complete los siguientes campos</legend>
-        <div class="control-group">  
-            <label class="control-label" for="input01"> Direccion </label>  
-
-            <div class="controls">  
-              <input type="text" class="input-xlarge" id="direccionDeposito" name="direccionDeposito">  
-            </div>  
-        </div >  
-          <div class="control-group">  
-            <label class="control-label" for="select01"> Rubro </label>
-            <div class="controls">
-              <select id="rubroDeposito" name="rubroDeposito">
-                {% for rubro in rubros %}
-						<option value="{{rubro.pk}}">{{rubro}}</option>
-					    <p>{{rubro.nombre}},{{rubro.pk}}</p>
-				{% endfor %}
-              </select>  
-            </div>  
-          </div>  
-          <div class="control-group">  
-            <label class="control-label" for="input01">Telefono</label>  
-            <div class="controls">  
-              <input type="text" class="input-xlarge" id="telefonoDeposito" name="telefonoDeposito">  
-            </div>  
-          </div>
-    <div align="center">
-            <button type="submit" class="btn btn-primary">Guardar</button>          
-    </div>
-
-        </fieldset>  
-</form>
+        <form class="form-horizontal" method="POST" action="" onSubmit="return validaDeposito(this)">  
+    
+          <fieldset>
+            <legend>Complete los siguientes campos</legend>
+            <div class="control-group">  
+                <label class="control-label" for="input01"> Direccion </label>  
+    
+                <div class="controls">  
+                  <input type="text" class="input-xlarge" id="direccionDeposito" name="direccionDeposito" placeholder="Direccion">  
+                </div>  
+            </div >  
+              <div class="control-group">  
+                <label class="control-label" for="select01"> Rubro </label>
+                <div class="controls">
+                  <select id="rubroDeposito" name="rubroDeposito">
+                    {% for rubro in rubros %}
+    						<option value="{{rubro.pk}}">{{rubro}}</option>
+    					    <p>{{rubro.nombre}},{{rubro.pk}}</p>
+    				{% endfor %}
+                  </select>  
+                </div>  
+              </div>  
+              <div class="control-group">  
+                <label class="control-label" for="input01">Telefono</label>  
+                <div class="controls">  
+                  <input type="text" class="input-xlarge" id="telefonoDeposito" name="telefonoDeposito" placeholder="Telefono">  
+                </div>  
+              </div>
+        <div align="center">
+                <button type="submit" class="btn btn-primary">Guardar</button>          
+        </div>
+            </fieldset>  
+    </form>
+</div>
 {% endblock %}

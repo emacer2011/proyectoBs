@@ -29,4 +29,40 @@
 			return validarTelefono(document.getElementById('telefonoDeposito'));
 		}
 
-  
+
+  	function buscar(texto){
+		var tabla, txt, filas, elemento,aComparar,rta;
+		txt = texto.toUpperCase();
+		tabla = document.getElementById("tablaDeposito");
+		filas = tabla.getElementsByTagName('tr');
+		for(i=1;i<=filas.length;i++){
+                    elemento = filas[i];
+                    aComparar = elemento.cells[0].textContent;
+                    aComparar = aComparar.toUpperCase();
+                    rta = aComparar.indexOf(txt);
+                    if(rta == -1){
+			elemento.style.display='none';
+                    }
+		}
+		
+	}
+        
+        function restaurar(){
+            var tabla,filas,elemento;
+                tabla = document.getElementById("tablaDeposito");
+		filas = tabla.getElementsByTagName('tr');
+		for(i=1;i<=filas.length;i++){
+                    elemento = filas[i];
+                    elemento.style.display='';
+		}
+            
+            
+        }
+
+	function validarTexto(texto){
+		var letra;
+		letra = texto.charAt(texto.length-1);
+		if((texto>='a' && texto <='z') || (texto>='A' && texto <='Z')){
+			buscar(texto);
+		}else{restaurar()}
+	}

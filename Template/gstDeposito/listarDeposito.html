@@ -2,18 +2,38 @@
 
 
 {% block cabecera %}
-    Seccion: <br>Listado de Depósitos
+    Listado de Depósitos
+    <script language="javascript" type="text/javascript" src="/static/js/deposito.js"></script>
         
 {% endblock %}
 
 
 {% block contenedor %}
 
-<table cellpadding="0" cellspacing="0">
-    {% for deposito in depositos %}
+    <div id="CabeceraLDTablas">
+        <form class="navbar-search pull-left" style="padding-left:20px">
+            <input type="text" class="search-query" style="height:27px" placeholder="Dirección o Telefono" onChange="validarTexto(this.value);"><br>
+        </form><br>
+        <table class="table table-striped" style="margin-top:20px">
+            <thead>
+                <tr><th class="table-head">Direcci&oacuten</th>
+                    <th class="table-head">Telefono</th>
+                </tr>    
+            </thead>
+        </table>
+    </div>
 
-    <tr> <td>{{deposito.direccion}} </td><td>{{deposito.telefono}}</td></tr>
-    {% endfor %}
+
+<div id="ContenedorTabla">
+<table id="tablaDeposito" cellpadding="0" cellspacing="0" class="table table-striped">
+    </thead>
+    <tbody>
+        {% for deposito in depositos %}
+
+            <tr> <td>{{deposito.direccion}} </td><td>{{deposito.telefono}}</td></tr>
+        {% endfor %}
+    </tbody>
 </table>
+</div>
 
 {% endblock %}
