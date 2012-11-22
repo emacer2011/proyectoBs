@@ -31,17 +31,21 @@
 
 
   	function buscar(texto){
-		var tabla, txt, filas, elemento,aComparar,rta;
+		var tabla, txt, filas, elemento,aComparar, aComparar2,rta, rtaTel;
 		txt = texto.toUpperCase();
 		tabla = document.getElementById("tablaDeposito");
 		filas = tabla.getElementsByTagName('tr');
 		for(i=0;i<=filas.length;i++){
-                    elemento = filas[i];
-                    aComparar = elemento.cells[0].textContent;
-                    aComparar = aComparar.toUpperCase();
-                    rta = aComparar.indexOf(txt);
-                    if(rta == -1){
+		    elemento = filas[i];
+		    aComparar = elemento.cells[0].textContent;
+		    aComparar = aComparar.toUpperCase();
+		    rta = aComparar.indexOf(txt);
+		    if(rta == -1){
+		      aComparar = elemento.cells[1].textContent;
+		      rtaTel= aComparar.indexOf(txt);
+		      if(rtaTel == -1){
 			elemento.style.display='none';
+		      }
                     }
 		}
 		
@@ -51,7 +55,7 @@
             var tabla,filas,elemento;
                 tabla = document.getElementById("tablaDeposito");
 		filas = tabla.getElementsByTagName('tr');
-		for(i=1;i<=filas.length;i++){
+		for(i=0;i<=filas.length;i++){
                     elemento = filas[i];
                     elemento.style.display='';
 		}
@@ -62,7 +66,7 @@
 	function validarTexto(texto){
 		var letra;
 		letra = texto.charAt(texto.length-1);
-		if((texto>='a' && texto <='z') || (texto>='A' && texto <='Z')){
+		if((letra>='a' && letra <='z') || (letra>='A' && letra <='Z') || (letra>='0' && letra <='9')){
 			buscar(texto);
 		}else{restaurar()}
 	}
