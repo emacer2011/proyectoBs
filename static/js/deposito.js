@@ -35,7 +35,7 @@
 		txt = texto.toUpperCase();
 		tabla = document.getElementById("tablaDeposito");
 		filas = tabla.getElementsByTagName('tr');
-		for(i=1;i<=filas.length;i++){
+		for(i=0;i<=filas.length;i++){
                     elemento = filas[i];
                     aComparar = elemento.cells[0].textContent;
                     aComparar = aComparar.toUpperCase();
