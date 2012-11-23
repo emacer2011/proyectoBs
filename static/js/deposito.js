@@ -37,16 +37,18 @@
 		filas = tabla.getElementsByTagName('tr');
 		for(i=0;i<=filas.length;i++){
 		    elemento = filas[i];
+		    elemento.style.display='none';
 		    aComparar = elemento.cells[0].textContent;
 		    aComparar = aComparar.toUpperCase();
 		    rta = aComparar.indexOf(txt);
-		    if(rta == -1){
-		      aComparar = elemento.cells[1].textContent;
-		      rtaTel= aComparar.indexOf(txt);
-		      if(rtaTel == -1){
-			elemento.style.display='none';
-		      }
-                    }
+		    if(rta != -1){
+                elemento.style.display='';
+            }
+		    aComparar2 = elemento.cells[1].textContent;
+		    rtaTel= aComparar2.indexOf(txt);
+		    if(rtaTel != -1){
+		          elemento.style.display='';
+		     }
 		}
 		
 	}
@@ -54,19 +56,13 @@
         function restaurar(){
             var tabla,filas,elemento;
                 tabla = document.getElementById("tablaDeposito");
-		filas = tabla.getElementsByTagName('tr');
-		for(i=0;i<=filas.length;i++){
+		        filas = tabla.getElementsByTagName('tr');
+		        for(i=0;i<=filas.length;i++){
                     elemento = filas[i];
                     elemento.style.display='';
-		}
-            
-            
+		        }
         }
 
 	function validarTexto(texto){
-		var letra;
-		letra = texto.charAt(texto.length-1);
-		if((letra>='a' && letra <='z') || (letra>='A' && letra <='Z') || (letra>='0' && letra <='9')){
-			buscar(texto);
-		}else{restaurar()}
+		buscar(texto);
 	}

@@ -1,12 +1,14 @@
 #*-*coding: utf-8 --*-*
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from bsMateriales.models import Rubro, Deposito
+from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
-
+# =======================
+# = GESTION DE USUARIOS =
+# =======================
 def login_user(request):
     estado = ""
     mensaje = ""
@@ -39,12 +41,17 @@ def deslogear(request):
     logout(request)
     return HttpResponseRedirect("/login")
 
-
+# =====================
+# = GESTION PRINCIPAL =
+# =====================
 @login_required(login_url='/login')
 def index(request):
     """docstring for index"""
     return render_to_response('menuPrincipal.html',context_instance=RequestContext(request)) 
 
+# ====================
+# = GESTION DEPOSITO =
+# ====================
 @login_required(login_url='/login')
 def altaDeposito(request):
     """docstring for altaDeposito"""
@@ -70,7 +77,8 @@ def listarDeposito(request):
 # =========
 # = Venta =
 # =========
-
+@login_required(login_url='/login')
 def venta(request):
     """docstring for venta"""
-    return render_to_response('venta.html',context_instance=RequestContext(request)) 
+    productos = Producto.objects.all()
+    return render_to_response('venta.html',{'productos':productos},context_instance=RequestContext(request)) 

@@ -2,16 +2,22 @@
 
 {% block cabecera %}
     Venta Productos
+    <script language="javascript" type="text/javascript" src="/static/js/venta.js"></script>
 {% endblock %}
 
 {% block contenedor %}
     <div id="CabeceraNotaVenta">
+        <form class="well" onSubmit="return validaVenta()">
+                <input id="nombrePersona" name="nombrePersona" type="text" class="span3" placeholder="Apellido Cliente">  
+                <input id="apellidoPersona" name="apellidoPersona"type="text" class="span3" placeholder="Nombre Cliente">  <br>
+            <button type="submit" class="btn">Generar Nota Venta</button>  
+</form> 
 
     </div>
     
     <div id="CabeceraNVTablas">
         <form class="navbar-search pull-left">
-            <input type="text" class="search-query" style="height:27px" placeholder="Producto"><br><br>
+            <input type="text" class="search-query" style="height:27px;margin-left:10px;" placeholder="Producto o Descripción" onKeyUp="buscar(this.value,'Disponibles')" ><br><br>
         </form>
             <table class="table table-striped">
                 <thead>
@@ -22,41 +28,44 @@
                 </tr>    
                 </thead>
             </table>
-
 </div>
     
     <div id="CabeceraNVTablas">
         <form class="navbar-search pull-left">
-            <input type="text" class="search-query" style="height:27px" placeholder="Producto"><br><br>
+            <input type="text" class="search-query" style="height:27px;margin-left:10px;" placeholder="Producto o Descripción" onKeyUp="buscar(this.value,'Comprometidos')"> <br><br>
         </form>
         <table class="table table-striped">
             <thead>
                 <tr><th class="table-headVenta">Producto</th>
                     <th class="table-headVenta">Descripci&oacuten</th>
                     <th class="table-headVenta">Cantidad</th>
-                    <th class="table-headVenta">Precio</th>
+                    <th class="table-headVenta">P/Unitario</th>
+                    <th class="table-headVenta">Total</th>
                 </tr>    
             </thead>
         </table>
     </div>
     
     <div id="SubContenedor" style="OVERFLOW: auto">
-        <table class="table table-striped" border="0" cellspacing="5" cellpadding="5">
+        <table id="Disponibles" class="table table-striped" border="0" cellspacing="5" cellpadding="5">
             <tbody>
-                <tr>
-                    <td>Data</td><td>Data</td><td>Data</td><td>Data</td>
-                </tr>
+                {% for producto in productos %}
+                    <tr onclick="agregarProducto(this);">
+                        <td>{{producto.nombre}}</td>
+                        <td>{{producto.descripcion}}</td>
+                        <td id="{{producto.pk}}">{{producto.cantidad}}</td>
+                        <td>{{producto.precio}}</td>
+                        <td class="Oculto">{{producto.pk}}</td>
+                    </tr>                    
+                {% endfor %}
             </tbody>
             
         </table>
     </div>
     
     <div id="SubContenedor" style="OVERFLOW: auto">
-           <table class="table table-striped" border="0" cellspacing="5" cellpadding="5">
+           <table id="Comprometidos" class="table table-striped" border="0" cellspacing="5" cellpadding="5">
             <tbody>
-                <tr>
-                    <td>Data</td><td>Data</td><td>Data</td><td>Data</td>
-                </tr>    
             </tbody>
             
         </table>
