@@ -7,9 +7,10 @@
 
 {% block contenedor %}
     <div id="CabeceraNotaVenta">
-        <form class="well" onSubmit="return validaVenta()">
-                <input id="nombrePersona" name="nombrePersona" type="text" class="span3" placeholder="Apellido Cliente">  
-                <input id="apellidoPersona" name="apellidoPersona"type="text" class="span3" placeholder="Nombre Cliente">  <br>
+        <form class="well" method="POST" onSubmit="return validaVenta()">
+                <input id="apellidoPersona" name="apellidoPersona" type="text" class="span3" placeholder="Apellido Cliente">  
+                <input id="nombrePersona" name="nombrePersona" type="text" class="span3" placeholder="Nombre Cliente">  <br>
+                <input id="productos" name="productos" type="hidden">
             <button type="submit" class="btn">Generar Nota Venta</button>  
 </form> 
 

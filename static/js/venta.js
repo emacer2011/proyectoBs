@@ -1,12 +1,26 @@
+function enviar() {
+    var producto;
+    var productos =document.getElementById("productos");
+    var tabla = document.getElementById("Comprometidos");
+    var elArray = new Array();
+    for (var i=0; i < tabla.rows.length; i++) {
+        producto = tabla.rows[i];
+        productos.value= productos.value+producto.cells[4].innerHTML+"="+producto.cells[2].innerHTML+","
+    };
+    
+    
+}
+
 function validarTabla(tabla){
     var numFilas = tabla.rows.length;
     if (numFilas == 0) {alert("Debe Elegir Productos Para Comprar");return false;};
+    enviar()
     return true;    
     
 }
 
 function validarNombreApellido(campo) {
-        var RegExPattern = /^\w{3,20}$/;
+        var RegExPattern = /^\w+\w+\w+(\s\w)*$/;
         var errorMessage = 'Nombre o Apellido invalido';
         if (campo.value.match(RegExPattern)){
             return true;
@@ -21,10 +35,10 @@ function validaVenta(){
 		if(!validarNombreApellido(document.getElementById('nombrePersona'))){
 			return false;
 		}
-		if(!validarTabla(document.getElementById('Comprometidos'))){
+		if(!validarNombreApellido(document.getElementById('apellidoPersona'))){
 			return false;
 		}
-		return validarNombreApellido(document.getElementById('apellidoPersona'));
+		return validarTabla(document.getElementById('Comprometidos'));
 	}
 
 
@@ -84,6 +98,9 @@ function devolverProducto(fila) {
         celda.innerHTML = (cantidadComprada * parseInt(fila.cells[3].innerHTML));
         nuevaFila.id=-parseInt(pk);
         nuevaFila.onclick = function(){devolverProducto(nuevaFila)};
+        
+        
+        
     }else{
         existente.cells[2].innerHTML = parseInt(existente.cells[2].innerHTML) + cantidadComprada;
         existente.cells[5].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseInt(existente.cells[3].innerHTML));

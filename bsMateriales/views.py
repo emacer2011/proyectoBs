@@ -74,6 +74,12 @@ def listarDeposito(request):
     depositos = Deposito.objects.all()
     return render_to_response('gstDeposito/listarDeposito.html',{'depositos':depositos},context_instance=RequestContext(request)) 
 
+@login_required(login_url='/login')
+def bajaDeposito(request):
+    """docstring for bajaDeposito"""
+    depositos = Deposito.objects.all()
+    return render_to_response('gstDeposito/bajaDeposito.html',{'depositos':depositos},context_instance=RequestContext(request)) 
+
 # =========
 # = Venta =
 # =========
@@ -81,4 +87,13 @@ def listarDeposito(request):
 def venta(request):
     """docstring for venta"""
     productos = Producto.objects.all()
+    if request.POST:
+        palabra = request.POST.get("productos")
+        palabraParse = str(palabra).split(",")
+        dic =  {}
+        for i in palabrasParse:
+            claveValor = i.split("=")
+            dic[claveValor[0]] = claveValor[1]
+        
+        
     return render_to_response('venta.html',{'productos':productos},context_instance=RequestContext(request)) 
