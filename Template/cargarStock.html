@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+
+{% block cabecera %}
+    Carga de Stock
+    <script language="javascript" type="text/javascript" src="/static/js/deposito.js"></script>
+        
+{% endblock %}
+
+
+{% block contenedor %}
+
+    <div id="CabeceraLDTablas">
+        <form class="navbar-search pull-left" style="padding-left:20px">
+            <input type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='validarTexto(this.value);' ><br>
+        </form><br>
+        <table class="table table-striped" style="margin-top:20px">
+            <thead>
+                <tr>
+                    <th style="display:none" >pk</th>
+                    <th class="table-head">Producto</th>
+                    <th class="table-head">Descripci&oacuten</th>
+                    <th class="table-head">T.Producto</th>
+                    <th class="table-head">Categoria</th>
+                    <th class="table-head">Cantidad</th>
+                    <th class="table-head">Precio</th>
+                </tr>    
+            </thead>
+        </table>
+    </div>
+
+
+<div id="ContenedorTabla">
+<table id="tablaDeposito" cellpadding="0" cellspacing="0" class="table table-striped">
+    </thead>
+    <tbody>
+        {% for producto in productos %}
+
+            <tr>
+                <td><%= link_to 'Destroy', product_path(product), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %></td>
+                <td>
+    <li class="gbgt gbg4p gbes dropdown">
+                    <a data-toggle="dropdown" class="dropdown-toggle"> <b class="caret"></b> Gst. Producto</a>
+                    <ul class="dropdown-menu">
+                        <form method="POST" action="#">
+                            <input name="disponible" type="text" placeholder="Disponibles">
+                                Dep&oacutesito
+                                <select id="rubroDeposito" name="rubroDeposito">
+                                    {% for deposito in depositos %}
+	      		              	       	<option value="{{deposito.pk}}">{{deposito.direccion}}</option>
+            		    		    {% endfor %}
+                                </select>
+                            <input class="btn btn-success" type="submit" value="Aceptar"></a>
+                        </form>
+    </ul>
+    </li>
+    
+                </td>
+                <td>{{producto.nombre}}</td>
+                <td>{{producto.descripcion}}</td>
+                <td>{{producto.tipoProducto}}</td>
+                <td>como se vende</td>
+                <td>{{producto.cantidad}}</td>
+                <td>{{producto.precio}}</td>
+                </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}

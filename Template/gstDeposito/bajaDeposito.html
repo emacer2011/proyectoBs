@@ -30,7 +30,12 @@
     <tbody>
         {% for deposito in depositos %}
 
-            <tr> <td>{{deposito.direccion}} </td><td>{{deposito.telefono}}</td></tr>
+            <tr> 
+                <td>{{deposito.direccion}} </td>
+                <td>{{deposito.telefono}}</td>  
+                    <td> <input class="btn btn-danger" type="submit" value="Eliminar"></a> 
+                   </td> 
+            </tr>
         {% endfor %}
     </tbody>
 </table>

@@ -91,9 +91,18 @@ def venta(request):
         palabra = request.POST.get("productos")
         palabraParse = str(palabra).split(",")
         dic =  {}
-        for i in palabrasParse:
+        for i in palabraParse :
             claveValor = i.split("=")
             dic[claveValor[0]] = claveValor[1]
-        
-        
+            print "producto:"+claveValor[0]+"y cantidad: "+claveValor[1]
+                
     return render_to_response('venta.html',{'productos':productos},context_instance=RequestContext(request)) 
+    
+# ================
+# = Cargar Stock =
+# ================
+def cargarStock(request):
+    """docstring for cargarStock"""
+    productos = Producto.objects.all()
+    depositos = Deposito.objects.all()
+    return render_to_response('cargarStock.html',{'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 

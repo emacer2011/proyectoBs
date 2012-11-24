@@ -1,14 +1,14 @@
 function enviar() {
     var producto;
     var productos =document.getElementById("productos");
+    productos.value ="";
     var tabla = document.getElementById("Comprometidos");
     var elArray = new Array();
     for (var i=0; i < tabla.rows.length; i++) {
         producto = tabla.rows[i];
         productos.value= productos.value+producto.cells[4].innerHTML+"="+producto.cells[2].innerHTML+","
-    };
-    
-    
+    }
+    productos.value = productos.value.substring(0, productos.value.length-1);    
 }
 
 function validarTabla(tabla){
