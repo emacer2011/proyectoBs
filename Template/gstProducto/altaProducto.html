@@ -1,14 +1,61 @@
 {% extends "base.html" %}
-{% block cabecera %}
 
-<div>
-    Alta de Productos
-</div>
-    
+
+
+{% block cabecera %}
+    <script language="javascript" type="text/javascript" src="/static/js/deposito.js"></script>
+    Alta de Productos    
+{% endblock %}
+
+{% block mensaje %}
+    <div class="{{estado}}">
+        {{mensaje}}
+    </div>
 {% endblock %}
 
 {% block contenedor %}
+<div class="container">
 
-aca iria el formulario de productos de bootstrap
+        <form class="form-horizontal" method="POST" action="" onSubmit="">  
     
+          <fieldset>
+            <legend>Complete los siguientes campos</legend>
+            <div class="control-group">  
+                <label class="control-label" for="input01"> Nombre </label>
+                <div class="controls">  
+                  <input type="text" class="input-xlarge" id="nombreProducto" name="nombreProducto" placeholder="Direccion">  
+                </div>  
+            </div >
+    
+            <div class="control-group">  
+                <label class="control-label" for="input01"> Descripción </label>
+                <div class="controls">  
+                  <input type="text" class="input-xlarge" id="descripcionProducto" name="descripcionProducto" placeholder="Descripción">  
+                </div>  
+            </div >
+
+    
+              <div class="control-group">  
+                <label class="control-label" for="select01"> tipoProducto </label>
+                <div class="controls">
+                  <select id="tipoProducto" name="tipoProducto">
+                    {% for tipo in tipoProductos %}
+    						<option value="{{tipo.pk}}">{{tipo}}</option>
+    					    <p>{{tipo.nombre}},{{tipo.pk}}</p>
+    				{% endfor %}
+                  </select>  
+                </div>  
+              </div>  
+              <div class="control-group">  
+                <label class="control-label" for="input01">Precio</label>  
+                <div class="controls">  
+                  <input type="text" class="input-xlarge" id="precioProducto" name="precioProducto" placeholder="Precio">  
+                </div>  
+              </div>
+        <div align="center">
+                <button type="submit" class="btn btn-primary">Guardar</button>          
+        </div>
+            </fieldset>  
+    </form>
+</div>
 {% endblock %}
