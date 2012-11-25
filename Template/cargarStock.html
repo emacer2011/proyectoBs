@@ -10,6 +10,61 @@
 
 {% block contenedor %}
 
+<script type="text/Javascript">
+
+    function popPropio(){
+        var elemento=document.getElementById("modalPropio");
+        elemento.className="modal hide fade in";
+        elemento.style.display="block";
+        elemento.setAttribute("aria-hidden",false);
+        elemento = document.createElement('div');
+        elemento.setAttribute('id','nuevoPop');
+        elemento.className="modal-backdrop fade in";
+        document.getElementById("paraFondo").appendChild(elemento);
+    }
+    
+    function volver(){
+        var elemento=document.getElementById("modalPropio");
+        elemento.className="modal hide fade";
+        elemento.style.display="none";
+        elemento.setAttribute("aria-hidden",true);
+        elemento = document.getElementById("paraFondo");
+        var remover = document.getElementById("nuevoPop");
+        elemento.removeChild(remover);
+        
+        }
+
+</script>
+
+<div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Modal header</h3>
+    </div>
+    <div class="modal-body">
+                        <form method="POST" action="#">
+                            <input id="pkProducto" name="pkProducto" value = "{{producto.pk}}">
+                            <input id="disponible" name="disponible" type="text" placeholder="Disponibles">
+                                Dep&oacutesito
+                                <select id="deposito" name="deposito">
+                                    {% for deposito in depositos %}
+	      		              	       	<option value="{{deposito.pk}}">{{deposito.direccion}}</option>
+            		    		    {% endfor %}
+                                </select>
+                            <input class="btn btn-success" type="submit" value="Aceptar"></a>
+                        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true" onClick="volver()">Cancelar</button>
+        <button class="btn btn-primary">Save changes</button>
+    </div>
+</div>
+
+
+
+
+
+
     <div id="CabeceraLDTablas">
         <form class="navbar-search pull-left" style="padding-left:20px">
             <input type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='validarTexto(this.value);' ><br>
@@ -64,10 +119,15 @@
                 <td>como se vende</td>
                 <td>{{producto.cantidad}}</td>
                 <td>{{producto.precio}}</td>
+                <td>
+
+                    <button onClick="popPropio()" class="btn btn-success" data-toggle="modal">
+                    
+                </td>
                 </tr>
         {% endfor %}
     </tbody>
+    <div id="paraFondo"></div>
 </table>
-</div>
 
 {% endblock %}

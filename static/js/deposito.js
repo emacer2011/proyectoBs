@@ -66,3 +66,8 @@
 	function validarTexto(texto){
 		buscar(texto);
 	}
+	
+	function popupPropio(){    
+	    $('#modalPropio').modal('show')
+	    
+	   }
