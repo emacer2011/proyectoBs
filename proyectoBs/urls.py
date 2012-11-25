@@ -22,6 +22,7 @@ urlpatterns = patterns('',
     url(r'^deslogear/$', 'bsMateriales.views.deslogear'),
     url(r'^listarDeposito/$', 'bsMateriales.views.listarDeposito'),
     url(r'^cargarStock/$', 'bsMateriales.views.cargarStock'),
+    url(r'^altaProducto/$', 'bsMateriales.views.altaProducto'),
     url(r'^admin/', include(admin.site.urls)),
 )
 if settings.DEBUG and settings.STATIC_ROOT:

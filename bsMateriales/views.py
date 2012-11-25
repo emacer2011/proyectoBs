@@ -1,7 +1,7 @@
 #*-*coding: utf-8 --*-*
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, NotaVenta, DetalleNotaVenta
+from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, NotaVenta, DetalleNotaVenta, NoFraccionable
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
@@ -131,3 +131,22 @@ def cargarStock(request):
         producto.cantidad = producto.cantidad + disponibles
         producto.save()
     return render_to_response('cargarStock.html',{'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 
+
+
+def altaProducto(request):
+    """docstring for altaProducto"""
+    tipoProductos =TipoProducto.objects.all()
+    mensaje = ""
+    estado = ""
+    if request.POST:
+        producto= Producto()
+        producto.nombre = request.POST.get("nombreProducto")
+        producto.descripcion = request.POST.get("descripcionProducto")
+        producto.tipoProducto = TipoProducto.objects.get(pk = request.POST.get("tipoProducto"))
+        producto.precio = request.POST.get("precioProducto")
+        producto.cantidad = 0
+        producto.estrategiaVenta = NoFraccionable.objects.get(pk = 0)
+        producto.save()
+        mensaje='Producto dado de alta con nombre: ' + producto.nombre
+        estado='alert alert-success'
+    return render_to_response('gstProducto/altaProducto.html',{'estado':estado, 'mensaje':mensaje, 'tipoProductos':tipoProductos},context_instance=RequestContext(request)) 
