@@ -39,6 +39,21 @@ class TipoProducto(models.Model):
     rubro = models.ForeignKey(Rubro)    
     def __unicode__(self):
         return "%s" % self.nombre
+
+
+# ====================
+# = Estrategia Venta =
+# ====================
+
+ESTRATEGIA_NOFRACCIONABLE = 0
+
+class EstrategiaVenta(models.Model):
+
+    class Meta:
+        abstract = True
+
+    def vender(self, producto, cantidad, fraccion):
+        raise NotImplemented    
         
 # ==================
 # = Clase Producto =
@@ -64,25 +79,14 @@ class Producto(models.Model):
 
     def obtenerEstrategiaDeVenta(self):
         if self.estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
-            return NoFraccionable.intance()
+            a = NoFraccionable()
+            return a.instance()
         return self.estrategiaVenta
 
     def vender(self, cantidad = None, fraccion = None):
         return self.obtenerEstrategiaDeVenta().vender(self, cantidad = cantidad, fraccion = fraccion)
         
-# ====================
-# = Estrategia Venta =
-# ====================
 
-ESTRATEGIA_NOFRACCIONABLE = 0
-
-class EstrategiaVenta(models.Model):
-
-    class Meta:
-        abstract = True
-
-    def vender(self, producto, cantidad, fraccion):
-        raise NotImplemented    
 # =================
 # = Fraccionables =
 # =================
@@ -127,6 +131,11 @@ class Fraccionable(EstrategiaVenta):
         pVenta.save()
         return pVenta
 
+    def __unicode__(self):
+        if self.pk == 0:
+            return "NoFraccionable"
+        else:
+            return "Fraccionable de " + str(self.medida) + " a " + str(self.minimo)
 # ===================
 # = No Fraccionable =
 # ===================
@@ -140,21 +149,39 @@ class NoFraccionable(Fraccionable):
         return NoFraccionable.objects.get(pk = ESTRATEGIA_NOFRACCIONABLE)    
 
     def vender(self, producto, cantidad = None, fraccion = None):
-        print "entre a la venta"
+        cantidad = int(cantidad)
+        stockAfectados = {}
+        ventaCompleta = False
+        stockMinimo = None
         stockLista = producto.stock_set.all()
-        for elementoLista in stockLista:
-            if elementoLista.disponibles >= cantidad:
-                elementoLista.disponibles = elementoLista.disponibles - cantidad
-                elementoLista.reservadosNoConfirmados = elementoLista.reservadosNoConfirmados + cantidad
-                elementoLista.save()
-                break
-            else:
-                elementoLista.reservadosNoConfirmados = elementoLista.reservadosNoConfirmados + elementoLista.disponibles
-                cantidad = cantidad - elementoLista.disponibles                
-                elementoLista.disponibles = 0
-                elementoLista.save()
-                continue
-        return producto
+        while not ventaCompleta:
+            if stockLista[0].disponibles > 0:
+                stockMinimo = stockLista[0]        
+            for elementoLista in stockLista:
+                if stockMinimo != None:
+                    if (elementoLista.disponibles != 0) and (elementoLista.disponibles < stockMinimo.disponibles):
+                        stockMinimo = elementoLista
+                    else:
+                        continue
+                elif elementoLista.disponibles > 0:
+                        stockMinimo = elementoLista
+            if stockMinimo != None:            
+                if stockMinimo.disponibles >= cantidad:
+                    stockMinimo.disponibles = stockMinimo.disponibles - cantidad
+                    stockMinimo.reservadosNoConfirmados = stockMinimo.reservadosNoConfirmados + cantidad
+                    producto.cantidad = producto.cantidad - cantidad
+                    ventaCompleta = True
+                    stockMinimo.save()
+                    stockAfectados[stockMinimo] = cantidad
+                else:
+                    stockMinimo.reservadosNoConfirmados = stockMinimo.reservadosNoConfirmados + stockMinimo.disponibles
+                    cantidad = cantidad - stockMinimo.disponibles
+                    stockAfectados[stockMinimo] = stockMinimo.disponibles
+                    producto.cantidad = producto.cantidad - stockMinimo.disponibles
+                    stockMinimo.disponibles = 0
+                    stockMinimo.save()
+        producto.save()                    
+        return stockAfectados
 
     def __unicode__(self):
         return "NoFraccionable"
@@ -164,8 +191,8 @@ class NoFraccionable(Fraccionable):
 # =========
 
 class Stock(models.Model):
-    reservadosComfirmados = models.IntegerField()
-    reservadosNoComfirmados = models.IntegerField()
+    reservadosConfirmados = models.IntegerField()
+    reservadosNoConfirmados = models.IntegerField()
     disponibles = models.IntegerField()
     deposito = models.ForeignKey(Deposito, blank = True)
     producto = models.ForeignKey(Producto)
@@ -173,8 +200,8 @@ class Stock(models.Model):
     def crearStock(self, disponibles, deposito, producto):
         """docstring for crearStock"""
         stock =  Stock()
-        stock.reservadosComfirmados= 0
-        stock.reservadosNoComfirmados= 0
+        stock.reservadosConfirmados= 0
+        stock.reservadosNoConfirmados= 0
         stock.producto= producto
         stock.disponibles= disponibles
         stock.deposito= deposito
@@ -198,9 +225,14 @@ class Stock(models.Model):
 # ===========
 
 class Detalle(models.Model):
+
+    class Meta:
+        abstract = True
+
     cantidad = models.IntegerField()
     subtotal = models.IntegerField()
     producto = models.ForeignKey(Producto)
+    deposito = models.ForeignKey(Deposito)
 
 # ======================
 # = Detalle Nota Venta =
@@ -208,7 +240,7 @@ class Detalle(models.Model):
 
 class DetalleNotaVenta(Detalle):
     nota = models.ForeignKey('NotaVenta')
-    pass
+
 # ===================
 # = Detalle Factura =
 # ===================
@@ -216,14 +248,12 @@ class DetalleNotaVenta(Detalle):
 class DetalleFactura(Detalle):
     factura = models.ForeignKey('Factura')
     venta = models.ForeignKey(DetalleNotaVenta)
-    pass
 
 # ==============
 # = Nota venta =
 # ==============
 
 class NotaVenta(models.Model):
-    nroNota = models.IntegerField()
     nombre_cliente = models.CharField(max_length = 40)
     apellido_cliente = models.CharField(max_length = 20)
     fecha = models.datetime 
