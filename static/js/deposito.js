@@ -1,4 +1,4 @@
-  function validarTelefono(campo) {
+   function validarTelefono(campo) {
         var RegExPattern = /^[0-9]{7,13}$/;
         var errorMessage = 'Telefono Invalido 7 a 13 digitos';
         if (campo.value.match(RegExPattern)){

@@ -1,8 +1,10 @@
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 # Create your models here.
 # ===============
 # = Clase Rubro =
 # ===============
+
 class Rubro(models.Model):
     nombre = models.CharField(max_length = 40)
     descripcion = models.CharField(max_length = 40, blank=True)
@@ -168,13 +170,25 @@ class Stock(models.Model):
     deposito = models.ForeignKey(Deposito, blank = True)
     producto = models.ForeignKey(Producto)
     
-    #def __init__(self, reservadosComfirmados, reservadosNoComfirmados, disponibles, deposito, producto):
-     #  self.reservadosComfirmados= reservadosComfirmados
-    #    self.disponibles = disponibles
-   #     self.reservadosNoComfirmados = reservadosNoComfirmados
-  #      self.deposito = deposito
- #       self.producto = producto
-#        print "POR ACA PROBANDO ALGO"
+    def crearStock(self, disponibles, deposito, producto):
+        """docstring for crearStock"""
+        stock =  Stock()
+        stock.reservadosComfirmados= 0
+        stock.reservadosNoComfirmados= 0
+        stock.producto= producto
+        stock.disponibles= disponibles
+        stock.deposito= deposito
+        stock.save()
+    
+    def nuevoStock(self, disponibles, deposito, producto):
+        """docstring for crearStock"""
+        try:
+            stock = Stock.objects.get(producto = producto, deposito = deposito)
+            stock.disponibles = stock.disponibles+disponibles
+            stock.save()
+        except ObjectDoesNotExist:
+            self.crearStock(disponibles, deposito, producto)
+        
     
     def __unicode__(self):
         return "%d en deposido de %s" % (self.disponibles, self.deposito)

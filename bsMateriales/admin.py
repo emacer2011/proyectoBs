@@ -5,7 +5,7 @@ admin.site.register(TipoProducto)
 admin.site.register(Rubro)
 admin.site.register(Deposito)
 admin.site.register(Fraccionable)
-
+admin.site.register(Stock)
 class StockInline(admin.TabularInline):
     model = Stock
 

@@ -1,7 +1,7 @@
 #*-*coding: utf-8 --*-*
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto
+from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
@@ -105,4 +105,12 @@ def cargarStock(request):
     """docstring for cargarStock"""
     productos = Producto.objects.all()
     depositos = Deposito.objects.all()
+    if request.POST:
+        producto =Producto.objects.get(pk = request.POST.get("pkProducto"))
+        disponibles = int(request.POST.get("disponible"))
+        deposito=Deposito.objects.get(pk =request.POST.get("deposito"))
+        stock = Stock()
+        stock.nuevoStock(disponibles,deposito, producto)
+        producto.cantidad = producto.cantidad + disponibles
+        producto.save()
     return render_to_response('cargarStock.html',{'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 
