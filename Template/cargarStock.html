@@ -3,68 +3,49 @@
 
 {% block cabecera %}
     Carga de Stock
-    <script language="javascript" type="text/javascript" src="/static/js/deposito.js"></script>
+    <script language="javascript" type="text/javascript" src="/static/js/cargarStock.js"></script>
         
+{% endblock %}
+
+
+{% block mensaje %}
+    <div class="{{estado}}">
+        {{mensaje}}
+    </div>
 {% endblock %}
 
 
 {% block contenedor %}
 
-<script type="text/Javascript">
-
-    function popPropio(){
-        var elemento=document.getElementById("modalPropio");
-        elemento.className="modal hide fade in";
-        elemento.style.display="block";
-        elemento.setAttribute("aria-hidden",false);
-        elemento = document.createElement('div');
-        elemento.setAttribute('id','nuevoPop');
-        elemento.className="modal-backdrop fade in";
-        document.getElementById("paraFondo").appendChild(elemento);
-    }
-    
-    function volver(){
-        var elemento=document.getElementById("modalPropio");
-        elemento.className="modal hide fade";
-        elemento.style.display="none";
-        elemento.setAttribute("aria-hidden",true);
-        elemento = document.getElementById("paraFondo");
-        var remover = document.getElementById("nuevoPop");
-        elemento.removeChild(remover);
-        
-        }
-
-</script>
-
 <div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-header">
         <button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">Modal header</h3>
+        <h3 id="myModalLabel">Cargar Stock</h3>
     </div>
+    
     <div class="modal-body">
-                        <form method="POST" action="#">
-                            <input id="pkProducto" name="pkProducto" value = "{{producto.pk}}">
-                            <input id="disponible" name="disponible" type="text" placeholder="Disponibles">
-                                Dep&oacutesito
-                                <select id="deposito" name="deposito">
-                                    {% for deposito in depositos %}
-	      		              	       	<option value="{{deposito.pk}}">{{deposito.direccion}}</option>
-            		    		    {% endfor %}
-                                </select>
-                            <input class="btn btn-success" type="submit" value="Aceptar"></a>
-                        </form>
+    <form method="POST" action="" onSubmit="return validarDisponibles(disponible.value)">
+                            <input id="pkProducto" name="pkProducto" value = "{{producto.pk}}" type="hidden">
+                                <div align="center">
+                                    Disponible
+                                    <input id="disponible" name="disponible" style="height:27px;margin-left:10px;" type="text" placeholder="Disponibles"><br>
+                                    Dep&oacutesito
+                                    <select id="deposito" name="deposito">
+                                        {% for deposito in depositos %}
+	      		              	           	<option value="{{deposito.pk}}">{{deposito.direccion}}</option>
+            		    		        {% endfor %}
+                                    </select>
+                                </div>
+                        
     </div>
     <div class="modal-footer">
+        <input class="btn btn-primary" type="submit" value="Guardar" >
+    </form>        
         <button class="btn" data-dismiss="modal" aria-hidden="true" onClick="volver()">Cancelar</button>
-        <button class="btn btn-primary">Save changes</button>
     </div>
+
+    
 </div>
-
-
-
-
-
-
     <div id="CabeceraLDTablas">
         <form class="navbar-search pull-left" style="padding-left:20px">
             <input type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='validarTexto(this.value);' ><br>
@@ -91,39 +72,14 @@
     <tbody>
         {% for producto in productos %}
 
-            <tr>
-                
-           
-                <td>
-    <li class="gbgt gbg4p gbes dropdown">
-                    <a data-toggle="dropdown" class="dropdown-toggle"> <b class="caret"></b> Gst. Producto</a>
-                    <ul class="dropdown-menu">
-                        <form method="POST" action="#">
-                            <input id="pkProducto" name="pkProducto" value = "{{producto.pk}}">
-                            <input id="disponible" name="disponible" type="text" placeholder="Disponibles">
-                                Dep&oacutesito
-                                <select id="deposito" name="deposito">
-                                    {% for deposito in depositos %}
-	      		              	       	<option value="{{deposito.pk}}">{{deposito.direccion}}</option>
-            		    		    {% endfor %}
-                                </select>
-                            <input class="btn btn-success" type="submit" value="Aceptar"></a>
-                        </form>
-    </ul>
-    </li>
-    
-                </td>
+            <tr>        
                 <td>{{producto.nombre}}</td>
                 <td>{{producto.descripcion}}</td>
                 <td>{{producto.tipoProducto}}</td>
                 <td>como se vende</td>
                 <td>{{producto.cantidad}}</td>
                 <td>{{producto.precio}}</td>
-                <td>
-
-                    <button onClick="popPropio()" class="btn btn-success" data-toggle="modal">
-                    
-                </td>
+                <td><button onClick="popPropio('{{producto.pk}}')" class="btn btn-success" data-toggle="modal"><b>+</b></button></td>
                 </tr>
         {% endfor %}
     </tbody>

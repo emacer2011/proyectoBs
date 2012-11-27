@@ -122,6 +122,8 @@ def cargarStock(request):
     """docstring for cargarStock"""
     productos = Producto.objects.all()
     depositos = Deposito.objects.all()
+    mensaje = ""
+    estado= ""
     if request.POST:
         producto =Producto.objects.get(pk = request.POST.get("pkProducto"))
         disponibles = int(request.POST.get("disponible"))
@@ -130,7 +132,9 @@ def cargarStock(request):
         stock.nuevoStock(disponibles,deposito, producto)
         producto.cantidad = producto.cantidad + disponibles
         producto.save()
-    return render_to_response('cargarStock.html',{'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 
+        mensaje='Se agrega '+str(disponibles) +' del producto '+producto.nombre+' en el deposito de '+deposito.direccion
+        estado='alert alert-success'
+    return render_to_response('cargarStock.html',{'mensaje':mensaje, 'estado':estado, 'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 
 
 
 def altaProducto(request):
