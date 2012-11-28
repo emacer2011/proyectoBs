@@ -1,7 +1,7 @@
 #*-*coding: utf-8 --*-*
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, NotaVenta, DetalleNotaVenta, NoFraccionable
+from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, NotaVenta, DetalleNotaVenta, NoFraccionable, Remito, DetalleFactura, Factura, DetalleRemito
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
@@ -90,10 +90,12 @@ def venta(request):
     productos = Producto.objects.all()
     if request.POST:
         notaVenta= NotaVenta()
-        notaVenta.nombre_cliente = request.POST.get("nombrePersona")
-        notaVenta.apellido_cliente = request.POST.get("apellidoPersona")
+        notaVenta.nombreCliente = request.POST.get("nombrePersona")
+        notaVenta.apellidoCliente = request.POST.get("apellidoPersona")
         notaVenta.fecha = date.today()
-        notaVenta.save()
+        notaVenta.precioTotal = 0
+        notaVenta.facturada = False
+        notaVenta.save() 
         palabra = request.POST.get("productos")
         palabraParse = str(palabra).split(",")
         dic =  {}
@@ -111,8 +113,9 @@ def venta(request):
                 detalle.subtotal = producto.precio * detalle.cantidad
                 detalle.deposito = stock.deposito
                 detalle.nota = notaVenta
+                notaVenta.precioTotal = notaVenta.precioTotal + detalle.subtotal
                 detalle.save()
-        
+        notaVenta.save()
     return render_to_response('venta.html',{'productos':productos},context_instance=RequestContext(request)) 
     
 # ================
@@ -136,7 +139,9 @@ def cargarStock(request):
         estado='alert alert-success'
     return render_to_response('cargarStock.html',{'mensaje':mensaje, 'estado':estado, 'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 
 
-
+# =======================
+# = Gestion de Producto =
+# =======================
 def altaProducto(request):
     """docstring for altaProducto"""
     tipoProductos =TipoProducto.objects.all()
@@ -154,3 +159,90 @@ def altaProducto(request):
         mensaje='Producto dado de alta con nombre: ' + producto.nombre
         estado='alert alert-success'
     return render_to_response('gstProducto/altaProducto.html',{'estado':estado, 'mensaje':mensaje, 'tipoProductos':tipoProductos},context_instance=RequestContext(request)) 
+    
+# ======================
+# = Entrega Materiales =
+# ======================
+def entregaMateriales(request):
+    """docstring for entregaMateriales"""
+    remitos = Remito.objects.filter(entregadoCompleto = False)
+    mensaje = ''
+    estado = ''
+    return render_to_response('entregaMateriales.html',{'remitos':remitos},context_instance=RequestContext(request)) 
+    
+# =====================
+# = Cobro de Facturas =
+# =====================
+def cobro(request):
+    """docstring for cobro"""
+    notas = NotaVenta.objects.filter(facturada = False)
+    if request.POST:
+        notaVenta=  NotaVenta.objects.get(pk = request.POST.get("nroNota"))
+        notaVenta.facturada = True
+        formaPago = request.POST.get("formaPago")
+        precio = request.POST.get("precioNota")
+        factura = Factura()
+        factura.fecha=date.today()
+        factura.precioTotal = precio
+        factura.ventaNota = notaVenta
+        factura.save()
+        detalles  = DetalleNotaVenta.objects.filter(nota = notaVenta)
+        for detalle in detalles:
+            detalleFactura = DetalleFactura()
+            detalleFactura.detalleNotaVenta = detalle
+            detalleFactura.factura = factura
+            detalleFactura.producto = detalle.producto
+            detalleFactura.cantidad = detalle.cantidad
+            detalleFactura.subtotal = detalle.subtotal
+            detalleFactura.deposito = detalle.deposito
+            detalleFactura.save()
+            try:
+                remito = Remito.objects.get(factura = factura, deposito = detalleFactura.deposito )
+            except ObjectDoesNotExist: 
+                remito = Remito()
+                remito.factura = factura
+                remito.deposito = detalleFactura.deposito
+                remito.entregadoCompleto = False
+                remito.save()
+            detalleRemito = DetalleRemito()
+            detalleRemito.cantidad = detalleFactura.cantidad
+            detalleRemito.entregado = False
+            detalleRemito.detalleFactura = detalleFactura
+            detalleRemito.remito = remito
+            detalleRemito.producto = detalleFactura.producto
+            detalleRemito.save()
+        notaVenta.save()
+            
+        
+    return render_to_response('cobro.html',{'notas':notas},context_instance=RequestContext(request))
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

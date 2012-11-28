@@ -23,10 +23,12 @@ urlpatterns = patterns('',
     url(r'^listarDeposito/$', 'bsMateriales.views.listarDeposito'),
     url(r'^cargarStock/$', 'bsMateriales.views.cargarStock'),
     url(r'^altaProducto/$', 'bsMateriales.views.altaProducto'),
+    url(r'^entregaMateriales/$', 'bsMateriales.views.entregaMateriales'),
+    url(r'^cobro/$', 'bsMateriales.views.cobro'),
     url(r'^admin/', include(admin.site.urls)),
 )
-if settings.DEBUG and settings.STATIC_ROOT:
-    urlpatterns += patterns('',
-        (r'%s(?P<path>.*)$' % settings.STATIC_URL.lstrip('/'), 
-            'django.views.static.serve',
-            {'document_root' : settings.STATIC_ROOT }),)
+
+if settings.DEBUG:
+    urlpatterns += patterns('django.contrib.staticfiles.views',
+        url(r'^static/(?P<path>.*)$', 'serve'),
+    )

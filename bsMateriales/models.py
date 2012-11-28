@@ -247,16 +247,18 @@ class DetalleNotaVenta(Detalle):
 
 class DetalleFactura(Detalle):
     factura = models.ForeignKey('Factura')
-    venta = models.ForeignKey(DetalleNotaVenta)
+    detalleNotaVenta = models.ForeignKey(DetalleNotaVenta)
 
 # ==============
 # = Nota venta =
 # ==============
 
 class NotaVenta(models.Model):
-    nombre_cliente = models.CharField(max_length = 40)
-    apellido_cliente = models.CharField(max_length = 20)
+    nombreCliente = models.CharField(max_length = 40)
+    apellidoCliente = models.CharField(max_length = 20)
     fecha = models.datetime 
+    precioTotal = models.IntegerField()
+    facturada = models.BooleanField()
     class Meta:
         permissions = (
             ("venta", "puede vender"),
@@ -269,25 +271,30 @@ class NotaVenta(models.Model):
 # ===========
 
 class Factura(models.Model):
-    nroFactura = models.IntegerField()
     fecha = models.datetime
     formaDePago = models.CharField(max_length = 15)
     precioTotal = models.IntegerField()
-    ventaNota = models.ForeignKey(NotaVenta)
-    factura = models.ForeignKey('Remito')    
+    ventaNota = models.ForeignKey(NotaVenta)   
 
 # ==========
 # = Remito =
 # ==========
 
 class Remito(models.Model):
-    nroRemito = models.IntegerField()
+    deposito =models.ForeignKey(Deposito)
+    factura =models.ForeignKey(Factura)
+    entregadoCompleto = models.BooleanField()
     class Meta:
         permissions = (
             ("entregaMateriales", "puede entregar materiales"),
             ("change_task_status", "Can change the status of tasks"),
             ("close_task", "Can remove a task by setting its status as closed"),
         )
+    
+    def __unicode__(self):
+        return "%s" % self.pk
+    
+    
 
 # ==================
 # = Detalle Remito =
@@ -298,6 +305,7 @@ class DetalleRemito(models.Model):
     entregado = models.BooleanField()
     detalleFactura = models.ForeignKey(DetalleFactura)
     remito = models.ForeignKey(Remito)
+    producto = models.ForeignKey(Producto)
     
 # =============
 # = Descuento =
