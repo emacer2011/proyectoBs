@@ -89,6 +89,7 @@ def venta(request):
     """docstring for venta"""
     productos = Producto.objects.all()
     if request.POST:
+        productos = Producto.objects.all()
         notaVenta= NotaVenta()
         notaVenta.nombre_cliente = request.POST.get("nombrePersona")
         notaVenta.apellido_cliente = request.POST.get("apellidoPersona")
@@ -112,9 +113,9 @@ def venta(request):
                 detalle.deposito = stock.deposito
                 detalle.nota = notaVenta
                 detalle.save()
-        
+        return HttpResponseRedirect("/venta")
     return render_to_response('venta.html',{'productos':productos},context_instance=RequestContext(request)) 
-    
+
 # ================
 # = Cargar Stock =
 # ================

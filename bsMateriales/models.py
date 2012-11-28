@@ -79,12 +79,11 @@ class Producto(models.Model):
 
     def obtenerEstrategiaDeVenta(self):
         if self.estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
-            a = NoFraccionable()
-            return a.instance()
+            return NoFraccionable.instance()
         return self.estrategiaVenta
 
-    def vender(self, cantidad = None, fraccion = None):
-        return self.obtenerEstrategiaDeVenta().vender(self, cantidad = cantidad, fraccion = fraccion)
+    def vender(self, cantidad = None, fraccion = 5):
+        return self.obtenerEstrategiaDeVenta().vender(self, cantidad, fraccion)
         
 
 # =================
@@ -95,41 +94,95 @@ class Fraccionable(EstrategiaVenta):
     medida = models.IntegerField()
     minimo = models.IntegerField()
 
-    def vender(self, producto, cantiad = None, fraccion = None):
+    def vender(self, producto, cantidad, fraccion):
         stockLista = producto.stock_set.all()
-        stockLista[0].disponibles = stockLista[0].disponibles - 1
-#        producto = self.fraccionar(producto, fraccion)
-#        producto.save()
+        stockMinimo = None
+        stockAfectados = {}
+        ventaCompleta = False
+        while not ventaCompleta:        
+            if stockLista[0].disponibles > 0:
+                stockMinimo = stockLista[0]        
+            for elementoLista in stockLista:
+                if stockMinimo != None:
+                    if (elementoLista.disponibles != 0) and (elementoLista.disponibles < stockMinimo.disponibles):
+                        stockMinimo = elementoLista
+                    else:
+                        continue
+                elif elementoLista.disponibles > 0:
+                    stockMinimo = elementoLista
+            if stockMinimo.disponibles >= cantidad:
+                producto = self.fraccionar(producto, fraccion, cantidad)
+                stockAfectados[stockMinimo] = cantidad
+            else:
+                producto = self.fraccionar(producto, fraccion, stockMinimo.disponibles, stockMinimo)
+                stockAfectados[stockMinimo] = cantidad - stockMinimo.disponibles
+                prod = self.vender(producto, cantidad = cantidad - stockMinimo.disponibles, fraccion = fraccion)
+            producto.save()
+        return stockAfectados
 
-#    def fraccionar(self, producto, cantiad, fraccion):
-        pSobra = Producto()
-        pSobra.nombre = producto.nombre
-        pSobra.descripcion = "producto nuevo generado para stock"
-        pSobra.tipoProductoConcreto = producto.tipoProductoConcreto
-
+    def fraccionar(self, producto, fraccion, cantidad, stockMinimo = None):
+        print fraccion
+        descrip = "tiene medida: " + str(self.medida - fraccion)
         resto = self.medida - fraccion
         if resto > self.minimo:
-          	pSobra.estrategiaVenta = Fraccionable(medida = resto, minimo = self.minimo)
+          	estrategiaVenta = Fraccionable(medida = resto, minimo = self.minimo)
         else:
-          	pSobra.estrategiaVenta = NoFraccionable()
-
-        stock = Stock()
-        stock.reservadosConfirmados = 0
-        stock.reservadosNoConfirmados = 0
-        stock.disponibles = 1
-        stock.deposito = stockLista[0].deposito
-        stock.producto = pSobra
-        pSobra.save()
-        stock.save()
+            estrategiaVenta = NoFraccionable.instance()
         
-        pVenta = Producto()
-        pVenta.nombre = "%s %s" % (producto.nombre, fraccion)
-        #pVenta.stockTotal = cantiad
-        pVenta.descripcion = producto.descripcion
-        pVenta.tipoProductoConcreto = producto.tipoProductoConcreto
-        pVenta.estrategiaVenta = NoFraccionable()
-        pVenta.save()
-        return pVenta
+        pSobra, created = Producto.objects.get_or_create(nombre = producto.nombre, descripcion = descrip, default = {
+                        'nombre': producto.nombre,
+                        'descripcion': descrip,
+                        'tipoProducto': producto.tipoProducto,
+                        'estrategiaVenta': estrategiaVenta
+                        })
+        if created:
+            stock = Stock()
+            stock.reservadosConfirmados = 0
+            stock.reservadosNoConfirmados = 0
+            stock.disponibles = cantidad
+            stock.deposito = stockMinimo.deposito
+            stock.producto = pSobra
+            stock.save()
+        else:
+            stock, created = Stock.objects.get_or_create(producto = prod, deposito = stockMinimo.deposito, default = {
+                             'reservadosConfirmados' : 0,
+                             'reservadosNoConfirmados' : 0,
+            				 'disponibles' : cantidad,
+            				 'deposito' : stockMinimo.deposito,
+            				 'producto' : pSobra
+                             })
+            if not created:            
+                stock.disponibles = stock.disponibles + cantidad
+                stock.save()
+    
+        descrip = "tiene medida: " + str(fraccion)
+        pVenta, created = Producto.objects.get_or_create(nombre = producto.nombre, descripcion = descrip, default = {
+                        'nombre' : producto.nombre,
+                        'descripcion' : "tiene medida: " + str(fraccion),
+                        'tipoProducto' : producto.tipoProducto,
+                        'estrategiaVenta' : NoFraccionable.instance()
+                        })
+        if created:
+            stock = Stock()
+            stock.reservadosConfirmados = 0
+            stock.reservadosNoConfirmados = cantidad
+            stock.disponibles = 0
+            stock.deposito = stockMinimo.deposito
+            stock.producto = pVenta
+            stock.save() 
+        else:           
+            stock, created = Stock.objects.get_or_create(producto = prod, deposito = stockMinimo.deposito, default = {
+                             'reservadosConfirmados' : 0,
+                             'reservadosNoConfirmados' : cantidad,
+                             'disponibles' : 0,
+                             'deposito' : stockMinimo.deposito,
+                             'producto' : pVenta,
+                             })
+            if not created:
+                stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + cantidad
+                stock.save()
+        
+        return stock
 
     def __unicode__(self):
         if self.pk == 0:
@@ -145,10 +198,11 @@ class NoFraccionable(Fraccionable):
     class Meta:
         proxy = True
 
-    def instance(self):
+    @classmethod
+    def instance(cls):
         return NoFraccionable.objects.get(pk = ESTRATEGIA_NOFRACCIONABLE)    
 
-    def vender(self, producto, cantidad = None, fraccion = None):
+    def vender(self, producto, cantidad, fraccion):
         cantidad = int(cantidad)
         stockAfectados = {}
         ventaCompleta = False
@@ -308,32 +362,14 @@ class Descuento(models.Model):
     fecha = models.datetime
     cantidad = models.IntegerField()
     producto = models.ForeignKey(Producto)
+    tipoDescuento = models.ForeignKey('TipoDescuento')
 
-# ============
-# = Donacion =
-# ============
-class Donacion(Descuento):
-    beneficiario = models.CharField(max_length = 40)
+# =================
+# = TipoDescuento =
+# =================
+
+class TipoDescuento(Descuento):
+    beneficiario = models.CharField(max_length = 40, blank = True)
     
     def __unicode__(self):
         return "%s" % self.beneficiario
-
-# ==========
-# = Averia =
-# ==========
-
-class Averia(Descuento):
-    pass
-
-# ============
-# = Extravio =
-# ============
-class Extravio(Descuento):
-    pass
-
-# ========
-# = Robo =
-# ========
-
-class Robo(Descuento):
-    pass

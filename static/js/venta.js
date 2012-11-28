@@ -14,7 +14,7 @@ function enviar() {
 function validarTabla(tabla){
     var numFilas = tabla.rows.length;
     if (numFilas == 0) {alert("Debe Elegir Productos Para Comprar");return false;};
-    enviar()
+    enviar();
     return true;    
     
 }
