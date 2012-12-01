@@ -276,6 +276,7 @@ class Factura(models.Model):
     precioTotal = models.IntegerField()
     ventaNota = models.ForeignKey(NotaVenta)   
 
+
 # ==========
 # = Remito =
 # ==========
@@ -291,10 +292,18 @@ class Remito(models.Model):
             ("close_task", "Can remove a task by setting its status as closed"),
         )
     
+    def actualizarEntregados(self):
+        entregado = True
+        detalles = DetalleRemito.objects.filter(remito = self.pk)
+        for detalle in detalles:
+            entregado = entregado & detalle.entregado
+        self.entregadoCompleto = entregado
+        self.save()
+    
     def __unicode__(self):
         return "%s" % self.pk
     
-    
+
 
 # ==================
 # = Detalle Remito =
@@ -306,7 +315,11 @@ class DetalleRemito(models.Model):
     detalleFactura = models.ForeignKey(DetalleFactura)
     remito = models.ForeignKey(Remito)
     producto = models.ForeignKey(Producto)
-    
+
+
+
+
+        
 # =============
 # = Descuento =
 # =============

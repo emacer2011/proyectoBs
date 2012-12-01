@@ -78,8 +78,15 @@ SECRET_KEY = '$!x=ujyxolw&amp;jw(zx0xn5#w+t3wr^e6361+)=y8b#dng%@@0(5'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+ #   'django.template.loaders.eggs.Loader',
 )
+
+#DAJAX_MEDIA_PREFIX="dajax"  # Will create http://yourdomain.com/dajax/
+
+#DAJAX_FUNCTIONS = (
+ #       'foo.ajax.assign_test',
+#)
+
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -114,6 +121,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bsMateriales',
+   #'bsMateriales.dajax',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

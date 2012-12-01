@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
 {% block cabecera %}
-    Carga de Stock
-    <script language="javascript" type="text/javascript" src="/static/js/cargarStock.js"></script>
+    Entraga De Materiales
+    
+    <script language="javascript" type="text/javascript" src="/static/js/jquery.js"></script>
+    <script language="javascript" type="text/javascript" src="/static/js/entregaMateriales.js"></script>
         
 {% endblock %}
 
@@ -16,35 +18,6 @@
 
 {% block contenedor %}
 
-<div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-header">
-        <button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">Materiales a Entregar</h3>
-    </div>
-    
-    <div class="modal-body">
-    <form method="POST" action="" onSubmit="return validarDisponibles(disponible.value)">
-                            <input id="pkProducto" name="pkProducto" value = "{{remito.pk}}" type="hidden">
-                                <div align="center">
-                                    Disponible
-                                    <input id="disponible" name="disponible" style="height:27px;margin-left:10px;" type="text" placeholder="Disponibles"><br>
-                                    Dep&oacutesito
-                                    <select id="deposito" name="deposito">
-                                        {% for deposito in depositos %}
-	      		              	           	<option value="{{deposito.pk}}">{{deposito.direccion}}</option>
-            		    		        {% endfor %}
-                                    </select>
-                                </div>
-                        
-    </div>
-    <div class="modal-footer">
-        <input class="btn btn-primary" type="submit" value="Guardar" >
-    </form>        
-        <button class="btn" data-dismiss="modal" aria-hidden="true" onClick="volver()">Cancelar</button>
-    </div>
-
-    
-</div>
     <div id="CabeceraLDTablas">
         <form class="navbar-search pull-left" style="padding-left:20px">
             <input type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='validarTexto(this.value);' ><br>
@@ -53,6 +26,7 @@
             <thead>
                 <tr>
                     <th>Nro Remito</th>
+                    <th>Nombre Comprador</th>
                 </tr>    
             </thead>
         </table>
@@ -69,10 +43,45 @@
                 <td>
                     {{remito.pk}}
                 </td>
+                <td style="padding-left:360px">
+                    {{remito.factura.ventaNota.apellidoCliente}}, {{remito.factura.ventaNota.nombreCliente}}
+                </td>
+                <td>
+                    <button onClick="popPropio('{{remito.pk}}')" class="btn btn-success" data-toggle="modal">
+                    <i class="icon-plus icon-white"></i>
+                </button></td>
             </tr>
         {% endfor %}
     </tbody>
     <div id="paraFondo"></div>
 </table>
+
+
+
+<div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <<button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Entrega Materiales</h3>
+    </div>
+    
+    <div class="modal-body">
+    <form method="POST" action="">
+        <input id="pkRemito" name="pkRemito" type="hidden">
+            <div align="center" style="OVERFLOW: auto">
+                <table id = "tablaDetalles">
+                    
+                </table>
+            </div>
+                        
+    </div>
+    <div class="modal-footer">
+        <input class="btn btn-primary" type="submit" value="Guardar" >
+    </form>        
+    </div>
+</div>
+
+    
+</div>
+
 
 {% endblock %}

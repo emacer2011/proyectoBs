@@ -25,6 +25,8 @@ urlpatterns = patterns('',
     url(r'^altaProducto/$', 'bsMateriales.views.altaProducto'),
     url(r'^entregaMateriales/$', 'bsMateriales.views.entregaMateriales'),
     url(r'^cobro/$', 'bsMateriales.views.cobro'),
+    url(r'^cargarDetalles/$', 'bsMateriales.views.cargarDetalles'),
+    url(r'^cargarEntregados/$', 'bsMateriales.views.cargarEntregados'),
     url(r'^admin/', include(admin.site.urls)),
 )
 
