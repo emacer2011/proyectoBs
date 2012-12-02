@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 
-
 {% block cabecera %}
     Carga de Stock
     <script language="javascript" type="text/javascript" src="/static/js/cargarStock.js"></script>
@@ -20,12 +19,12 @@
 <div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-header">
         <button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">Cargar Stock</h3>
+        <h3 id="myModalLabel">Materiales a Entregar</h3>
     </div>
     
     <div class="modal-body">
     <form method="POST" action="" onSubmit="return validarDisponibles(disponible.value)">
-                            <input id="pkProducto" name="pkProducto" value = "{{producto.pk}}" type="hidden">
+                            <input id="pkProducto" name="pkProducto" value = "{{remito.pk}}" type="hidden">
                                 <div align="center">
                                     Disponible
                                     <input id="disponible" name="disponible" style="height:27px;margin-left:10px;" type="text" placeholder="Disponibles"><br>
@@ -53,13 +52,7 @@
         <table class="table table-striped" style="margin-top:20px">
             <thead>
                 <tr>
-                    <th style="display:none" >pk</th>
-                    <th class="table-head">Producto</th>
-                    <th class="table-head">Descripci&oacuten</th>
-                    <th class="table-head">T.Producto</th>
-                    <th class="table-head">Categoria</th>
-                    <th class="table-head">Cantidad</th>
-                    <th class="table-head">Precio</th>
+                    <th>Nro Remito</th>
                 </tr>    
             </thead>
         </table>
@@ -70,19 +63,13 @@
 <table id="tablaDeposito" cellpadding="0" cellspacing="0" class="table table-striped">
     </thead>
     <tbody>
-        {% for producto in productos %}
+        {% for remito in remitos %}
 
             <tr>        
-                <td>{{producto.nombre}}</td>
-                <td>{{producto.descripcion}}</td>
-                <td>{{producto.tipoProducto}}</td>
-                <td>como se vende</td>
-                <td>{{producto.cantidad}}</td>
-                <td>{{producto.precio}}</td>
-                <td><button onClick="popPropio('{{producto.pk}}')" class="btn btn-success" data-toggle="modal">
-                    <i class="icon-plus icon-white"></i>
-                    </button></td>
-                </tr>
+                <td>
+                    {{remito.pk}}
+                </td>
+            </tr>
         {% endfor %}
     </tbody>
     <div id="paraFondo"></div>

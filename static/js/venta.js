@@ -20,7 +20,7 @@ function validarTabla(tabla){
 }
 
 function validarNombreApellido(campo) {
-        var RegExPattern = /^\w+\w+\w+(\s\w)*$/;
+        var RegExPattern = /^\w+\w+\w+(\s\w+)*$/;
         var errorMessage = 'Nombre o Apellido invalido';
         if (campo.value.match(RegExPattern)){
             return true;

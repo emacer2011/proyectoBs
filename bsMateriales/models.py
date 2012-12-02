@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
+from misExcepciones import *
+import re
 # Create your models here.
 # ===============
 # = Clase Rubro =
@@ -24,8 +26,25 @@ class Deposito(models.Model):
             ("change_task_status", "Can change the status of tasks"),
             ("close_task", "Can remove a task by setting its status as closed"),
         )
-        
-  
+    def setDireccion(self, direccion):
+        if re.match('\w+(\s\w+)*$', direccion):
+            self.direccion = direccion
+        else:
+            raise ErrorDeposito()
+
+    def setTelefono(self, telefono):
+        if re.match('\d{7,13}$', telefono):
+            self.telefono = telefono
+        else:
+            raise ErrorDeposito()
+
+    def setRubro(self, pkRubro):
+        try:
+            unRubro = Rubro.objects.get(pk = pkRubro)        
+            self.rubro = unRubro
+        except ObjectDoesNotExist:
+            raise ErrorDeposito()
+    
     def __unicode__(self):
         return "%s" % self.direccion
         
@@ -82,8 +101,18 @@ class Producto(models.Model):
             return NoFraccionable.instance()
         return self.estrategiaVenta
 
+    def verificarCantidadStock(self):
+        stockList = self.stock_set.all()
+        cantidad = 0
+        for stock in stockList:
+            cantidad += stock.disponibles
+        return cantidad            
+
     def vender(self, cantidad = None, fraccion = 5):
-        return self.obtenerEstrategiaDeVenta().vender(self, cantidad, fraccion)
+        if (cantidad <= 0) or (catidad > self.verificarCantidadStock()):
+            raise ErrorVenta()
+        else:
+            return self.obtenerEstrategiaDeVenta().vender(self, cantidad, fraccion)
         
 
 # =================
@@ -295,53 +324,101 @@ class Detalle(models.Model):
 class DetalleNotaVenta(Detalle):
     nota = models.ForeignKey('NotaVenta')
 
+    def setProducto(self, producto):
+        self.producto = producto
+
+    def setCantidad(self, cantidad):
+        self.cantidad = cantidad
+    def setSubTotal(self, subT):
+        if subT > 0:
+            self.subtotal = subT
+        else:
+            raise ErrorVenta()
+    
+    def setDeposito(self, deposito):
+        self.deposito = deposito
+
+    def setNota(self, notaVenta):
+        self.nota = notaVenta
+
 # ===================
 # = Detalle Factura =
 # ===================
 
 class DetalleFactura(Detalle):
     factura = models.ForeignKey('Factura')
-    venta = models.ForeignKey(DetalleNotaVenta)
+    detalleNotaVenta = models.ForeignKey(DetalleNotaVenta)
 
 # ==============
 # = Nota venta =
 # ==============
 
 class NotaVenta(models.Model):
-    nombre_cliente = models.CharField(max_length = 40)
-    apellido_cliente = models.CharField(max_length = 20)
+    nombreCliente = models.CharField(max_length = 40)
+    apellidoCliente = models.CharField(max_length = 20)
     fecha = models.datetime 
+    precioTotal = models.IntegerField()
+    facturada = models.BooleanField()
     class Meta:
         permissions = (
             ("venta", "puede vender"),
             ("change_task_status", "Can change the status of tasks"),
             ("close_task", "Can remove a task by setting its status as closed"),
         )       
+    
+    def setNombre(self, nombre):
+        if re.match('\w{3,}(\s\w+)*$', nombre):
+            self.nombreCliente = nombre
+        else:
+            raise ErrorVenta()
+
+    def setApellido(self, apellido):
+        if re.match('\w{3,}(\s\w+)*$', apellido):
+            self.apellidoCliente = apellido
+        else:
+            raise ErrorVenta()
+
+    def setFecha(self, fecha):
+        self.fecha = fecha
+
+    def setPrecioTotal(self, precio):
+        if precio >= 0:
+            self.precioTotal = precio
+        else:
+            raise ErrorVenta()
+
+    def setFacturada(self, factura):
+        self.facturada = factura
 
 # ===========
 # = Factura =
 # ===========
 
 class Factura(models.Model):
-    nroFactura = models.IntegerField()
     fecha = models.datetime
     formaDePago = models.CharField(max_length = 15)
     precioTotal = models.IntegerField()
-    ventaNota = models.ForeignKey(NotaVenta)
-    factura = models.ForeignKey('Remito')    
+    ventaNota = models.ForeignKey(NotaVenta)   
 
 # ==========
 # = Remito =
 # ==========
 
 class Remito(models.Model):
-    nroRemito = models.IntegerField()
+    deposito =models.ForeignKey(Deposito)
+    factura =models.ForeignKey(Factura)
+    entregadoCompleto = models.BooleanField()
     class Meta:
         permissions = (
             ("entregaMateriales", "puede entregar materiales"),
             ("change_task_status", "Can change the status of tasks"),
             ("close_task", "Can remove a task by setting its status as closed"),
         )
+    
+    def __unicode__(self):
+        return "%s" % self.pk
+    
+    
 
 # ==================
 # = Detalle Remito =
@@ -352,6 +429,7 @@ class DetalleRemito(models.Model):
     entregado = models.BooleanField()
     detalleFactura = models.ForeignKey(DetalleFactura)
     remito = models.ForeignKey(Remito)
+    producto = models.ForeignKey(Producto)
     
 # =============
 # = Descuento =
@@ -372,4 +450,4 @@ class TipoDescuento(Descuento):
     beneficiario = models.CharField(max_length = 40, blank = True)
     
     def __unicode__(self):
-        return "%s" % self.beneficiario
+        return "%s" % self.beneficiario        

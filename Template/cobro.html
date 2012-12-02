@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block cabecera %}
+    Cobro
+    <script language="javascript" type="text/javascript" src="/static/js/cobro.js"></script>
+        
+{% endblock %}
+
+
+{% block mensaje %}
+    <div class="{{estado}}">
+        {{mensaje}}
+    </div>
+{% endblock %}
+
+
+{% block contenedor %}
+
+<div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Facturacion</h3>
+    </div>
+    
+    <div class="modal-body">
+    <form method="POST" action="">
+                            <input id="pkProducto" name="pkProducto" value = "{{remito.pk}}" type="hidden">
+                                <div align="center">
+                                    Forma de Pago
+                                    <select id="formaPago" name="formaPago">
+	      		              	           	<option value="efectivo">Efectivo</option>
+	      		              	           	<option value="tarjeta Credito">Tarjeta de Credito</option>
+	      		              	           	<option value="tarjeta debito">Tarjeta de Debito</option>
+                                    </select><br>
+                                    Precio Total
+                                    <input id="precioNota" name="precioNota" style="height:27px;margin-left:10px;" type="text" readonly="true"><br>
+                                    <input id="nroNota" name="nroNota" type="text" readonly="true"><br>
+                                </div>
+                        
+    </div>
+    <div class="modal-footer">
+        <input class="btn btn-primary" type="submit" value="Cobrar" >
+    </form>        
+        <button class="btn" data-dismiss="modal" aria-hidden="true" onClick="volver()">Cancelar</button>
+    </div>
+
+    
+</div>
+    <div id="CabeceraLDTablas">
+        <form class="navbar-search pull-left" style="padding-left:20px">
+            <input type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='validarTexto(this.value);' ><br>
+        </form><br>
+        <table class="table table-striped" style="margin-top:20px">
+            <thead>
+                <tr>
+                    <th>Nro NotaVenta</th>
+                    <th>Cliente</th>
+                </tr>    
+            </thead>
+        </table>
+    </div>
+
+
+<div id="ContenedorTabla">
+<table id="tablaDeposito" cellpadding="0" cellspacing="0" class="table table-striped">
+    </thead>
+    <tbody>
+        {% for nota in notas %}
+
+            <tr>        
+                <td>
+                    {{nota.pk}}
+                </td>
+    
+                <td style="padding-left: 300px">
+                    {{nota.apellidoCliente}}, {{nota.nombreCliente}}
+                </td>
+                <td><button onClick="popPropio('{{nota.pk}}','{{nota.precioTotal}}')" class="btn btn-success" data-toggle="modal">
+                    <i class="icon-plus icon-white"></i>
+                </button></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    <div id="paraFondo"></div>
+</table>
+
+{% endblock %}
