@@ -1,11 +1,16 @@
-#*-*coding: utf-8 --*-*
+# -*- coding: utf-8 -*-
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, NotaVenta, DetalleNotaVenta, NoFraccionable, Remito, DetalleFactura, Factura, DetalleRemito
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
+<<<<<<< HEAD
+from django.http import HttpResponseRedirect
+from misExcepciones import *
+=======
 from django.http import HttpResponseRedirect, HttpResponse
+>>>>>>> ef54c2c61ca17ecd80793257bb26ae8962cc1baf
 from datetime import *
 
 
@@ -101,12 +106,16 @@ def altaDeposito(request):
     estado = ''
     mensaje=''
     if request.POST:
-        deposito.direccion= request.POST.get('direccionDeposito')
-        deposito.telefono= request.POST.get('telefonoDeposito')
-        deposito.rubro= Rubro.objects.get(pk= request.POST.get('rubroDeposito'))
-        deposito.save()
-        mensaje='Deposito dado de alta con direccion: '+deposito.direccion
-        estado='alert alert-success'
+        try:
+            deposito.setDireccion(request.POST.get('direccionDeposito'))
+            deposito.setTelefono(request.POST.get('telefonoDeposito'))
+            deposito.setRubro(request.POST.get('rubroDeposito'))
+            deposito.save()
+            mensaje='Deposito dado de alta con direccion: '+deposito.direccion
+            estado='alert alert-success'
+        except ErrorDeposito:
+            mensaje='Error en los Datos'
+            estado='alert alert-error'
     return render_to_response('gstDeposito/altaDeposito.html',{'estado':estado, 'rubros':rubros, 'mensaje': mensaje},context_instance=RequestContext(request))
 
 @login_required(login_url='/login')
@@ -129,35 +138,44 @@ def venta(request):
     """docstring for venta"""
     productos = Producto.objects.all()
     if request.POST:
+        productos = Producto.objects.all()
         notaVenta= NotaVenta()
-        notaVenta.nombreCliente = request.POST.get("nombrePersona")
-        notaVenta.apellidoCliente = request.POST.get("apellidoPersona")
-        notaVenta.fecha = date.today()
-        notaVenta.precioTotal = 0
-        notaVenta.facturada = False
-        notaVenta.save() 
-        palabra = request.POST.get("productos")
-        palabraParse = str(palabra).split(",")
-        dic =  {}
-        for i in palabraParse :
-            claveValor = i.split("=")
-            dic[Producto.objects.get(pk = claveValor[0])] = claveValor[1]
-        productos =dic.keys()
-        for producto in productos:
-            listaStock = producto.vender(cantidad = dic[producto])
-            stocks = listaStock.keys()
-            for stock in stocks:
-                detalle = DetalleNotaVenta()
-                detalle.producto = stock.producto
-                detalle.cantidad = listaStock[stock]
-                detalle.subtotal = producto.precio * detalle.cantidad
-                detalle.deposito = stock.deposito
-                detalle.nota = notaVenta
-                notaVenta.precioTotal = notaVenta.precioTotal + detalle.subtotal
-                detalle.save()
-        notaVenta.save()
+        try:
+            notaVenta.setNombre(request.POST.get("nombrePersona"))
+            notaVenta.setApellido(request.POST.get("apellidoPersona"))
+            notaVenta.setFecha(date.today())
+            notaVenta.setPrecioTotal(0)
+            notaVenta.setFacturada(False)
+            notaVenta.save()
+        
+            palabra = request.POST.get("productos")
+            palabraParse = str(palabra).split(",")
+            dic =  {}
+            for i in palabraParse :
+                claveValor = i.split("=")
+                dic[Producto.objects.get(pk = claveValor[0])] = claveValor[1]
+            productos =dic.keys()
+            for producto in productos:
+                listaStock = producto.vender(cantidad = dic[producto])
+                stocks = listaStock.keys()
+                for stock in stocks:
+                    detalle = DetalleNotaVenta()
+                    detalle.setProducto(stock.producto)
+                    detalle.setCantidad(listaStock[stock])
+                    detalle.setSubTotal(producto.precio * detalle.cantidad)
+                    detalle.setDeposito(stock.deposito)
+                    detalle.setNota(notaVenta)
+                    notaVenta.setPrecioTotal(notaVenta.precioTotal + detalle.subtotal)
+                    detalle.save()
+            return HttpResponseRedirect("/venta")
+        except ErrorVenta:
+            print "asdasd"
+            return HttpResponseRedirect("/venta")
+        except ObjectDoesNotExist:
+            print "asdasd"
+            return HttpResponseRedirect("/venta")
     return render_to_response('venta.html',{'productos':productos},context_instance=RequestContext(request)) 
-    
+
 # ================
 # = Cargar Stock =
 # ================
@@ -282,4 +300,14 @@ def cobro(request):
     
     
     
+<<<<<<< HEAD
     
+    
+    
+    
+    
+    
+    
+=======
+    
+>>>>>>> ef54c2c61ca17ecd80793257bb26ae8962cc1baf

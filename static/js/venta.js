@@ -14,13 +14,13 @@ function enviar() {
 function validarTabla(tabla){
     var numFilas = tabla.rows.length;
     if (numFilas == 0) {alert("Debe Elegir Productos Para Comprar");return false;};
-    enviar()
+    enviar();
     return true;    
     
 }
 
 function validarNombreApellido(campo) {
-        var RegExPattern = /^\w+\w+\w+(\s\w)*$/;
+        var RegExPattern = /^\w+\w+\w+(\s\w+)*$/;
         var errorMessage = 'Nombre o Apellido invalido';
         if (campo.value.match(RegExPattern)){
             return true;
