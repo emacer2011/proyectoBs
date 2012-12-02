@@ -20,7 +20,7 @@
         } 
     }
     function validarDireccion(campo) {
-        var RegExPattern = /^\w+(\s+\w+)*$/;
+        var RegExPattern = /^\w+(\s\w+)*$/;
         var errorMessage = 'Direccion invalida o vacia';
         if (campo.value.match(RegExPattern)){
             return true;
