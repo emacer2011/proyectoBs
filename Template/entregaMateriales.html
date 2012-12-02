@@ -25,7 +25,7 @@
         <table class="table table-striped" style="margin-top:20px">
             <thead>
                 <tr>
-                    <th>Nro Remito</th>
+                    <th id="TamNroRemito">Nro Remito</th>
                     <th>Nombre Comprador</th>
                 </tr>    
             </thead>
@@ -40,10 +40,10 @@
         {% for remito in remitos %}
 
             <tr>        
-                <td>
+                <td id="TamNroRemito">
                     {{remito.pk}}
                 </td>
-                <td style="padding-left:360px">
+                <td>
                     {{remito.factura.ventaNota.apellidoCliente}}, {{remito.factura.ventaNota.nombreCliente}}
                 </td>
                 <td>
