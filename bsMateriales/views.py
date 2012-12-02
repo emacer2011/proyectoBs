@@ -119,6 +119,13 @@ def listarDeposito(request):
 def bajaDeposito(request):
     """docstring for bajaDeposito"""
     depositos = Deposito.objects.all()
+    if request.is_ajax():
+        if request.GET:
+            pk = request.GET.get('pkDeposito')
+            deposito = Deposito.objects.get(pk = pk )
+            deposito.delete()
+            return HttpResponseRedirect("/bajaDeposito") 
+            
     return render_to_response('gstDeposito/bajaDeposito.html',{'depositos':depositos},context_instance=RequestContext(request)) 
 
 # =========

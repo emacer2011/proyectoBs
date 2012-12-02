@@ -4,6 +4,7 @@
 {% block cabecera %}
     Baja Depósitos
     <script language="javascript" type="text/javascript" src="/static/js/deposito.js"></script>
+    <script language="javascript" type="text/javascript" src="/static/js/jquery.js"></script>
         
 {% endblock %}
 
@@ -33,7 +34,7 @@
             <tr> 
                 <td>{{deposito.direccion}} </td>
                 <td>{{deposito.telefono}}</td>  
-                    <td> <input class="btn btn-danger" type="submit" value="Eliminar"></a> 
+                    <td> <input class="btn btn-danger" onClick="bajaDeposito('{{deposito.pk}}')" type="submit" value="Eliminar"></a> 
                    </td> 
             </tr>
         {% endfor %}
