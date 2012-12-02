@@ -5,9 +5,53 @@ from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
+<<<<<<< HEAD
 from django.http import HttpResponseRedirect
 from misExcepciones import *
+=======
+from django.http import HttpResponseRedirect, HttpResponse
+>>>>>>> ef54c2c61ca17ecd80793257bb26ae8962cc1baf
 from datetime import *
+
+
+# ==================
+# = Funciones Ajax =
+# ==================
+
+def cargarDetalles(request):
+    """docstring for cargarDetalle"""
+    detalles = DetalleRemito.objects.filter(remito = request.GET.get('pkRemito'))              
+    mensaje = "<table>"
+    mensaje = mensaje + "<th></th>"
+    mensaje = mensaje + "<th>Producto</th>"
+    mensaje = mensaje + "<th>Cantidad</th>"
+    mensaje = mensaje + "<th>Entregado</th>"
+    for detalle in detalles:
+        mensaje = mensaje + "<tr>"
+        mensaje = mensaje + '<td style="visibility:hidden" id = "pkDetalle">'+ str(detalle.pk)+'</td>'
+        mensaje = mensaje + "<td>" + detalle.producto.nombre+ "</td>"
+        mensaje = mensaje + "<td>" + str(detalle.cantidad)+ "</td>"
+        if detalle.entregado:
+            entregado = "checked DISABLED"
+        else:
+            entregado = ""
+        pk = str(detalle.pk)
+        mensaje = mensaje + '<td><input type="checkbox" onClick="cargarEntregados('+pk+')" name="entregado'+str(detalle.pk)+'" '+str(entregado)+'> </td>'
+        mensaje = mensaje +"</tr>"
+    mensaje = mensaje+"</table>"
+    return HttpResponse(mensaje)
+
+def cargarEntregados(request):
+    """docstring for cargarEntregados"""
+    pkDetalle = request.GET.get('pkDetalle')
+    detalle = DetalleRemito.objects.get(pk = pkDetalle )
+    entregado = not detalle.entregado
+    detalle.entregado = entregado
+    detalle.save()
+    detalle.remito.actualizarEntregados()
+    return HttpResponseRedirect("/cargarDetalles")
+
+
 # =======================
 # = GESTION DE USUARIOS =
 # =======================
@@ -135,6 +179,7 @@ def venta(request):
 # ================
 # = Cargar Stock =
 # ================
+@login_required(login_url='/login')
 def cargarStock(request):
     """docstring for cargarStock"""
     productos = Producto.objects.all()
@@ -156,6 +201,7 @@ def cargarStock(request):
 # =======================
 # = Gestion de Producto =
 # =======================
+@login_required(login_url='/login')
 def altaProducto(request):
     """docstring for altaProducto"""
     tipoProductos =TipoProducto.objects.all()
@@ -177,16 +223,17 @@ def altaProducto(request):
 # ======================
 # = Entrega Materiales =
 # ======================
+@login_required(login_url='/login')
 def entregaMateriales(request):
     """docstring for entregaMateriales"""
     remitos = Remito.objects.filter(entregadoCompleto = False)
-    mensaje = ''
-    estado = ''
-    return render_to_response('entregaMateriales.html',{'remitos':remitos},context_instance=RequestContext(request)) 
+    detallesRemitos = DetalleRemito.objects.filter(entregado = False)       
+    return render_to_response('entregaMateriales.html',{'remitos':remitos, 'detalles':detallesRemitos},context_instance=RequestContext(request)) 
     
 # =====================
 # = Cobro de Facturas =
 # =====================
+@login_required(login_url='/login')
 def cobro(request):
     """docstring for cobro"""
     notas = NotaVenta.objects.filter(facturada = False)
@@ -253,6 +300,7 @@ def cobro(request):
     
     
     
+<<<<<<< HEAD
     
     
     
@@ -260,3 +308,6 @@ def cobro(request):
     
     
     
+=======
+    
+>>>>>>> ef54c2c61ca17ecd80793257bb26ae8962cc1baf
