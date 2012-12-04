@@ -5,12 +5,9 @@ from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
-<<<<<<< HEAD
 from django.http import HttpResponseRedirect
 from misExcepciones import *
-=======
 from django.http import HttpResponseRedirect, HttpResponse
->>>>>>> ef54c2c61ca17ecd80793257bb26ae8962cc1baf
 from datetime import *
 
 
@@ -160,13 +157,14 @@ def venta(request):
                 stocks = listaStock.keys()
                 for stock in stocks:
                     detalle = DetalleNotaVenta()
-                    detalle.setProducto(stock.producto)
+                    detalle.setProducto(stock.getProducto())
                     detalle.setCantidad(listaStock[stock])
-                    detalle.setSubTotal(producto.precio * detalle.cantidad)
-                    detalle.setDeposito(stock.deposito)
+                    detalle.setSubTotal(producto.getPrecio() * detalle.getCantidad())
+                    detalle.setDeposito(stock.getDeposito())
                     detalle.setNota(notaVenta)
-                    notaVenta.setPrecioTotal(notaVenta.precioTotal + detalle.subtotal)
                     detalle.save()
+                    notaVenta.incrementarTotal(detalle.getSubTotal())
+            notaVenta.save()
             return HttpResponseRedirect("/venta")
         except ErrorVenta:
             print "asdasd"
@@ -187,15 +185,22 @@ def cargarStock(request):
     mensaje = ""
     estado= ""
     if request.POST:
-        producto =Producto.objects.get(pk = request.POST.get("pkProducto"))
-        disponibles = int(request.POST.get("disponible"))
-        deposito=Deposito.objects.get(pk =request.POST.get("deposito"))
-        stock = Stock()
-        stock.nuevoStock(disponibles,deposito, producto)
-        producto.cantidad = producto.cantidad + disponibles
-        producto.save()
-        mensaje='Se agrega '+str(disponibles) +' del producto '+producto.nombre+' en el deposito de '+deposito.direccion
-        estado='alert alert-success'
+        try:        
+            producto =Producto.objects.get(pk = request.POST.get("pkProducto"))
+            disponibles = int(request.POST.get("disponible"))
+            deposito=Deposito.objects.get(pk =request.POST.get("deposito"))
+            Stock.cargarStock(disponibles,deposito, producto)
+            producto.setCantidad(producto.cantidad + disponibles)
+            producto.save()
+            mensaje='Se agrega '+str(disponibles) +' del producto '+producto.nombre+' en el deposito de '+deposito.direccion
+            estado='alert alert-success'
+        except ErrorProducto:
+            pass
+        except ErrorStock:
+            pass
+        except ObjectDoesNotExist:
+            mensaje='Error en los Datos'
+            estado='alert alert-error'
     return render_to_response('cargarStock.html',{'mensaje':mensaje, 'estado':estado, 'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 
 
 # =======================
@@ -272,42 +277,12 @@ def cobro(request):
             detalleRemito.remito = remito
             detalleRemito.producto = detalleFactura.producto
             detalleRemito.save()
+
+            stock= Stock.objects.get(producto=detalle.getProducto(), deposito=detalle.getDeposito())
+            stock.reservadosNoConfirmados -= detalle.getCantidad()
+            stock.reservadosConfirmados += detalle.getCantidad()
+            stock.save()
         notaVenta.save()
             
         
     return render_to_response('cobro.html',{'notas':notas},context_instance=RequestContext(request))
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-<<<<<<< HEAD
-    
-    
-    
-    
-    
-    
-    
-=======
-    
->>>>>>> ef54c2c61ca17ecd80793257bb26ae8962cc1baf

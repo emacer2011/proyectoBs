@@ -56,6 +56,7 @@ class TipoProducto(models.Model):
     unidadMedida = models.CharField(max_length = 40)
     descripcion = models.CharField(max_length = 40, blank=True)
     rubro = models.ForeignKey(Rubro)    
+    
     def __unicode__(self):
         return "%s" % self.nombre
 
@@ -92,9 +93,18 @@ class Producto(models.Model):
             ("change_task_status", "Can change the status of tasks"),
             ("close_task", "Can remove a task by setting its status as closed"),
         )
-
+    
     def __unicode__(self):
         return "%s" % self.nombre
+
+    def getPrecio(self):
+        return self.precio
+
+    def setCantidad(self, cantidad):
+        if cantidad >= 0:
+            self.cantidad = cantidad
+        else:
+            raise ErrorProducto()
 
     def obtenerEstrategiaDeVenta(self):
         if self.estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
@@ -109,7 +119,7 @@ class Producto(models.Model):
         return cantidad            
 
     def vender(self, cantidad = None, fraccion = 5):
-        if (cantidad <= 0) or (catidad > self.verificarCantidadStock()):
+        if (int(cantidad) <= 0) or (int(cantidad) > self.verificarCantidadStock()):
             raise ErrorVenta()
         else:
             return self.obtenerEstrategiaDeVenta().vender(self, cantidad, fraccion)
@@ -158,7 +168,7 @@ class Fraccionable(EstrategiaVenta):
         else:
             estrategiaVenta = NoFraccionable.instance()
         
-        pSobra, created = Producto.objects.get_or_create(nombre = producto.nombre, descripcion = descrip, default = {
+        pSobra, created = Producto.objects.get_or_create(nombre = producto.nombre, descripcion = descrip, defaults = {
                         'nombre': producto.nombre,
                         'descripcion': descrip,
                         'tipoProducto': producto.tipoProducto,
@@ -173,7 +183,7 @@ class Fraccionable(EstrategiaVenta):
             stock.producto = pSobra
             stock.save()
         else:
-            stock, created = Stock.objects.get_or_create(producto = prod, deposito = stockMinimo.deposito, default = {
+            stock, created = Stock.objects.get_or_create(producto = prod, deposito = stockMinimo.deposito, defaults = {
                              'reservadosConfirmados' : 0,
                              'reservadosNoConfirmados' : 0,
             				 'disponibles' : cantidad,
@@ -185,7 +195,7 @@ class Fraccionable(EstrategiaVenta):
                 stock.save()
     
         descrip = "tiene medida: " + str(fraccion)
-        pVenta, created = Producto.objects.get_or_create(nombre = producto.nombre, descripcion = descrip, default = {
+        pVenta, created = Producto.objects.get_or_create(nombre = producto.nombre, descripcion = descrip, defaults = {
                         'nombre' : producto.nombre,
                         'descripcion' : "tiene medida: " + str(fraccion),
                         'tipoProducto' : producto.tipoProducto,
@@ -200,12 +210,12 @@ class Fraccionable(EstrategiaVenta):
             stock.producto = pVenta
             stock.save() 
         else:           
-            stock, created = Stock.objects.get_or_create(producto = prod, deposito = stockMinimo.deposito, default = {
+            stock, created = Stock.objects.get_or_create(producto = prod, deposito = stockMinimo.deposito, defaults = {
                              'reservadosConfirmados' : 0,
                              'reservadosNoConfirmados' : cantidad,
                              'disponibles' : 0,
                              'deposito' : stockMinimo.deposito,
-                             'producto' : pVenta,
+                             'producto' : pVenta
                              })
             if not created:
                 stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + cantidad
@@ -279,29 +289,42 @@ class Stock(models.Model):
     disponibles = models.IntegerField()
     deposito = models.ForeignKey(Deposito, blank = True)
     producto = models.ForeignKey(Producto)
+
+
+    def getDisponibles(self):
+        return self.disponibles
     
-    def crearStock(self, disponibles, deposito, producto):
-        """docstring for crearStock"""
-        stock =  Stock()
-        stock.reservadosConfirmados= 0
-        stock.reservadosNoConfirmados= 0
-        stock.producto= producto
-        stock.disponibles= disponibles
-        stock.deposito= deposito
-        stock.save()
+    def setDisponibles(self, disponible):
+        if disponible < 0:
+            raise ErrorStock()
+        else:
+            self.disponibles = disponible
+
+    def getDeposito(self):
+        return self.deposito
+
+    def getProducto(self):
+        return self.producto
     
-    def nuevoStock(self, disponibles, deposito, producto):
+    @classmethod
+    def cargarStock(cls, disponibles, deposito, producto):
         """docstring for crearStock"""
-        try:
-            stock = Stock.objects.get(producto = producto, deposito = deposito)
-            stock.disponibles = stock.disponibles+disponibles
-            stock.save()
-        except ObjectDoesNotExist:
-            self.crearStock(disponibles, deposito, producto)
-        
+        if disponibles <= 0:
+            raise ErrorStock()
+        else:
+            stock, created = Stock.objects.get_or_create(producto = producto, deposito = deposito, defaults = {
+                             'reservadosConfirmados' : 0,
+                             'reservadosNoConfirmados' : 0,
+                             'producto' : producto,
+                             'disponibles' : disponibles,
+                             'deposito' : deposito
+                             })
+            if not created:
+                stock.setDisponibles(stock.getDisponibles() + disponibles)
+                stock.save()
     
     def __unicode__(self):
-        return "%d en deposido de %s" % (self.disponibles, self.deposito)
+        return "%d en deposido: %s" % (self.getDisponibles(), self.getDeposito())
 
 # ===========
 # = Detalle =
@@ -317,6 +340,30 @@ class Detalle(models.Model):
     producto = models.ForeignKey(Producto)
     deposito = models.ForeignKey(Deposito)
 
+    def getCantidad(self):
+        return self.cantidad
+
+    def setCantidad(self, cantidad):
+        self.cantidad = cantidad
+
+    def getSubTotal(self):
+        return self.subtotal
+
+    def setSubTotal(self, subT):
+        if subT > 0:
+            self.subtotal = subT
+        else:
+            raise ErrorVenta()
+    
+    def getProducto(self):
+        return self.producto
+
+    def setProducto(self, producto):
+        self.producto = producto
+
+    def setDeposito(self, deposito):
+        self.deposito = deposito
+
 # ======================
 # = Detalle Nota Venta =
 # ======================
@@ -324,22 +371,11 @@ class Detalle(models.Model):
 class DetalleNotaVenta(Detalle):
     nota = models.ForeignKey('NotaVenta')
 
-    def setProducto(self, producto):
-        self.producto = producto
-
-    def setCantidad(self, cantidad):
-        self.cantidad = cantidad
-    def setSubTotal(self, subT):
-        if subT > 0:
-            self.subtotal = subT
-        else:
-            raise ErrorVenta()
-    
-    def setDeposito(self, deposito):
-        self.deposito = deposito
-
     def setNota(self, notaVenta):
         self.nota = notaVenta
+
+    def getDeposito(self):
+        return self.deposito
 
 # ===================
 # = Detalle Factura =
@@ -381,11 +417,17 @@ class NotaVenta(models.Model):
     def setFecha(self, fecha):
         self.fecha = fecha
 
+    def getPrecioTotal(self):
+        return self.precioTotal
+    
     def setPrecioTotal(self, precio):
         if precio >= 0:
             self.precioTotal = precio
         else:
             raise ErrorVenta()
+
+    def incrementarTotal(self, cantidad):
+        self.precioTotal += cantidad
 
     def setFacturada(self, factura):
         self.facturada = factura
