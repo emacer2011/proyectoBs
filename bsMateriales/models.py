@@ -304,7 +304,6 @@ class Stock(models.Model):
     deposito = models.ForeignKey(Deposito, blank = True)
     producto = models.ForeignKey(Producto)
 
-
     def getDisponibles(self):
         return self.disponibles
     
@@ -352,7 +351,7 @@ class Detalle(models.Model):
     cantidad = models.IntegerField()
     subtotal = models.IntegerField()
     producto = models.ForeignKey(Producto)
-    deposito = models.ForeignKey(Deposito)
+
 
     def getCantidad(self):
         return self.cantidad
@@ -384,6 +383,7 @@ class Detalle(models.Model):
 
 class DetalleNotaVenta(Detalle):
     nota = models.ForeignKey('NotaVenta')
+    deposito = models.ForeignKey(Deposito)
 
     def setNota(self, notaVenta):
         self.nota = notaVenta
@@ -496,9 +496,14 @@ class DetalleRemito(models.Model):
     remito = models.ForeignKey(Remito)
     producto = models.ForeignKey(Producto)
 
-
-
-
+    def confirmarStock(self):
+        """docstring for confirmarStock"""
+        stock = Stock.objects.get(producto = self.producto, deposito= self.remito.deposito)
+        if self.entregado:
+                stock.reservadosConfirmados= int(stock.reservadosConfirmados)-int(self.cantidad)
+        else: 
+              stock.reservadosConfirmados= int(stock.reservadosConfirmados)+int(self.cantidad)
+        stock.save()
         
 # =============
 # = Descuento =

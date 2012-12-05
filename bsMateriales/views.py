@@ -43,6 +43,7 @@ def cargarEntregados(request):
     detalle = DetalleRemito.objects.get(pk = pkDetalle )
     entregado = not detalle.entregado
     detalle.entregado = entregado
+    detalle.confirmarStock()
     detalle.save()  
     return HttpResponseRedirect("/cargarDetalles")
 
@@ -289,14 +290,13 @@ def cobro(request):
             detalleFactura.producto = detalle.producto
             detalleFactura.cantidad = detalle.cantidad
             detalleFactura.subtotal = detalle.subtotal
-            detalleFactura.deposito = detalle.deposito
             detalleFactura.save()
             try:
-                remito = Remito.objects.get(factura = factura, deposito = detalleFactura.deposito )
+                remito = Remito.objects.get(factura = factura, deposito = detalle.deposito )
             except ObjectDoesNotExist: 
                 remito = Remito()
                 remito.factura = factura
-                remito.deposito = detalleFactura.deposito
+                remito.deposito = detalle.deposito
                 remito.entregadoCompleto = False
                 remito.save()
             detalleRemito = DetalleRemito()
@@ -305,6 +305,7 @@ def cobro(request):
             detalleRemito.detalleFactura = detalleFactura
             detalleRemito.remito = remito
             detalleRemito.producto = detalleFactura.producto
+            detalleRemito.deposito = detalle.deposito
             detalleRemito.save()
 
             stock= Stock.objects.get(producto=detalle.getProducto(), deposito=detalle.getDeposito())
