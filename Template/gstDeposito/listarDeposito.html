@@ -16,8 +16,9 @@
         </form><br>
         <table class="table table-striped" style="margin-top:20px">
             <thead>
-                <tr><th class="table-head">Direcci&oacuten</th>
-                    <th class="table-head">Telefono</th>
+                <tr><th id="Deposito-Titulo-Direccion" class="table-head">Direcci&oacuten</th>
+                    <th id="Deposito-Titulo-Rubro" class="table-head">Rubro</th>
+                    <th id="Deposito-Titulo-Telefono" class="table-head">Telefono</th>
                 </tr>    
             </thead>
         </table>
@@ -30,7 +31,11 @@
     <tbody>
         {% for deposito in depositos %}
 
-            <tr> <td>{{deposito.direccion}} </td><td>{{deposito.telefono}}</td></tr>
+            <tr>
+                <td id="Deposito-Direccion">{{deposito.direccion}}</td>
+                <td id="Deposito-Rubro">{{deposito.rubro}}</td>
+                <td id="Deposito-Telefono">{{deposito.telefono}}</td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>

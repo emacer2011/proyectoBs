@@ -44,7 +44,21 @@ class Deposito(models.Model):
             self.rubro = unRubro
         except ObjectDoesNotExist:
             raise ErrorDeposito()
-    
+
+    def puedoEliminarlo(self): 
+        try:
+            stocks = Stock.objects.get(deposito = self)
+            return False
+        except ObjectDoesNotExist:
+            return True
+            
+    def eliminarDeposito(self):
+        print str(self.puedoEliminarlo())
+        if self.puedoEliminarlo():
+            self.delete()
+        else:
+            raise ErrorDeposito()
+            
     def __unicode__(self):
         return "%s" % self.direccion
         
@@ -109,7 +123,7 @@ class Producto(models.Model):
         return cantidad            
 
     def vender(self, cantidad = None, fraccion = 5):
-        if (cantidad <= 0) or (catidad > self.verificarCantidadStock()):
+        if (int(cantidad) <= 0) or (int(cantidad) > self.verificarCantidadStock()):
             raise ErrorVenta()
         else:
             return self.obtenerEstrategiaDeVenta().vender(self, cantidad, fraccion)

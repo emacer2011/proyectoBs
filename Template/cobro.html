@@ -34,7 +34,7 @@
                                     </select><br>
                                     Precio Total
                                     <input id="precioNota" name="precioNota" style="height:27px;margin-left:10px;" type="text" readonly="true"><br>
-                                    <input id="nroNota" name="nroNota" type="text" readonly="true"><br>
+                                    <input id="nroNota" name="nroNota" type="hidden" readonly="true"><br>
                                 </div>
                         
     </div>
@@ -48,13 +48,14 @@
 </div>
     <div id="CabeceraLDTablas">
         <form class="navbar-search pull-left" style="padding-left:20px">
-            <input type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='validarTexto(this.value);' ><br>
+            <input type="text" class="search-query" style="height:27px" placeholder="Nro Nota o Nombre Cliente" onKeyUp='buscar(this.value,"tablaNotas");' ><br>
         </form><br>
         <table class="table table-striped" style="margin-top:20px">
             <thead>
                 <tr>
                     <th id="TamNroNota">Nro NotaVenta</th>
-                    <th>Cliente</th>
+                    <th id="Cobro-Titulo-Cliente">Cliente</th>
+                    <th>Cobrar</th>
                 </tr>    
             </thead>
         </table>
@@ -62,7 +63,7 @@
 
 
 <div id="ContenedorTabla">
-<table id="tablaDeposito" cellpadding="0" cellspacing="0" class="table table-striped">
+<table id="tablaNotas" cellpadding="0" cellspacing="0" class="table table-striped">
     </thead>
     <tbody>
         {% for nota in notas %}
@@ -72,7 +73,7 @@
                     {{nota.pk}}
                 </td>
     
-                <td>
+                <td id="Cobro-Cliente">
                     {{nota.apellidoCliente}}, {{nota.nombreCliente}}
                 </td>
                 <td><button onClick="popPropio('{{nota.pk}}','{{nota.precioTotal}}')" class="btn btn-success" data-toggle="modal">

@@ -22,3 +22,36 @@ function volver(){
         var remover = document.getElementById("nuevoPop");
         elemento.removeChild(remover);
 }
+
+function buscar(texto,idTabla){
+    var tabla, txt, filas, elemento,aComparar, aComparar2,rta, rtaTel;
+    txt = texto.toUpperCase();
+    tabla = document.getElementById(idTabla);
+    filas = tabla.getElementsByTagName('tr');
+    for(i=0;i<=filas.length;i++){
+          elemento = filas[i];
+          elemento.style.display='none';
+          aComparar = elemento.cells[0].textContent;
+          aComparar = aComparar.toUpperCase();
+          rta = aComparar.indexOf(txt);
+          if(rta != -1){
+                elemento.style.display='';
+            }
+          aComparar2 = (elemento.cells[1].textContent).toUpperCase();
+          rtaTel= aComparar2.indexOf(txt);
+          if(rtaTel != -1){
+            elemento.style.display='';
+       }
+    }
+
+}
+    
+    function restaurar(idTabla){
+        var tabla,filas,elemento;
+            tabla = document.getElementById(idTabla);
+      filas = tabla.getElementsByTagName('tr');
+      for(i=0;i<=filas.length;i++){
+                elemento = filas[i];
+                elemento.style.display='';
+      }
+}

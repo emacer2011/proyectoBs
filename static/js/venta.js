@@ -1,3 +1,12 @@
+function cargar(){
+    var div = document.getElementById("mensajes");
+    if(div.className != "")
+    {
+        $_POST = array(); 
+        setTimeout("window.location.reload()",3000);
+    }
+}
+
 function enviar() {
     var producto;
     var productos =document.getElementById("productos");

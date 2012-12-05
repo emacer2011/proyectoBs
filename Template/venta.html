@@ -5,6 +5,14 @@
     <script language="javascript" type="text/javascript" src="/static/js/venta.js"></script>
 {% endblock %}
 
+{% block mensaje %}
+    <div class="{{estado}}" id="mensajes">
+        {{mensaje}}
+    </div>
+{% endblock %}
+
+
+
 {% block contenedor %}
     <div id="CabeceraNotaVenta">
         <form class="well" method="POST" onSubmit="return validaVenta()">

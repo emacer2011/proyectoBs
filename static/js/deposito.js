@@ -1,6 +1,11 @@
     
     function bajaDeposito(pk){
-           $.get ("/bajaDeposito",{ pkDeposito: pk },function(data){
+           $.get ("/bajaDeposito",{ pkDeposito: pk },function(estado){
+               var div = document.getElementById("mensajes")
+               var mensajes = estado.split("/") ;
+               div.className = mensajes[0];
+               div.innerHTML = mensajes[1];
+               setTimeout("window.location.reload()",3000);
     }
   );    
  
@@ -55,6 +60,7 @@
                 elemento.style.display='';
             }
 		    aComparar2 = elemento.cells[1].textContent;
+		    aComparar2 = aComparar2.toUpperCase();
 		    rtaTel= aComparar2.indexOf(txt);
 		    if(rtaTel != -1){
 		          elemento.style.display='';

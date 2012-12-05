@@ -9,6 +9,13 @@
 {% endblock %}
 
 
+{% block mensaje %}
+    <div id="mensajes" class="{{estado}}"s>
+        {{mensaje}}
+    </div>
+{% endblock %}
+
+
 {% block contenedor %}
 
     <div id="CabeceraLDTablas">
@@ -17,8 +24,10 @@
         </form><br>
         <table class="table table-striped" style="margin-top:20px">
             <thead>
-                <tr><th class="table-head">Direcci&oacuten</th>
-                    <th class="table-head">Telefono</th>
+                <tr><th id="BajaDeposito-Titulo-Direccion" class="table-head">Direcci&oacuten</th>
+                    <th id="BajaDeposito-Titulo-Rubro" class="table-head">Rubro</th>
+                    <th id="BajaDeposito-Titulo-Telefono" class="table-head">Telefono</th>
+                    <th id="BajaDeposito-Titulo-Accion" class="table-head">Eliminar</th>
                 </tr>    
             </thead>
         </table>
@@ -32,10 +41,11 @@
         {% for deposito in depositos %}
 
             <tr> 
-                <td>{{deposito.direccion}} </td>
-                <td>{{deposito.telefono}}</td>  
-                    <td> <input class="btn btn-danger" onClick="bajaDeposito('{{deposito.pk}}')" type="submit" value="Eliminar"></a> 
-                   </td> 
+                <td id="BajaDeposito-Direccion">{{deposito.direccion}} </td>
+                <td id="BajaDeposito-Rubro">{{deposito.rubro}} </td>
+                <td id="BajaDeposito-Telefono">{{deposito.telefono}}</td>  
+                <td id="BajaDeposito-Accion"> <button class="btn btn-danger" onClick="bajaDeposito('{{deposito.pk}}')" type="submit"> <i class="icon-trash icon-white"></i> Eliminar </button> 
+                </td> 
             </tr>
         {% endfor %}
     </tbody>

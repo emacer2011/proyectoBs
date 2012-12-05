@@ -250,6 +250,10 @@ form {
     width:29%;    
 }
 
+#CargaStock-Titulo-Descripcion{
+    width:27%;    
+}
+
 #CargaStock-TipoProducto{
     width:24%;    
 }
@@ -260,7 +264,9 @@ form {
 
 #CargaStock-Cantidad{
     width:6%;
-
+}
+#CargaStock-Titulo-Cantidad{
+    width:7%;
 }
 
 #CargaStock-Precio{
@@ -270,6 +276,72 @@ form {
 #CargaStock-Cargar{
     text-align:center;
 }
+
+#Cobro-Titulo-Cliente{
+    width:65%;    
+}
+
+#Cobro-Cliente{
+    width:67%;    
+}
+
+#BajaDeposito-Titulo-Direccion{
+    width:40%;    
+}
+
+#BajaDeposito-Direccion{
+    width:40%;    
+}
+
+#BajaDeposito-Titulo-Rubro{
+    width:20%;    
+}
+#BajaDeposito-Rubro{
+    width:20%;    
+}
+
+#BajaDeposito-Titulo-Telefono{
+    width:20%;
+}
+
+#BajaDeposito-Telefono{
+    width:20%;
+}
+
+#BajaDeposito-Titulo-Accion{
+    width:20%;    
+}
+
+#BajaDeposito-Accion{
+    width:20%;
+}
+
+#Deposito-Titulo-Direccion{
+    width:40%;
+}
+
+#Deposito-Direccion{
+    width:40%;
+}
+
+#Deposito-Titulo-Rubro{
+    width:20%;
+}
+
+#Deposito-Rubro{
+    width:20%;
+}
+
+#Deposito-Titulo-Telefono{
+    width:20%;
+}
+
+#Deposito-Telefono{
+    width:20%;
+}
+
+
+
 
 
 #CabeceraNota{

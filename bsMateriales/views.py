@@ -5,7 +5,7 @@ from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from misExcepciones import *
 from datetime import *
 
@@ -123,14 +123,31 @@ def listarDeposito(request):
 @login_required(login_url='/login')
 def bajaDeposito(request):
     """docstring for bajaDeposito"""
+    estado = ""
+    mensaje = ""
     depositos = Deposito.objects.all()
     if request.is_ajax():
         if request.GET:
             pk = request.GET.get('pkDeposito')
             deposito = Deposito.objects.get(pk = pk )
-            deposito.delete()
-            
-    return render_to_response('gstDeposito/bajaDeposito.html',{'depositos':depositos},context_instance=RequestContext(request)) 
+            try: 
+                mensaje='Deposito con direccion: '+deposito.direccion+" eliminado"
+                estado='alert alert-success'
+                deposito.eliminarDeposito()
+            except ErrorDeposito:
+                mensaje='No se puede eliminar, deposito con stock'
+                estado='alert alert-error'
+            return HttpResponse(str(estado)+"/"+str(mensaje))
+    return render_to_response('gstDeposito/bajaDeposito.html',{'depositos':depositos, 'mensaje': mensaje, 'estado': estado},context_instance=RequestContext(request)) 
+
+@login_required(login_url='/login')
+def modificarDeposito(request):
+    """docstring for modificarDeposito"""
+    depositos = Deposito.objects.all()
+    mensaje = ""
+    estado = ""
+    return render_to_response('gstDeposito/modificarDeposito.html',{'depositos':depositos, 'mensaje': mensaje, 'estado': estado},context_instance=RequestContext(request)) 
+
 
 # =========
 # = Venta =
@@ -139,6 +156,8 @@ def bajaDeposito(request):
 def venta(request):
     """docstring for venta"""
     productos = Producto.objects.all()
+    mensaje = ""
+    estado = ""
     if request.POST:
         productos = Producto.objects.all()
         notaVenta= NotaVenta()
@@ -169,14 +188,16 @@ def venta(request):
                     detalle.setNota(notaVenta)
                     notaVenta.setPrecioTotal(notaVenta.precioTotal + detalle.subtotal)
                     detalle.save()
-            return HttpResponseRedirect("/venta")
+                    mensaje ="Venta Realizada Con Exito" 
+                    estado = "estado='alert alert-success'"
         except ErrorVenta:
-            print "error 1"
-            return HttpResponseRedirect("/venta")
+            mensaje='Error en la Venta, Intentelo Nuevamente'
+            estado='alert alert-error'
         except ObjectDoesNotExist:
-            print "error 2"
-            return HttpResponseRedirect("/venta")
-    return render_to_response('venta.html',{'productos':productos},context_instance=RequestContext(request)) 
+            mensaje='Error en la Venta, Intentelo Nuevamente'
+            estado='alert alert-error'
+            
+    return render_to_response('venta.html',{'productos':productos,'estado': estado, 'mensaje':mensaje},context_instance=RequestContext(request)) 
 
 # ================
 # = Cargar Stock =
