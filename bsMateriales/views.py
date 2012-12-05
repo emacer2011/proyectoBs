@@ -5,12 +5,8 @@ from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
-<<<<<<< HEAD
 from django.http import HttpResponseRedirect
 from misExcepciones import *
-=======
-from django.http import HttpResponseRedirect, HttpResponse
->>>>>>> ef54c2c61ca17ecd80793257bb26ae8962cc1baf
 from datetime import *
 
 
@@ -133,7 +129,6 @@ def bajaDeposito(request):
             pk = request.GET.get('pkDeposito')
             deposito = Deposito.objects.get(pk = pk )
             deposito.delete()
-            return HttpResponseRedirect("/bajaDeposito") 
             
     return render_to_response('gstDeposito/bajaDeposito.html',{'depositos':depositos},context_instance=RequestContext(request)) 
 
@@ -176,10 +171,10 @@ def venta(request):
                     detalle.save()
             return HttpResponseRedirect("/venta")
         except ErrorVenta:
-            print "asdasd"
+            print "error 1"
             return HttpResponseRedirect("/venta")
         except ObjectDoesNotExist:
-            print "asdasd"
+            print "error 2"
             return HttpResponseRedirect("/venta")
     return render_to_response('venta.html',{'productos':productos},context_instance=RequestContext(request)) 
 
@@ -284,37 +279,3 @@ def cobro(request):
         
     return render_to_response('cobro.html',{'notas':notas},context_instance=RequestContext(request))
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-<<<<<<< HEAD
-    
-    
-    
-    
-    
-    
-    
-=======
-    
->>>>>>> ef54c2c61ca17ecd80793257bb26ae8962cc1baf
