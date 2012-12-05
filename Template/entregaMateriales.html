@@ -2,8 +2,6 @@
 
 {% block cabecera %}
     Entraga De Materiales
-    
-    <script language="javascript" type="text/javascript" src="/static/js/jquery.js"></script>
     <script language="javascript" type="text/javascript" src="/static/js/entregaMateriales.js"></script>
         
 {% endblock %}
@@ -60,23 +58,22 @@
 
 <div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-header">
-        <<button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">Entrega Materiales</h3>
     </div>
     
-    <div class="modal-body">
-    <form method="POST" action="">
+    <div class="modal-body" style="OVERFLOW:auto; height:100px;">
         <input id="pkRemito" name="pkRemito" type="hidden">
-            <div align="center" style="OVERFLOW: auto">
-                <table id = "tablaDetalles">
+            <div align="center" style="OVERFLOW:auto" height="50">
+                <table id="tablaDetalles">
                     
                 </table>
             </div>
                         
-    </div>
     <div class="modal-footer">
-        <input class="btn btn-primary" type="submit" value="Guardar" >
-    </form>        
+        <button class="btn btn-primary" type="submit" onClick="actualizarEntregados();"> Guardar</button>
+        
+    </div>
     </div>
 </div>
 

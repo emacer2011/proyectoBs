@@ -17,7 +17,7 @@ from datetime import *
 def cargarDetalles(request):
     """docstring for cargarDetalle"""
     detalles = DetalleRemito.objects.filter(remito = request.GET.get('pkRemito'))              
-    mensaje = "<table>"
+    mensaje = '<table>'
     mensaje = mensaje + "<th></th>"
     mensaje = mensaje + "<th>Producto</th>"
     mensaje = mensaje + "<th>Cantidad</th>"
@@ -43,10 +43,16 @@ def cargarEntregados(request):
     detalle = DetalleRemito.objects.get(pk = pkDetalle )
     entregado = not detalle.entregado
     detalle.entregado = entregado
-    detalle.save()
-    detalle.remito.actualizarEntregados()
+    detalle.save()  
     return HttpResponseRedirect("/cargarDetalles")
 
+def actualizarEntregados(request):
+    print "asdasdasdasdas"
+    pkRemito = request.GET.get('pkRemito')
+    remito = Remito.objects.get(pk = pkRemito )
+    remito.actualizarEntregados()
+    print "GADSDASDASDSA"
+    return HttpResponseRedirect("/cargarDetalles")
 
 # =======================
 # = GESTION DE USUARIOS =
@@ -168,7 +174,6 @@ def venta(request):
             notaVenta.setPrecioTotal(0)
             notaVenta.setFacturada(False)
             notaVenta.save()
-        
             palabra = request.POST.get("productos")
             palabraParse = str(palabra).split(",")
             dic =  {}
@@ -181,22 +186,21 @@ def venta(request):
                 stocks = listaStock.keys()
                 for stock in stocks:
                     detalle = DetalleNotaVenta()
-                    detalle.setProducto(stock.producto)
+                    detalle.setProducto(stock.getProducto())
                     detalle.setCantidad(listaStock[stock])
-                    detalle.setSubTotal(producto.precio * detalle.cantidad)
-                    detalle.setDeposito(stock.deposito)
+                    detalle.setSubTotal(producto.getPrecio() * detalle.getCantidad())
+                    detalle.setDeposito(stock.getDeposito())
                     detalle.setNota(notaVenta)
-                    notaVenta.setPrecioTotal(notaVenta.precioTotal + detalle.subtotal)
                     detalle.save()
                     mensaje ="Venta Realizada Con Exito" 
-                    estado = "estado='alert alert-success'"
-        except ErrorVenta:
+                    estado = 'alert alert-success'
+                    notaVenta.incrementarTotal(detalle.getSubTotal())
+            notaVenta.save()
+        except ErrorVenta,ObjectDoesNotExist:
             mensaje='Error en la Venta, Intentelo Nuevamente'
             estado='alert alert-error'
-        except ObjectDoesNotExist:
-            mensaje='Error en la Venta, Intentelo Nuevamente'
-            estado='alert alert-error'
-            
+            notaVenta.delete()
+                
     return render_to_response('venta.html',{'productos':productos,'estado': estado, 'mensaje':mensaje},context_instance=RequestContext(request)) 
 
 # ================
@@ -210,15 +214,22 @@ def cargarStock(request):
     mensaje = ""
     estado= ""
     if request.POST:
-        producto =Producto.objects.get(pk = request.POST.get("pkProducto"))
-        disponibles = int(request.POST.get("disponible"))
-        deposito=Deposito.objects.get(pk =request.POST.get("deposito"))
-        stock = Stock()
-        stock.nuevoStock(disponibles,deposito, producto)
-        producto.cantidad = producto.cantidad + disponibles
-        producto.save()
-        mensaje='Se agrega '+str(disponibles) +' del producto '+producto.nombre+' en el deposito de '+deposito.direccion
-        estado='alert alert-success'
+        try:        
+            producto =Producto.objects.get(pk = request.POST.get("pkProducto"))
+            disponibles = int(request.POST.get("disponible"))
+            deposito=Deposito.objects.get(pk =request.POST.get("deposito"))
+            Stock.cargarStock(disponibles,deposito, producto)
+            producto.setCantidad(producto.cantidad + disponibles)
+            producto.save()
+            mensaje='Se agrega '+str(disponibles) +' del producto '+producto.nombre+' en el deposito de '+deposito.direccion
+            estado='alert alert-success'
+        except ErrorProducto:
+            pass
+        except ErrorStock:
+            pass
+        except ObjectDoesNotExist:
+            mensaje='Error en los Datos'
+            estado='alert alert-error'
     return render_to_response('cargarStock.html',{'mensaje':mensaje, 'estado':estado, 'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 
 
 # =======================
@@ -295,8 +306,10 @@ def cobro(request):
             detalleRemito.remito = remito
             detalleRemito.producto = detalleFactura.producto
             detalleRemito.save()
+
+            stock= Stock.objects.get(producto=detalle.getProducto(), deposito=detalle.getDeposito())
+            stock.reservadosNoConfirmados -= detalle.getCantidad()
+            stock.reservadosConfirmados += detalle.getCantidad()
+            stock.save()
         notaVenta.save()
-            
-        
     return render_to_response('cobro.html',{'notas':notas},context_instance=RequestContext(request))
-    

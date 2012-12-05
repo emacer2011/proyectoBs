@@ -5,3 +5,9 @@ class ErrorDeposito(Exception):
 
 class ErrorVenta(Exception):
     pass
+
+class ErrorStock(Exception):
+    pass
+
+class ErrorProducto(Exception):
+    pass

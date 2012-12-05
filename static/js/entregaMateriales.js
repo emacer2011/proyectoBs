@@ -15,7 +15,33 @@ function cargarEntregados(pk){
   );    
     
 }
+ 
+ 
+function actualizarEntregados(){
+    debugger;
+    var pk = document.getElementById("pkRemito").value;
+    $.get ("/actualizarEntregados",{ pkRemito: pk },function(data){
+        window.location.reload();
+    }
+  );    
     
+}   
+
+function cerrar(){
+    var check,filaActual;
+    var tabla = document.getElementById("tablaDetalles");
+    var filas = tabla.rows;
+            debugger;
+    for(i=1; i < filas.length; i++){
+        filaActual = filas[i];
+        check = filaActual.cells[3].children[0];
+        if((check.checked) && !(check.hasAttribute("disabled"))){
+            cargarEntregados(filaActual.cells[0].innerHTML);
+        }
+    }
+        
+    
+}
 
 function popPropio(pk){
         var nroRemito = document.getElementById("pkRemito");
@@ -32,6 +58,7 @@ function popPropio(pk){
 }
     
 function volver(){
+        cerrar();
         var elemento=document.getElementById("modalPropio");
         elemento.className="modal hide fade";
         elemento.style.display="none";
