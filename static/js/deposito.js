@@ -43,47 +43,66 @@
 			}
 			return validarTelefono(document.getElementById('telefonoDeposito'));
 		}
+	
+	function popPropio(pk,direccion,rubro,telefono){
+        var pkDeposito = document.getElementById("pkDeposito");
+        pkDeposito.value = pk;
+        var direccionDeposito = document.getElementById("direccionDeposito");
+        direccionDeposito.value= direccion;
+        var telDeposito = document.getElementById("telefonoDeposito");
+        telDeposito.value= telefono;
+        var rubroDeposito = document.getElementById("rubroDeposito");
+        rubroDeposito.value= rubro;
+        var elemento=document.getElementById("modalPropio");
+        elemento.className="modal hide fade in";
+        elemento.style.display="block";
+        elemento.setAttribute("aria-hidden",false);
+        elemento = document.createElement('div');
+        elemento.setAttribute('id','nuevoPop');
+        elemento.className="modal-backdrop fade in";
+        document.getElementById("paraFondo").appendChild(elemento);
+}
+    
+    function volver(){
+        var elemento=document.getElementById("modalPropio");
+        elemento.className="modal hide fade";
+        elemento.style.display="none";
+        elemento.setAttribute("aria-hidden",true);
+        elemento = document.getElementById("paraFondo");
+        var remover = document.getElementById("nuevoPop");
+        elemento.removeChild(remover);
+}    
 
 
-  	function buscar(texto){
-		var tabla, txt, filas, elemento,aComparar, aComparar2,rta, rtaTel;
-		txt = texto.toUpperCase();
-		tabla = document.getElementById("tablaDeposito");
-		filas = tabla.getElementsByTagName('tr');
-		for(i=0;i<=filas.length;i++){
-		    elemento = filas[i];
-		    elemento.style.display='none';
-		    aComparar = elemento.cells[0].textContent;
-		    aComparar = aComparar.toUpperCase();
-		    rta = aComparar.indexOf(txt);
-		    if(rta != -1){
+function buscar(texto,idTabla){
+    var tabla, txt, filas, elemento,aComparar, aComparar2,rta, rtaTel;
+    txt = texto.toUpperCase();
+    tabla = document.getElementById(idTabla);
+    filas = tabla.getElementsByTagName('tr');
+    for(i=0;i<=filas.length;i++){
+          elemento = filas[i];
+          elemento.style.display='none';
+          aComparar = elemento.cells[0].textContent;
+          aComparar = aComparar.toUpperCase();
+          rta = aComparar.indexOf(txt);
+          if(rta != -1){
                 elemento.style.display='';
             }
-		    aComparar2 = elemento.cells[1].textContent;
-		    aComparar2 = aComparar2.toUpperCase();
-		    rtaTel= aComparar2.indexOf(txt);
-		    if(rtaTel != -1){
-		          elemento.style.display='';
-		     }
-		}
-		
-	}
-        
-        function restaurar(){
-            var tabla,filas,elemento;
-                tabla = document.getElementById("tablaDeposito");
-		        filas = tabla.getElementsByTagName('tr');
-		        for(i=0;i<=filas.length;i++){
-                    elemento = filas[i];
-                    elemento.style.display='';
-		        }
-        }
+          aComparar2 = (elemento.cells[1].textContent).toUpperCase();
+          rtaTel= aComparar2.indexOf(txt);
+          if(rtaTel != -1){
+            elemento.style.display='';
+       }
+    }
 
-	function validarTexto(texto){
-		buscar(texto);
-	}
-	
-	function popupPropio(){    
-	    $('#modalPropio').modal('show')
-	    
-	   }
+}
+    
+    function restaurar(idTabla){
+        var tabla,filas,elemento;
+            tabla = document.getElementById(idTabla);
+      filas = tabla.getElementsByTagName('tr');
+      for(i=0;i<=filas.length;i++){
+                elemento = filas[i];
+                elemento.style.display='';
+      }
+}

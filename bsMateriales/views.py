@@ -151,9 +151,23 @@ def bajaDeposito(request):
 def modificarDeposito(request):
     """docstring for modificarDeposito"""
     depositos = Deposito.objects.all()
+    rubros = Rubro.objects.all()
     mensaje = ""
     estado = ""
-    return render_to_response('gstDeposito/modificarDeposito.html',{'depositos':depositos, 'mensaje': mensaje, 'estado': estado},context_instance=RequestContext(request)) 
+    if request.POST:
+        try:
+            deposito = Deposito.objects.get(pk = request.POST.get('pkDeposito') )
+            deposito.setDireccion(request.POST.get('direccionDeposito'))
+            deposito.setTelefono(request.POST.get('telefonoDeposito'))
+            deposito.setRubro(request.POST.get('rubroDeposito'))
+            deposito.save()
+            mensaje='Deposito Modficiado con direccion: '+deposito.direccion
+            estado='alert alert-success'
+        except ErrorDeposito:
+            mensaje='Error en los Datos'
+            estado='alert alert-error'
+        
+    return render_to_response('gstDeposito/modificarDeposito.html',{'depositos':depositos, 'rubros':rubros, 'mensaje': mensaje, 'estado': estado},context_instance=RequestContext(request)) 
 
 
 # =========

@@ -341,6 +341,44 @@ form {
 }
 
 
+#modificarDeposito-direccion{
+    width:29%;
+}
+
+
+#modificarDeposito-rubro{
+    width:27%;
+}
+
+#modificarDeposito-telefono{
+    width:23%;
+}
+
+
+#modificarDeposito-modificar{
+    width:20%;
+}
+
+#modificarDeposito-Titulo-direccion{
+    width:27%;
+}
+
+
+#modificarDeposito-Titulo-rubro{
+    width:25%;
+}
+
+#modificarDeposito-Titulo-telefono{
+    width:20%;
+}
+
+
+#modificarDeposito-Titulo-modificar{
+    width:20%;
+}
+
+
+
 
 
 
