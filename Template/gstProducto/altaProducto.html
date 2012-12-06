@@ -3,7 +3,7 @@
 
 
 {% block cabecera %}
-    <script language="javascript" type="text/javascript" src="/static/js/deposito.js"></script>
+    <script language="javascript" type="text/javascript" src="/static/js/producto.js"></script>
     Alta de Productos    
 {% endblock %}
 
@@ -16,7 +16,7 @@
 {% block contenedor %}
 <div class="container">
 
-        <form class="form-horizontal" method="POST" action="" onSubmit="">  
+        <form class="form-horizontal" method="POST" action="" onSubmit="return validaProducto(this);">  
     
           <fieldset>
             <legend>Complete los siguientes campos</legend>

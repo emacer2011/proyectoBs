@@ -2,17 +2,9 @@
 
 
 {% block cabecera %}
-    Baja Producto
+    Listado de Productos
     <script language="javascript" type="text/javascript" src="/static/js/producto.js"></script>
-    <script language="javascript" type="text/javascript" src="/static/js/jquery.js"></script>
         
-{% endblock %}
-
-
-{% block mensaje %}
-    <div id="mensajes" class="{{estado}}"s>
-        {{mensaje}}
-    </div>
 {% endblock %}
 
 
@@ -31,7 +23,6 @@
                     <!--<th class="table-head" id="CargaStock-Categoria">Categoria</th>-->
                     <th class="table-head" id="Producto-Titulo-Cantidad">Cant.</th>
                     <th class="table-head" id="Producto-Titulo-Precio">$</th>
-                    <th class="table-head" id="Producto-Titulo-Cargar">Eliminar</th>
                 </tr>    
             </thead>
         </table>
@@ -39,10 +30,10 @@
 
 
 <div id="ContenedorTabla">
-<table id="tablaProducto" cellpadding="0" cellspacing="0" class="table table-striped">
+<table id="tablaDeposito" cellpadding="0" cellspacing="0" class="table table-striped">
     </thead>
-<tbody>
-    {% for producto in productos %}
+    <tbody>
+        {% for producto in productos %}
 
         <tr>        
             <td id="Producto-Nombre">{{producto.nombre}}</td>
@@ -51,9 +42,7 @@
             <!-- <td id="Producto-Categoria">como se vende</td> -->
             <td id="Producto-Cantidad">{{producto.cantidad}}</td>
             <td id="Producto-Precio">{{producto.precio}}</td>
-            <td id="Producto-Cargar"> <button class="btn btn-danger" onClick="bajaProducto('{{producto.pk}}')" type="submit"> <i class="icon-trash icon-white"></i> Eliminar </button> 
-            </td>
-    </tr>
+        </tr>
         {% endfor %}
     </tbody>
 </table>

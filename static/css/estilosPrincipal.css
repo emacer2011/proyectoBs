@@ -246,11 +246,27 @@ form {
     width:18%;    
 }
 
+#Producto-Titulo-Nombre{
+    width:18%;    
+}
+
+#Producto-Nombre{
+    width:18%;    
+}
+
 #CargaStock-Descripcion{
-    width:29%;    
+    width:27%;    
+}
+
+#Producto-Descripcion{
+    width:27%;    
 }
 
 #CargaStock-Titulo-Descripcion{
+    width:27%;    
+}
+
+#Producto-Titulo-Descripcion{
     width:27%;    
 }
 
@@ -258,14 +274,35 @@ form {
     width:24%;    
 }
 
+#Producto-TipoProducto{
+    width:24%;
+}
+
+#Producto-Titulo-TipoProducto{
+    width:24%;
+}
+
 #CargaStock-Categoria{
+    width:16%;    
+}
+
+#Producto-Categoria{
     width:16%;    
 }
 
 #CargaStock-Cantidad{
     width:6%;
 }
+
 #CargaStock-Titulo-Cantidad{
+    width:6%;
+}
+
+#Producto-Titulo-Cantidad{
+    width:7%;
+}
+
+#Producto-Cantidad{
     width:7%;
 }
 
@@ -273,7 +310,23 @@ form {
     width:10%;
 }
 
+#Producto-Precio{
+    width:10%;
+}
+
+#Producto-Titulo-Precio{
+    width:10%;
+}
+
 #CargaStock-Cargar{
+    text-align:center;
+}
+
+#Producto-Cargar{
+    text-align:center;
+}
+
+#Producto-Titulo-Cargar{
     text-align:center;
 }
 

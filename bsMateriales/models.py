@@ -111,6 +111,31 @@ class Producto(models.Model):
     def __unicode__(self):
         return "%s" % self.nombre
 
+    def puedeBorrarse(self):
+        try:
+            stock = Stock.objects.get(producto = self)
+            return False
+        except ObjectDoesNotExist:
+            return True
+    
+    def setNombre(self,nombre):
+         if re.match('\d{7,13}$', nombre):
+            self.nombre = nombre
+         else:
+            raise ErrorProducto()
+    
+    def setDescripcion(self,descripcion):
+         if re.match('\d{7,13}$', descripcion):
+            self.descripcion = descripcion
+         else:
+            raise ErrorProducto()
+
+    def setPrecio(self, precio):
+         if precio>0:
+            self.precio = precio
+         else:
+            raise ErrorProducto()
+            
     def getPrecio(self):
         return self.precio
 

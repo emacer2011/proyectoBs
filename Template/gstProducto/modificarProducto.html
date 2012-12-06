@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+
+{% block cabecera %}
+    Modificar Producto
+    <script language="javascript" type="text/javascript" src="/static/js/producto.js"></script>
+        
+{% endblock %}
+
+
+{% block mensaje %}
+    <div class="{{estado}}">
+        {{mensaje}}
+    </div>
+{% endblock %}
+
+
+{% block contenedor %}
+
+<div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Modificar Producto</h3>
+    </div>
+    
+    <div class="modal-body">
+    <form method="POST" action="" onSubmit="return validaProducto(this);">
+                            <input id="pkProducto" name="pkProducto" value = "{{producto.pk}}" type="hidden">
+                                <div align="center">
+                                    <div style="margin-right:10px;">
+                                    Nombre
+                                    <input id="nombreProducto" name="nombreProducto" style="height:27px;margin-left:10px;" type="text" placeholder="Nombre"></div>
+                                    <div style="margin-right:30px;">
+                                    Descripci&oacuten
+                                    <input id="descripcionProducto" name="descripcionProducto" style="height:27px;margin-left:10px;" type="text" placeholder="Descripcion"></div>
+                                    Precio
+                                    <input id="precioProducto" name="precioProducto" style="height:27px;margin-left:10px;" type="text" placeholder="Precio"><br>
+                                    <div style="margin-right:55px;">
+                                    Tipo de Producto
+                                    <select name="tipoProducto" id="tipoProducto" style="margin-left:15px;" >
+                                        {% for  tipoProducto in tipoProductos %}
+                                        <option value="{{tipoProducto.pk}}">{{tipoProducto.nombre}}</option>
+                                        {% endfor %}
+                                    </select></div>
+                            </div>
+    </div>
+    <div class="modal-footer">
+        <input class="btn btn-primary" type="submit" value="Guardar" >
+    </form>        
+        <button class="btn" data-dismiss="modal" aria-hidden="true" onClick="volver()">Cancelar</button>
+    </div>
+
+    
+</div>
+    <div id="CabeceraLDTablas">
+        <form class="navbar-search pull-left" style="padding-left:20px">
+            <input type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='buscar(this.value,"tablaProductos");' ><br>
+        </form><br>
+        <table class="table table-striped" style="margin-top:20px">
+            <thead>
+                <tr>
+                    <th class="table-head" id="Producto-Titulo-Nombre">Producto</th>
+                    <th class="table-head" id="Producto-Titulo-Descripcion">Descripci&oacuten</th>
+                    <th class="table-head" id="Producto-Titulo-TipoProducto">T.Producto</th>
+                    <th class="table-head" id="Producto-Titulo-Precio">$</th>
+                    <th class="table-head" id="Producto-Titulo-Cargar">Cargar</th>
+                </tr>    
+            </thead>
+        </table>
+    </div>
+
+
+<div id="ContenedorTabla">
+<table id="tablaProductos" cellpadding="0" cellspacing="0" class="table table-striped">
+    </thead>
+    <tbody>
+        {% for producto in productos %}
+            <tr>        
+                <td id="Producto-Nombre">{{producto.nombre}}</td>
+                <td id="Producto-Descripcion">{{producto.descripcion}}</td>
+                <td id="Producto-TipoProducto">{{producto.tipoProducto}}</td>
+                <td id="Producto-Precio">{{producto.precio}}</td>
+                <td id="Producto-Cargar"><button onClick="popPropio('{{producto.pk}}','{{producto.nombre}}','{{producto.descripcion}}','{{producto.tipoProducto}}','{{producto.precio}}')" class="btn btn-success" data-toggle="modal">
+                    <i class="icon-plus icon-white"></i>
+                    </button>
+            </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    <div id="paraFondo"></div>
+</table>
+
+{% endblock %}

@@ -8,8 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, HttpResponse
 from misExcepciones import *
 from datetime import *
-
-
+from django.db import transaction
 # ==================
 # = Funciones Ajax =
 # ==================
@@ -48,11 +47,9 @@ def cargarEntregados(request):
     return HttpResponseRedirect("/cargarDetalles")
 
 def actualizarEntregados(request):
-    print "asdasdasdasdas"
     pkRemito = request.GET.get('pkRemito')
     remito = Remito.objects.get(pk = pkRemito )
     remito.actualizarEntregados()
-    print "GADSDASDASDSA"
     return HttpResponseRedirect("/cargarDetalles")
 
 # =======================
@@ -101,6 +98,7 @@ def index(request):
 # ====================
 # = GESTION DEPOSITO =
 # ====================
+@transaction.commit_on_success
 @login_required(login_url='/login')
 def altaDeposito(request):
     """docstring for altaDeposito"""
@@ -109,16 +107,12 @@ def altaDeposito(request):
     estado = ''
     mensaje=''
     if request.POST:
-        try:
-            deposito.setDireccion(request.POST.get('direccionDeposito'))
-            deposito.setTelefono(request.POST.get('telefonoDeposito'))
-            deposito.setRubro(request.POST.get('rubroDeposito'))
-            deposito.save()
-            mensaje='Deposito dado de alta con direccion: '+deposito.direccion
-            estado='alert alert-success'
-        except ErrorDeposito:
-            mensaje='Error en los Datos'
-            estado='alert alert-error'
+        deposito.setDireccion(request.POST.get('direccionDeposito'))
+        deposito.setTelefono(request.POST.get('telefonoDeposito'))
+        deposito.setRubro(request.POST.get('rubroDeposito'))
+        deposito.save()
+        mensaje='Deposito dado de alta con direccion: '+deposito.direccion
+        estado='alert alert-success'
     return render_to_response('gstDeposito/altaDeposito.html',{'estado':estado, 'rubros':rubros, 'mensaje': mensaje},context_instance=RequestContext(request))
 
 @login_required(login_url='/login')
@@ -128,6 +122,7 @@ def listarDeposito(request):
     return render_to_response('gstDeposito/listarDeposito.html',{'depositos':depositos},context_instance=RequestContext(request)) 
 
 @login_required(login_url='/login')
+@transaction.commit_on_success
 def bajaDeposito(request):
     """docstring for bajaDeposito"""
     estado = ""
@@ -137,17 +132,14 @@ def bajaDeposito(request):
         if request.GET:
             pk = request.GET.get('pkDeposito')
             deposito = Deposito.objects.get(pk = pk )
-            try: 
-                mensaje='Deposito con direccion: '+deposito.direccion+" eliminado"
-                estado='alert alert-success'
-                deposito.eliminarDeposito()
-            except ErrorDeposito:
-                mensaje='No se puede eliminar, deposito con stock'
-                estado='alert alert-error'
+            mensaje='Deposito con direccion: '+deposito.direccion+" eliminado"
+            estado='alert alert-success'
+            deposito.eliminarDeposito()
             return HttpResponse(str(estado)+"/"+str(mensaje))
     return render_to_response('gstDeposito/bajaDeposito.html',{'depositos':depositos, 'mensaje': mensaje, 'estado': estado},context_instance=RequestContext(request)) 
 
 @login_required(login_url='/login')
+@transaction.commit_on_success
 def modificarDeposito(request):
     """docstring for modificarDeposito"""
     depositos = Deposito.objects.all()
@@ -155,17 +147,13 @@ def modificarDeposito(request):
     mensaje = ""
     estado = ""
     if request.POST:
-        try:
-            deposito = Deposito.objects.get(pk = request.POST.get('pkDeposito') )
-            deposito.setDireccion(request.POST.get('direccionDeposito'))
-            deposito.setTelefono(request.POST.get('telefonoDeposito'))
-            deposito.setRubro(request.POST.get('rubroDeposito'))
-            deposito.save()
-            mensaje='Deposito Modficiado con direccion: '+deposito.direccion
-            estado='alert alert-success'
-        except ErrorDeposito:
-            mensaje='Error en los Datos'
-            estado='alert alert-error'
+        deposito = Deposito.objects.get(pk = request.POST.get('pkDeposito') )
+        deposito.setDireccion(request.POST.get('direccionDeposito'))
+        deposito.setTelefono(request.POST.get('telefonoDeposito'))
+        deposito.setRubro(request.POST.get('rubroDeposito'))
+        deposito.save()
+        mensaje='Deposito Modficiado con direccion: '+deposito.direccion
+        estado='alert alert-success'
         
     return render_to_response('gstDeposito/modificarDeposito.html',{'depositos':depositos, 'rubros':rubros, 'mensaje': mensaje, 'estado': estado},context_instance=RequestContext(request)) 
 
@@ -173,6 +161,7 @@ def modificarDeposito(request):
 # =========
 # = Venta =
 # =========
+@transaction.commit_on_success
 @login_required(login_url='/login')
 def venta(request):
     """docstring for venta"""
@@ -182,45 +171,41 @@ def venta(request):
     if request.POST:
         productos = Producto.objects.all()
         notaVenta= NotaVenta()
-        try:
-            notaVenta.setNombre(request.POST.get("nombrePersona"))
-            notaVenta.setApellido(request.POST.get("apellidoPersona"))
-            notaVenta.setFecha(date.today())
-            notaVenta.setPrecioTotal(0)
-            notaVenta.setFacturada(False)
-            notaVenta.save()
-            palabra = request.POST.get("productos")
-            palabraParse = str(palabra).split(",")
-            dic =  {}
-            for i in palabraParse :
-                claveValor = i.split("=")
-                dic[Producto.objects.get(pk = claveValor[0])] = claveValor[1]
-            productos =dic.keys()
-            for producto in productos:
-                listaStock = producto.vender(cantidad = dic[producto])
-                stocks = listaStock.keys()
-                for stock in stocks:
-                    detalle = DetalleNotaVenta()
-                    detalle.setProducto(stock.getProducto())
-                    detalle.setCantidad(listaStock[stock])
-                    detalle.setSubTotal(producto.getPrecio() * detalle.getCantidad())
-                    detalle.setDeposito(stock.getDeposito())
-                    detalle.setNota(notaVenta)
-                    detalle.save()
-                    mensaje ="Venta Realizada Con Exito" 
-                    estado = 'alert alert-success'
-                    notaVenta.incrementarTotal(detalle.getSubTotal())
-            notaVenta.save()
-        except ErrorVenta,ObjectDoesNotExist:
-            mensaje='Error en la Venta, Intentelo Nuevamente'
-            estado='alert alert-error'
-            notaVenta.delete()
+        notaVenta.setNombre(request.POST.get("nombrePersona"))
+        notaVenta.setApellido(request.POST.get("apellidoPersona"))
+        notaVenta.setFecha(date.today())
+        notaVenta.setPrecioTotal(0)
+        notaVenta.setFacturada(False)
+        notaVenta.save()
+        palabra = request.POST.get("productos")
+        palabraParse = str(palabra).split(",")
+        dic =  {}
+        for i in palabraParse :
+            claveValor = i.split("=")
+            dic[Producto.objects.get(pk = claveValor[0])] = claveValor[1]
+        productos =dic.keys()
+        for producto in productos:
+            listaStock = producto.vender(cantidad = dic[producto])
+            stocks = listaStock.keys()
+            for stock in stocks:
+                detalle = DetalleNotaVenta()
+                detalle.setProducto(stock.getProducto())
+                detalle.setCantidad(listaStock[stock])
+                detalle.setSubTotal(producto.getPrecio() * detalle.getCantidad())
+                detalle.setDeposito(stock.getDeposito())
+                detalle.setNota(notaVenta)
+                detalle.save()
+                mensaje ="Venta Realizada Con Exito" 
+                estado = 'alert alert-success'
+                notaVenta.incrementarTotal(detalle.getSubTotal())
+        notaVenta.save()
                 
     return render_to_response('venta.html',{'productos':productos,'estado': estado, 'mensaje':mensaje},context_instance=RequestContext(request)) 
 
 # ================
 # = Cargar Stock =
 # ================
+@transaction.commit_on_success
 @login_required(login_url='/login')
 def cargarStock(request):
     """docstring for cargarStock"""
@@ -228,28 +213,22 @@ def cargarStock(request):
     depositos = Deposito.objects.all()
     mensaje = ""
     estado= ""
-    if request.POST:
-        try:        
-            producto =Producto.objects.get(pk = request.POST.get("pkProducto"))
-            disponibles = int(request.POST.get("disponible"))
-            deposito=Deposito.objects.get(pk =request.POST.get("deposito"))
-            Stock.cargarStock(disponibles,deposito, producto)
-            producto.setCantidad(producto.cantidad + disponibles)
-            producto.save()
-            mensaje='Se agrega '+str(disponibles) +' del producto '+producto.nombre+' en el deposito de '+deposito.direccion
-            estado='alert alert-success'
-        except ErrorProducto:
-            pass
-        except ErrorStock:
-            pass
-        except ObjectDoesNotExist:
-            mensaje='Error en los Datos'
-            estado='alert alert-error'
+    if request.POST:        
+        producto =Producto.objects.get(pk = request.POST.get("pkProducto"))
+        disponibles = int(request.POST.get("disponible"))
+        deposito=Deposito.objects.get(pk =request.POST.get("deposito"))
+        Stock.cargarStock(disponibles,deposito, producto)
+        producto.setCantidad(producto.cantidad + disponibles)
+        producto.save()
+        mensaje='Se agrega '+str(disponibles) +' del producto '+producto.nombre+' en el deposito de '+deposito.direccion
+        estado='alert alert-success'
+        
     return render_to_response('cargarStock.html',{'mensaje':mensaje, 'estado':estado, 'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 
 
 # =======================
 # = Gestion de Producto =
 # =======================
+@transaction.commit_on_success
 @login_required(login_url='/login')
 def altaProducto(request):
     """docstring for altaProducto"""
@@ -261,17 +240,74 @@ def altaProducto(request):
         producto.nombre = request.POST.get("nombreProducto")
         producto.descripcion = request.POST.get("descripcionProducto")
         producto.tipoProducto = TipoProducto.objects.get(pk = request.POST.get("tipoProducto"))
-        producto.precio = request.POST.get("precioProducto")
-        producto.cantidad = 0
+        producto.setPrecio(request.POST.get("precioProducto"))
+        producto.setCantidad(0)
         producto.estrategiaVenta = NoFraccionable.objects.get(pk = 0)
         producto.save()
         mensaje='Producto dado de alta con nombre: ' + producto.nombre
         estado='alert alert-success'
     return render_to_response('gstProducto/altaProducto.html',{'estado':estado, 'mensaje':mensaje, 'tipoProductos':tipoProductos},context_instance=RequestContext(request)) 
     
+@transaction.commit_on_success
+@login_required(login_url='/login')    
+def bajaProducto(request):
+    """docstring for bajaProducto"""
+    mensaje = ""
+    estado = ""
+    productos = Producto.objects.all()
+    if request.is_ajax():
+        producto = Producto.objects.get(pk =request.GET.get("pkProducto") )
+        if producto.puedeBorrarse():
+            mensaje="Producto Eliminado"
+            estado='alert alert-success'
+            producto.delete()
+        else:
+            mensaje="No se pudo Eliminar porque tiene stocks relacionados"
+            estado='alert alert-error'
+        return HttpResponse(str(estado)+"/"+str(mensaje))
+    return render_to_response('gstProducto/bajaProducto.html',{'estado':estado, 'mensaje':mensaje, 'productos':productos},context_instance=RequestContext(request)) 
+
+@transaction.commit_on_success
+@login_required(login_url='/login')        
+def modificarProducto(request):
+    """docstring for altaProducto"""
+    tipoProductos = TipoProducto.objects.all()
+    productos = Producto.objects.all()
+    mensaje = ""
+    estado = ""
+    if request.POST:
+        try:
+            producto= Producto.objects.get(pk = request.POST.get("pkProducto"))
+            producto.nombre = request.POST.get("nombreProducto")
+            if producto.nombre == "":
+                raise ErrorProducto
+            producto.descripcion = request.POST.get("descripcionProducto")
+            producto.tipoProducto = TipoProducto.objects.get(pk = request.POST.get("tipoProducto"))
+            if (producto.tipoProducto == None):
+                raise ErrorProducto
+            producto.precio = request.POST.get("precioProducto")
+            if int(producto.precio) <= 0:
+                raise ErrorProducto
+            producto.cantidad = 0
+            producto.estrategiaVenta = NoFraccionable.objects.get(pk = 0)
+            producto.save()
+            mensaje='Producto dado de alta con nombre: ' + producto.nombre
+            estado='alert alert-success'
+        except ErrorProducto:
+            mensaje='Error al cargar los datos, por favor verifique el correcto ingreso de los mismos'
+            estado='alert alert-error'
+    return render_to_response('gstProducto/modificarProducto.html',{'estado':estado, 'mensaje':mensaje, 'tipoProductos':tipoProductos, 'productos': productos},context_instance=RequestContext(request)) 
+
+@login_required(login_url='/login')
+def listarProducto(request):
+    """docstring for listarProducto"""
+    productos = Producto.objects.all()
+    return render_to_response('gstProducto/listarProducto.html',{'productos':productos},context_instance=RequestContext(request)) 
+
 # ======================
 # = Entrega Materiales =
 # ======================
+@transaction.commit_on_success
 @login_required(login_url='/login')
 def entregaMateriales(request):
     """docstring for entregaMateriales"""
@@ -282,6 +318,7 @@ def entregaMateriales(request):
 # =====================
 # = Cobro de Facturas =
 # =====================
+@transaction.commit_on_success
 @login_required(login_url='/login')
 def cobro(request):
     """docstring for cobro"""
