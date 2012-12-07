@@ -237,8 +237,8 @@ def altaProducto(request):
     estado = ""
     if request.POST:
         producto= Producto()
-        producto.nombre = request.POST.get("nombreProducto")
-        producto.descripcion = request.POST.get("descripcionProducto")
+        producto.setNombre = request.POST.get("nombreProducto")
+        producto.setDescripcion = request.POST.get("descripcionProducto")
         producto.tipoProducto = TipoProducto.objects.get(pk = request.POST.get("tipoProducto"))
         producto.setPrecio(request.POST.get("precioProducto"))
         producto.setCantidad(0)

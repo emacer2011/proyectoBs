@@ -119,16 +119,13 @@ class Producto(models.Model):
             return True
     
     def setNombre(self,nombre):
-         if re.match('\d{7,13}$', nombre):
+         if re.match('\w{3,30}$', nombre):
             self.nombre = nombre
          else:
             raise ErrorProducto()
     
     def setDescripcion(self,descripcion):
-         if re.match('\d{7,13}$', descripcion):
-            self.descripcion = descripcion
-         else:
-            raise ErrorProducto()
+         self.descripcion = descripcion
 
     def setPrecio(self, precio):
          if precio>0:
