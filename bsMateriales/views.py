@@ -186,7 +186,10 @@ def venta(request):
         productos =dic.keys()
         for producto in productos:
             listaStock = producto.vender(cantidad = dic[producto])
+            #TODO: producto.vender devuelve mal la lista de stocks afectados!
             stocks = listaStock.keys()
+            #import pdb # DEBUGGER
+            #pdb.set_trace()# DEBUGGER
             for stock in stocks:
                 detalle = DetalleNotaVenta()
                 detalle.setProducto(stock.getProducto())

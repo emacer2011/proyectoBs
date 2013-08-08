@@ -277,7 +277,57 @@ class NoFraccionable(Fraccionable):
     def instance(cls):
         return NoFraccionable.objects.get(pk = ESTRATEGIA_NOFRACCIONABLE)    
 
+    
+    def stocksAfectados (self, producto, cantidad):
+        listaStocks = []
+        #Caso en que un solo deposito cumple con la totalidad de la demanda
+        stocksOrdenados = sorted(producto.stock_set.all(), key=lambda stock: stock.disponibles)
+        for stock in stocksOrdenados:
+            if stock.disponibles >= cantidad:
+                return [stock]
+        stocksOrdenados = sorted(producto.stock_set.all(), key=lambda stock: stock.disponibles, reverse=True)
+        #Caso contrario
+        for stock in stocksOrdenados:
+            listaStocks.append(stock)
+            cantidad = cantidad - stock.disponibles
+            if cantidad <= 0:   
+                return listaStocks
+
     def vender(self, producto, cantidad, fraccion):
+
+        cantidad = int(cantidad)
+        
+        #TODO: crear y lazar la excepcion correspondiente a Stock Insuficiente
+        depositosAfectados = {}
+        if producto.verificarCantidadStock() >= cantidad:
+            stocks = self.stocksAfectados(producto, cantidad)
+
+            producto.cantidad = producto.cantidad - cantidad
+            producto.save()
+            for stock in stocks:
+                if cantidad > 0:
+                    if stock.disponibles >= cantidad:
+                        stock.disponibles = stock.disponibles - cantidad
+                        stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + cantidad
+                        stock.save()
+                        depositosAfectados[stock] = cantidad
+                        cantidad = 0
+                        return depositosAfectados
+                    else:
+                        cantidad = cantidad - stock.disponibles
+                        stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + stock.disponibles
+                        cantidadTemporal= stock.disponibles
+                        stock.disponibles = 0
+                        stock.save()
+                        depositosAfectados[stock]= cantidadTemporal 
+            return depositosAfectados
+
+
+
+
+
+
+    def vender1(self, producto, cantidad, fraccion):
         cantidad = int(cantidad)
         stockAfectados = {}
         ventaCompleta = False
@@ -309,6 +359,7 @@ class NoFraccionable(Fraccionable):
                     producto.cantidad = producto.cantidad - stockMinimo.disponibles
                     stockMinimo.disponibles = 0
                     stockMinimo.save()
+        
         producto.save()                    
         return stockAfectados
 
