@@ -107,9 +107,7 @@ def altaDeposito(request):
     estado = ''
     mensaje=''
     if request.POST:
-        deposito.setDireccion(request.POST.get('direccionDeposito'))
-        deposito.setTelefono(request.POST.get('telefonoDeposito'))
-        deposito.setRubro(request.POST.get('rubroDeposito'))
+        deposito.inicializar(request.POST.get('direccionDeposito'),request.POST.get('telefonoDeposito'),request.POST.get('rubroDeposito'))
         deposito.save()
         mensaje='Deposito dado de alta con direccion: '+deposito.direccion
         estado='alert alert-success'
@@ -148,9 +146,7 @@ def modificarDeposito(request):
     estado = ""
     if request.POST:
         deposito = Deposito.objects.get(pk = request.POST.get('pkDeposito') )
-        deposito.setDireccion(request.POST.get('direccionDeposito'))
-        deposito.setTelefono(request.POST.get('telefonoDeposito'))
-        deposito.setRubro(request.POST.get('rubroDeposito'))
+        deposito.inicializar(request.POST.get('direccionDeposito'),request.POST.get('telefonoDeposito'),request.POST.get('rubroDeposito'))
         deposito.save()
         mensaje='Deposito Modficiado con direccion: '+deposito.direccion
         estado='alert alert-success'
@@ -171,12 +167,10 @@ def venta(request):
     if request.POST:
         productos = Producto.objects.all()
         notaVenta= NotaVenta()
-        notaVenta.setNombre(request.POST.get("nombrePersona"))
-        notaVenta.setApellido(request.POST.get("apellidoPersona"))
-        notaVenta.setFecha(date.today())
-        notaVenta.setPrecioTotal(0)
-        notaVenta.setFacturada(False)
+        notaVenta.inicializar(request.POST.get("nombrePersona"), request.POST.get("apellidoPersona"))
         notaVenta.save()
+
+        #PROCESA ENTRADAS DE LOS DATOS
         palabra = request.POST.get("productos")
         palabraParse = str(palabra).split(",")
         dic =  {}
@@ -184,23 +178,17 @@ def venta(request):
             claveValor = i.split("=")
             dic[Producto.objects.get(pk = claveValor[0])] = claveValor[1]
         productos =dic.keys()
+        
         for producto in productos:
             listaStock = producto.vender(cantidad = dic[producto])
-            #TODO: producto.vender devuelve mal la lista de stocks afectados!
             stocks = listaStock.keys()
-            #import pdb # DEBUGGER
-            #pdb.set_trace()# DEBUGGER
             for stock in stocks:
                 detalle = DetalleNotaVenta()
-                detalle.setProducto(stock.getProducto())
-                detalle.setCantidad(listaStock[stock])
-                detalle.setSubTotal(producto.getPrecio() * detalle.getCantidad())
-                detalle.setDeposito(stock.getDeposito())
-                detalle.setNota(notaVenta)
+                detalle.inicializar(stock.getProducto(),listaStock[stock],(producto.getPrecio() * listaStock[stock]), stock.getDeposito(),notaVenta)
                 detalle.save()
+                notaVenta.incrementarTotal(detalle.getSubTotal())
                 mensaje ="Venta Realizada Con Exito" 
                 estado = 'alert alert-success'
-                notaVenta.incrementarTotal(detalle.getSubTotal())
         notaVenta.save()
                 
     return render_to_response('venta.html',{'productos':productos,'estado': estado, 'mensaje':mensaje},context_instance=RequestContext(request)) 
@@ -240,12 +228,7 @@ def altaProducto(request):
     estado = ""
     if request.POST:
         producto= Producto()
-        producto.setNombre(request.POST.get("nombreProducto"))
-        producto.setDescripcion(request.POST.get("descripcionProducto"))
-        producto.tipoProducto = TipoProducto.objects.get(pk = request.POST.get("tipoProducto"))
-        producto.setPrecio(request.POST.get("precioProducto"))
-        producto.setCantidad(0)
-        producto.estrategiaVenta = NoFraccionable.objects.get(pk = 0)
+        producto.inicializar(request.POST.get("nombreProducto"),request.POST.get("descripcionProducto"), TipoProducto.objects.get(pk = request.POST.get("tipoProducto")),request.POST.get("precioProducto"),NoFraccionable.objects.get(pk = 0))
         producto.save()
         mensaje='Producto dado de alta con nombre: ' + producto.nombre
         estado='alert alert-success'
@@ -281,18 +264,7 @@ def modificarProducto(request):
     if request.POST:
         try:
             producto= Producto.objects.get(pk = request.POST.get("pkProducto"))
-            producto.nombre = request.POST.get("nombreProducto")
-            if producto.nombre == "":
-                raise ErrorProducto
-            producto.descripcion = request.POST.get("descripcionProducto")
-            producto.tipoProducto = TipoProducto.objects.get(pk = request.POST.get("tipoProducto"))
-            if (producto.tipoProducto == None):
-                raise ErrorProducto
-            producto.precio = request.POST.get("precioProducto")
-            if int(producto.precio) <= 0:
-                raise ErrorProducto
-            producto.cantidad = 0
-            producto.estrategiaVenta = NoFraccionable.objects.get(pk = 0)
+            producto.inicializar(request.POST.get("nombreProducto"),request.POST.get("descripcionProducto"), TipoProducto.objects.get(pk = request.POST.get("tipoProducto")),request.POST.get("precioProducto"),NoFraccionable.objects.get(pk = 0))
             producto.save()
             mensaje='Producto dado de alta con nombre: ' + producto.nombre
             estado='alert alert-success'
@@ -318,7 +290,8 @@ def entregaMateriales(request):
     detallesRemitos = DetalleRemito.objects.filter(entregado = False)       
     return render_to_response('entregaMateriales.html',{'remitos':remitos, 'detalles':detallesRemitos},context_instance=RequestContext(request)) 
     
-# =====================
+#TODO: FALTA FACTORIZAR EL CODIGO COBRO FACTURAS
+## =====================
 # = Cobro de Facturas =
 # =====================
 @transaction.commit_on_success
@@ -327,7 +300,7 @@ def cobro(request):
     """docstring for cobro"""
     notas = NotaVenta.objects.filter(facturada = False)
     if request.POST:
-        notaVenta=  NotaVenta.objects.get(pk = request.POST.get("nroNota"))
+        notaVenta =  NotaVenta.objects.get(pk = request.POST.get("nroNota"))
         notaVenta.facturada = True
         formaPago = request.POST.get("formaPago")
         precio = request.POST.get("precioNota")

@@ -1,8 +1,9 @@
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from misExcepciones import *
+from datetime import *
 import re
-# Create your models here.
+# TODO: FALTA FACTORIZAR TODO ESTE CODIGO
 # ===============
 # = Clase Rubro =
 # ===============
@@ -59,6 +60,11 @@ class Deposito(models.Model):
         else:
             raise ErrorDeposito()
             
+    def inicializar(self, direccion, telefono, rubro):
+        self.setDireccion(direccion)
+        self.setTelefono(telefono)
+        self.setRubro(rubro)
+
     def __unicode__(self):
         return "%s" % self.direccion
         
@@ -99,7 +105,7 @@ class Producto(models.Model):
     descripcion = models.CharField(max_length = 40, blank = True)
     tipoProducto = models.ForeignKey(TipoProducto)
     estrategiaVenta = models.ForeignKey('Fraccionable')
-    cantidad = models.IntegerField()
+    cantidad = models.IntegerField(default= 0)
     precio = models.IntegerField()
     class Meta:
         permissions = (
@@ -142,6 +148,10 @@ class Producto(models.Model):
         else:
             raise ErrorProducto()
 
+    def setTipoProducto(self, tipoProducto):
+        if (tipoProducto == None):
+                raise ErrorProducto()
+
     def obtenerEstrategiaDeVenta(self):
         if self.estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
             return NoFraccionable.instance()
@@ -160,6 +170,12 @@ class Producto(models.Model):
         else:
             return self.obtenerEstrategiaDeVenta().vender(self, cantidad, fraccion)
         
+    def inicializar(self, nombre, descripcion, tipoProducto, precio, estrategiaVenta):
+        self.setNombre(nombre)
+        self.setDescripcion(descripcion)
+        self.tipoProducto = tipoProducto
+        self.setPrecio(precio)
+        self.estrategiaVenta = estrategiaVenta 
 
 # =================
 # = Fraccionables =
@@ -296,8 +312,6 @@ class NoFraccionable(Fraccionable):
     def vender(self, producto, cantidad, fraccion):
 
         cantidad = int(cantidad)
-        
-        #TODO: crear y lazar la excepcion correspondiente a Stock Insuficiente
         depositosAfectados = {}
         if producto.verificarCantidadStock() >= cantidad:
             stocks = self.stocksAfectados(producto, cantidad)
@@ -321,47 +335,9 @@ class NoFraccionable(Fraccionable):
                         stock.save()
                         depositosAfectados[stock]= cantidadTemporal 
             return depositosAfectados
+        else:
+            raise ErrorVenta()
 
-
-
-
-
-
-    def vender1(self, producto, cantidad, fraccion):
-        cantidad = int(cantidad)
-        stockAfectados = {}
-        ventaCompleta = False
-        stockMinimo = None
-        stockLista = producto.stock_set.all()
-        while not ventaCompleta:
-            if stockLista[0].disponibles > 0:
-                stockMinimo = stockLista[0]        
-            for elementoLista in stockLista:
-                if stockMinimo != None:
-                    if (elementoLista.disponibles != 0) and (elementoLista.disponibles < stockMinimo.disponibles):
-                        stockMinimo = elementoLista
-                    else:
-                        continue
-                elif elementoLista.disponibles > 0:
-                        stockMinimo = elementoLista
-            if stockMinimo != None:            
-                if stockMinimo.disponibles >= cantidad:
-                    stockMinimo.disponibles = stockMinimo.disponibles - cantidad
-                    stockMinimo.reservadosNoConfirmados = stockMinimo.reservadosNoConfirmados + cantidad
-                    producto.cantidad = producto.cantidad - cantidad
-                    ventaCompleta = True
-                    stockMinimo.save()
-                    stockAfectados[stockMinimo] = cantidad
-                else:
-                    stockMinimo.reservadosNoConfirmados = stockMinimo.reservadosNoConfirmados + stockMinimo.disponibles
-                    cantidad = cantidad - stockMinimo.disponibles
-                    stockAfectados[stockMinimo] = stockMinimo.disponibles
-                    producto.cantidad = producto.cantidad - stockMinimo.disponibles
-                    stockMinimo.disponibles = 0
-                    stockMinimo.save()
-        
-        producto.save()                    
-        return stockAfectados
 
     def __unicode__(self):
         return "NoFraccionable"
@@ -430,7 +406,10 @@ class Detalle(models.Model):
         return self.cantidad
 
     def setCantidad(self, cantidad):
-        self.cantidad = cantidad
+        if cantidad>=0:
+            self.cantidad = cantidad
+        else:
+            raise ErrorVenta()
 
     def getSubTotal(self):
         return self.subtotal
@@ -464,6 +443,15 @@ class DetalleNotaVenta(Detalle):
     def getDeposito(self):
         return self.deposito
 
+    def inicializar(self, producto, cantidad, subTotal, deposito, notaVenta):
+        self.setProducto(producto)
+        self.setCantidad(cantidad)
+        self.setSubTotal(subTotal)
+        self.setDeposito(deposito)
+        self.setNota(notaVenta)
+        
+
+
 # ===================
 # = Detalle Factura =
 # ===================
@@ -479,9 +467,9 @@ class DetalleFactura(Detalle):
 class NotaVenta(models.Model):
     nombreCliente = models.CharField(max_length = 40)
     apellidoCliente = models.CharField(max_length = 20)
-    fecha = models.datetime 
-    precioTotal = models.IntegerField()
-    facturada = models.BooleanField()
+    fecha = models.datetime
+    precioTotal = models.IntegerField(default=0)
+    facturada = models.BooleanField(default=False)
     class Meta:
         permissions = (
             ("venta", "puede vender"),
@@ -518,6 +506,14 @@ class NotaVenta(models.Model):
 
     def setFacturada(self, factura):
         self.facturada = factura
+
+    def inicializar(self, nombrePersona= None, apellidoPersona= None):
+        self.setNombre(nombrePersona)
+        self.setApellido(apellidoPersona)
+        self.setFecha(date.today())
+
+        
+
 
 # ===========
 # = Factura =
