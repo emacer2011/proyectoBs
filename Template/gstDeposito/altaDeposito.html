@@ -33,7 +33,7 @@
                   <select id="rubroDeposito" name="rubroDeposito">
                     {% for rubro in rubros %}
     						<option value="{{rubro.pk}}">{{rubro}}</option>
-    					    <p>{{rubro.nombre}},{{rubro.pk}}</p>
+    					    <p>{rubro.getNombre()},{{rubro.pk}}</p>
     				{% endfor %}
                   </select>  
                 </div>  

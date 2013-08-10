@@ -3,17 +3,36 @@ from django.core.exceptions import ObjectDoesNotExist
 from misExcepciones import *
 from datetime import *
 import re
-# TODO: FALTA FACTORIZAR TODO ESTE CODIGO
+
 # ===============
 # = Clase Rubro =
 # ===============
 
 class Rubro(models.Model):
-    nombre = models.CharField(max_length = 40)
-    descripcion = models.CharField(max_length = 40, blank=True)
+    __nombre = models.CharField(max_length = 40)
+    __descripcion = models.CharField(max_length = 40, blank=True)
     
+    def getNombre(self):
+        return self.__nombre
+
+    def setNombre(self, nombre):
+        self.__nombre= nombre
+
+    def getDescripcion(self):
+        return self.__descripcion
+        
+    def setDescripcion(self, descripcion):
+        self.__descripcion= descripcion
+
+    def inicializar(self, nombre, descripcion, pk=None):
+        self.setDescripcion(descripcion)
+        self.setNombre(nombre)
+        self.pk=pk
+
     def __unicode__(self):
-        return "%s" % self.nombre
+        return "%s" % self.getNombre()
+
+# TODO: FALTA FACTORIZAR TODO ESTE CODIGO
 # ==================
 # = Clase Deposito =
 # ==================
@@ -151,6 +170,8 @@ class Producto(models.Model):
     def setTipoProducto(self, tipoProducto):
         if (tipoProducto == None):
                 raise ErrorProducto()
+        else:
+            self.tipoProducto = tipoProducto
 
     def obtenerEstrategiaDeVenta(self):
         if self.estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
@@ -173,7 +194,7 @@ class Producto(models.Model):
     def inicializar(self, nombre, descripcion, tipoProducto, precio, estrategiaVenta):
         self.setNombre(nombre)
         self.setDescripcion(descripcion)
-        self.tipoProducto = tipoProducto
+        self.setTipoProducto(tipoProducto)
         self.setPrecio(precio)
         self.estrategiaVenta = estrategiaVenta 
 
@@ -426,8 +447,7 @@ class Detalle(models.Model):
     def setProducto(self, producto):
         self.producto = producto
 
-    def setDeposito(self, deposito):
-        self.deposito = deposito
+    
 
 # ======================
 # = Detalle Nota Venta =
@@ -440,6 +460,12 @@ class DetalleNotaVenta(Detalle):
     def setNota(self, notaVenta):
         self.nota = notaVenta
 
+    def getNota(self):
+        return self.nota
+
+    def setDeposito(self, deposito):
+        self.deposito = deposito
+    
     def getDeposito(self):
         return self.deposito
 
@@ -459,6 +485,26 @@ class DetalleNotaVenta(Detalle):
 class DetalleFactura(Detalle):
     factura = models.ForeignKey('Factura')
     detalleNotaVenta = models.ForeignKey(DetalleNotaVenta)
+
+    def getDetalleNotaVenta(self):
+        return self.detalleNotaVenta
+
+    def setDetalleNotaVenta(self, detalle):
+        self.detalleNotaVenta = detalle
+
+    def getFactura(self):
+        return self.factura
+
+    def setFactura(self, factura):
+        self.factura = factura
+
+    def inicializar(self, detalle, factura, producto, cantidad, subTotal):
+        self.setDetalleNotaVenta(detalle)
+        self.setFactura(factura)
+        self.setProducto(producto)
+        self.setCantidad(cantidad)
+        self.setSubTotal(subTotal)
+
 
 # ==============
 # = Nota venta =
@@ -523,7 +569,37 @@ class Factura(models.Model):
     fecha = models.datetime
     formaDePago = models.CharField(max_length = 15)
     precioTotal = models.IntegerField()
-    ventaNota = models.ForeignKey(NotaVenta)   
+    ventaNota = models.ForeignKey(NotaVenta)
+
+    def getFecha(self):
+        return self.fecha
+    
+    def setFecha(self, fecha):
+        self.fecha = fecha
+
+    def getFormaDePago(self):
+        return self.formaDePago
+
+    def setFormaDePago(self, formaDePago):
+        self.formaDePago = formaDePago
+
+    def getPrecioTotal(self):
+        return self.precioTotal
+
+    def setPrecioTotal(self, precioTotal):
+        self.precioTotal = precioTotal
+
+    def getVentaNota(self):
+        return self.ventaNota
+
+    def setVentaNota(self, ventaNota):
+        self.ventaNota = ventaNota
+
+    def inicializar(self, formaDePago, precioTotal, ventaNota): 
+        self.setFormaDePago(formaDePago)
+        self.setPrecioTotal(precioTotal)
+        self.setVentaNota(ventaNota)
+        self.setFecha(date.today())
 
 
 # ==========
@@ -533,7 +609,7 @@ class Factura(models.Model):
 class Remito(models.Model):
     deposito =models.ForeignKey(Deposito)
     factura =models.ForeignKey(Factura)
-    entregadoCompleto = models.BooleanField()
+    entregadoCompleto = models.BooleanField(default = False)
     class Meta:
         permissions = (
             ("entregaMateriales", "puede entregar materiales"),
@@ -549,9 +625,27 @@ class Remito(models.Model):
         self.entregadoCompleto = entregado
         self.save()
     
-    def __unicode__(self):
-        return "%s" % self.pk
+    def getDeposito(self):
+        return self.deposito
+
+    def setDeposito(self, deposito):
+        self.deposito = deposito
+
+    def getFactura(self):
+        return self.factura
+
+    def setFactura(self, factura):
+        self.factura = factura
+
+    def setEntregadoCompleto(self, valor):
+        self.entregadoCompleto = valor
     
+    def getEntregadoCompleto(self):
+        return self.entregadoCompleto
+
+    def inicializar(self, factura, deposito):
+        self.setFactura(factura)
+        self.setDeposito(deposito)
 
 
 # ==================
@@ -560,10 +654,40 @@ class Remito(models.Model):
 
 class DetalleRemito(models.Model):
     cantidad = models.IntegerField()
-    entregado = models.BooleanField()
+    entregado = models.BooleanField(default = False)
     detalleFactura = models.ForeignKey(DetalleFactura)
     remito = models.ForeignKey(Remito)
     producto = models.ForeignKey(Producto)
+
+    def setCantidad(self, cantidad):
+        self.cantidad = cantidad
+
+    def getCantidad(self):
+        return self.cantidad
+
+    def setEntregado(self, entregado):
+        self.entregado = entregado
+
+    def getEntregado(self):
+        return self.entregado
+    
+    def setDetalleFactura(self, detalle):
+        self.detalleFactura = detalle
+
+    def getDetalleFactura(self):
+        return self.detalleFactura
+
+    def setRemito(self, remito):
+        self.remito = remito
+
+    def getRemito(self):
+        return self.remito
+
+    def setProducto(self, producto):
+        self.producto = producto
+    
+    def getProducto(self):
+        return self.producto
 
     def confirmarStock(self):
         """docstring for confirmarStock"""
@@ -573,6 +697,12 @@ class DetalleRemito(models.Model):
         else: 
               stock.reservadosConfirmados= int(stock.reservadosConfirmados)+int(self.cantidad)
         stock.save()
+
+    def inicializar(self, cantidad, detalle, remito, producto):
+        self.setCantidad(cantidad)
+        self.setDetalleFactura(detalle)
+        self.setRemito(remito)
+        self.setProducto(producto)
         
 # =============
 # = Descuento =

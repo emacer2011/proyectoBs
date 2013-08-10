@@ -290,7 +290,6 @@ def entregaMateriales(request):
     detallesRemitos = DetalleRemito.objects.filter(entregado = False)       
     return render_to_response('entregaMateriales.html',{'remitos':remitos, 'detalles':detallesRemitos},context_instance=RequestContext(request)) 
     
-#TODO: FALTA FACTORIZAR EL CODIGO COBRO FACTURAS
 ## =====================
 # = Cobro de Facturas =
 # =====================
@@ -302,39 +301,23 @@ def cobro(request):
     if request.POST:
         notaVenta =  NotaVenta.objects.get(pk = request.POST.get("nroNota"))
         notaVenta.facturada = True
-        formaPago = request.POST.get("formaPago")
-        precio = request.POST.get("precioNota")
         factura = Factura()
-        factura.fecha=date.today()
-        factura.precioTotal = precio
-        factura.ventaNota = notaVenta
+        factura.inicializar(request.POST.get("formaPago"), request.POST.get("precioNota"), notaVenta)
         factura.save()
         detalles  = DetalleNotaVenta.objects.filter(nota = notaVenta)
         for detalle in detalles:
             detalleFactura = DetalleFactura()
-            detalleFactura.detalleNotaVenta = detalle
-            detalleFactura.factura = factura
-            detalleFactura.producto = detalle.producto
-            detalleFactura.cantidad = detalle.cantidad
-            detalleFactura.subtotal = detalle.subtotal
+            detalleFactura.inicializar(detalle,factura,detalle.producto, detalle.cantidad, detalle.subtotal)
             detalleFactura.save()
             try:
                 remito = Remito.objects.get(factura = factura, deposito = detalle.deposito )
             except ObjectDoesNotExist: 
                 remito = Remito()
-                remito.factura = factura
-                remito.deposito = detalle.deposito
-                remito.entregadoCompleto = False
+                remito.inicializar(factura, detalle.deposito)   
                 remito.save()
             detalleRemito = DetalleRemito()
-            detalleRemito.cantidad = detalleFactura.cantidad
-            detalleRemito.entregado = False
-            detalleRemito.detalleFactura = detalleFactura
-            detalleRemito.remito = remito
-            detalleRemito.producto = detalleFactura.producto
-            detalleRemito.deposito = detalle.deposito
+            detalleRemito.inicializar(detalleFactura.cantidad,detalleFactura,remito,detalleFactura.producto)
             detalleRemito.save()
-
             stock= Stock.objects.get(producto=detalle.getProducto(), deposito=detalle.getDeposito())
             stock.reservadosNoConfirmados -= detalle.getCantidad()
             stock.reservadosConfirmados += detalle.getCantidad()

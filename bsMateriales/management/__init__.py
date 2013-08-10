@@ -9,7 +9,10 @@ def crearSingleton(sender, **kwargs):
         defaults = {"medida":0, "minimo":0})
     print estrategia, ",", created
     
-    rubro, created = Rubro.objects.get_or_create(pk = 1, defaults = {"nombre":"Construccion"})
+    #RUBRO POR DEFECTO
+    rubro = Rubro()
+    rubro.inicializar("Construccion","Construccion",1)
+    rubro.save()
     print rubro, ",", created
 
     tipo, created = TipoProducto.objects.get_or_create(pk = 1, defaults = {"nombre":"Material de construccion", 

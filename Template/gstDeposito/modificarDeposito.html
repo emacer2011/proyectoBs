@@ -32,7 +32,7 @@
                                     <div style="margin-left:20px;">Rubro
                                     <select id="rubroDeposito" name="rubroDeposito" style="margin-left:20px;" >
                                         {% for rubro in rubros %}
-	      		              	           	<option value="{{rubro.pk}}">{{rubro.nombre}}</option>
+	      		              	           	<option value="{{rubro.pk}}">{{rubro.getNombre}}</option>
             		    		        {% endfor %}
                     </select></div>
                                 
