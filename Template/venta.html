@@ -60,11 +60,14 @@
             <tbody>
                 {% for producto in productos %}
                     <tr onclick="agregarProducto(this);">
-                        <td id="tabla-Nombre">{{producto.nombre}}</td>
-                        <td id="tabla-Descripcion">{{producto.descripcion}}</td>
-                        <td id="{{producto.pk}}">{{producto.cantidad}}</td>
-                        <td id="tabla-Precio">{{producto.precio}}</td>
+                        <td id="tabla-Nombre">{{producto.getNombre}}</td>
+                        <td id="tabla-Descripcion">{{producto.getDescripcion}}</td>
+                        <td id="{{producto.pk}}">{{producto.getCantidad}}</td>
+                        <td id="tabla-Precio">{{producto.getPrecio}}</td>
                         <td class="Oculto">{{producto.pk}}</td>
+                        <td class="Oculto">{{producto.obtenerEstrategiaDeVenta}}</td>
+                        <td class="Oculto">{{producto.obtenerEstrategiaDeVenta.getMedida}}</td>
+                        <td class="Oculto">{{producto.obtenerEstrategiaDeVenta.getMinimo}}</td>
                     </tr>                    
                 {% endfor %}
             </tbody>

@@ -148,9 +148,15 @@ class Producto(models.Model):
             self.nombre = nombre
          else:
             raise ErrorProducto()
+
+    def getNombre(self):
+         return self.nombre
     
     def setDescripcion(self,descripcion):
          self.descripcion = descripcion
+
+    def getDescripcion(self):
+         return self.descripcion
 
     def setPrecio(self, precio):
          if precio>0:
@@ -166,6 +172,9 @@ class Producto(models.Model):
             self.cantidad = cantidad
         else:
             raise ErrorProducto()
+
+    def getCantidad(self):
+         return self.cantidad
 
     def setTipoProducto(self, tipoProducto):
         if (tipoProducto == None):
@@ -205,6 +214,12 @@ class Producto(models.Model):
 class Fraccionable(EstrategiaVenta):
     medida = models.IntegerField()
     minimo = models.IntegerField()
+
+    def getMedida(self):
+        return self.medida
+
+    def getMinimo(self):
+        return self.minimo
 
     def vender(self, producto, cantidad, fraccion):
         stockLista = producto.stock_set.all()
@@ -300,7 +315,7 @@ class Fraccionable(EstrategiaVenta):
         if self.pk == 0:
             return "NoFraccionable"
         else:
-            return "Fraccionable de " + str(self.medida) + " a " + str(self.minimo)
+            return "Fraccionable"
 # ===================
 # = No Fraccionable =
 # ===================
