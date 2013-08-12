@@ -104,29 +104,58 @@ function buscarCompraExistente(pk,medida){
     return null;
 }
 
+function fraccionarProducto(medidaMinima, medidaActual, unidadesActuales, medidaDeseada, unidadesDeseadas){
+    medidaTemporal = medidaActual;
+    unidadesAfectadas = 1;
+    medidaTemporal = parseInt(medidaTemporal);
+    medidaMinima = parseInt(medidaMinima);
+    medidaActual = parseInt(medidaActual);
+    unidadesActuales = parseInt(unidadesActuales);
+    medidaDeseada = parseInt(medidaDeseada);
+    unidadesDeseadas = parseInt(unidadesDeseadas);
+
+    while(unidadesDeseadas>0){
+
+        if((medidaTemporal >= medidaDeseada) && (((medidaTemporal - medidaDeseada)>=medidaMinima) || ((medidaTemporal - medidaDeseada)==0))) {
+            medidaTemporal = medidaTemporal - medidaDeseada;
+            unidadesDeseadas = unidadesDeseadas - 1;
+        }else{
+            medidaTemporal = medidaActual;
+            unidadesAfectadas = unidadesAfectadas + 1;
+        }
+    }
+    if(unidadesAfectadas > unidadesActuales){
+        return (-1);
+    }
+    return unidadesAfectadas;
+}
+
+
 function agregarProductoFraccionable(fila){
-    var cantidad = 1;
+    var stock = 1;
     var medida = fila.cells[6].innerHTML;
     var medidaMinima = fila.cells[7].innerHTML;
-    var cantidadComprada = prompt('Medida:'+medida+'\t Medida Minima:'+ medidaMinima+'\nMedida Deseada:',cantidad);
+
+    var cantidadComprada = prompt('Medida:'+medida+'\t Medida Minima:'+ medidaMinima+'\nMedida Deseada:',medidaMinima);
     if(verificarMedida(medidaMinima, medida, cantidadComprada)){
-        var cantidad = parseInt(fila.cells[2].innerHTML);
+        var stock = parseInt(fila.cells[2].innerHTML);
         var pk = fila.cells[4].innerHTML;
         var tabla = document.getElementById("Comprometidos");
-        var unidades = prompt('Cantidad:',cantidad);
+        var unidades = prompt('Cantidad:',stock);
         cantidadComprada = parseInt(cantidadComprada);
-        if((isNaN(cantidadComprada)) || (cantidadComprada > cantidad) || (cantidadComprada<1)){return false;}
+        if((isNaN(cantidadComprada)) || (cantidadComprada > stock) || (cantidadComprada<1)){return false;}
         var existente = buscarCompraExistente(pk, cantidadComprada);
         if(existente == null){
             var indice = tabla.rows.length;
             var nuevaFila = tabla.insertRow(indice);
             var celda = nuevaFila.insertCell(0);
-            celda.innerHTML = fila.cells[0].innerHTML;
+            celda.innerHTML = fila.cells[0].innerHTML;  
             celda = nuevaFila.insertCell(1);
             celda.innerHTML = fila.cells[1].innerHTML;
             celda = nuevaFila.insertCell(2);
-            celda.innerHTML = unidades;
-            fila.cells[2].innerHTML = cantidad-unidades;
+            celda.innerHTML = fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
+//            fila.cells[2].innerHTML = cantidad-unidades;
+            fila.cells[2].innerHTML = parseInt(fila.cells[2].innerHTML) - fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
             celda = nuevaFila.insertCell(3);
             celda.innerHTML = fila.cells[3].innerHTML;
             celda = nuevaFila.insertCell(4);
@@ -138,10 +167,21 @@ function agregarProductoFraccionable(fila){
             nuevaFila.onclick = function(){devolverProducto(nuevaFila)};
             celda = nuevaFila.insertCell(6);
             celda.innerHTML = cantidadComprada;
+            celda = nuevaFila.insertCell(7);
+            celda.innerHTML = unidades;
         }else{
-            existente.cells[2].innerHTML = parseInt(existente.cells[2].innerHTML) + parseInt(unidades);
-            existente.cells[5].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseInt(existente.cells[3].innerHTML) * parseInt(existente.cells[6].innerHTML));
-            fila.cells[2].innerHTML = cantidad-parseInt(unidades);
+//            existente.cells[2].innerHTML = parseInt(existente.cells[2].innerHTML) + parseInt(unidades);
+//            fila.cells[2].innerHTML = cantidad-parseInt(unidades);
+
+// 0 = Nombre; 1 = Descripcion; 2 = StockAfectado; 3 = Precion Unitario;
+// 4 = Pk; 5 = Total; 6 = Medida; 7 = Cantidad Comprada
+            stock = stock + parseInt(existente.cells[2].innerHTML);
+            unidades = parseInt(unidades) + parseInt(existente.cells[7].innerHTML);
+//            cantidadComprada = cantidadComprada + parseInt(existente.cells[7].innerHTML);
+            fila.cells[2].innerHTML = stock - fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
+            existente.cells[2].innerHTML = fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
+            existente.cells[7].innerHTML = unidades;
+            existente.cells[5].innerHTML = (parseInt(existente.cells[7].innerHTML) * parseInt(existente.cells[3].innerHTML) * parseInt(existente.cells[6].innerHTML));
          }
 
     }
@@ -149,12 +189,15 @@ function agregarProductoFraccionable(fila){
 }
 
 function verificarMedida(medidaMinima, medidaMaxima, medidaSolicitada){
+    medidaSolicitada = parseInt(medidaSolicitada);
+    medidaMinima = parseInt(medidaMinima);
+    medidaMaxima = parseInt(medidaMaxima);
     var resto = medidaMaxima - medidaSolicitada;
     if(medidaSolicitada < medidaMinima || resto < medidaMinima || medidaSolicitada > medidaMaxima){
-        return true;
+        alert('Imposible Vender la cantidad Solicitada (Violacion de Medidas Minimas/Maximas)');
+        return false;
     }
-    alert('Imposible Vender la cantidad Solicitada (Violacion de Medidas Minimas/Maximas)');
-    return false;
+    return true;
 }
 
  function agregarProductoNoFraccionable(fila) {
