@@ -74,10 +74,10 @@
         {% for deposito in depositos %}
 
             <tr>        
-                <td id="modificarDeposito-direccion">{{deposito.direccion}}</td>
-                <td id="modificarDeposito-rubro">{{deposito.rubro}}</td>
-                <td id="modificarDeposito-telefono">{{deposito.telefono}}</td>
-                <td id="modificarDeposito-modficiar"><button onClick="popPropio('{{deposito.pk}}','{{deposito.direccion}}','{{deposito.rubro.pk}}','{{deposito.telefono}}')" class="btn btn-success" data-toggle="modal">
+                <td id="modificarDeposito-direccion">{{deposito.getDireccion}}</td>
+                <td id="modificarDeposito-rubro">{{deposito.getRubro}}</td>
+                <td id="modificarDeposito-telefono">{{deposito.getTelefono}}</td>
+                <td id="modificarDeposito-modficiar"><button onClick="popPropio('{{deposito.pk}}','{{deposito.getDireccion}}','{{deposito.rubro.pk}}','{{deposito.getTelefono}}')" class="btn btn-success" data-toggle="modal">
                     <i class="icon-plus icon-white"></i>
                     </button>
                 </td>

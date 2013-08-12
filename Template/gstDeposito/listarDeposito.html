@@ -32,9 +32,9 @@
         {% for deposito in depositos %}
 
             <tr>
-                <td id="Deposito-Direccion">{{deposito.direccion}}</td>
-                <td id="Deposito-Rubro">{{deposito.rubro}}</td>
-                <td id="Deposito-Telefono">{{deposito.telefono}}</td>
+                <td id="Deposito-Direccion">{{deposito.getDireccion}}</td>
+                <td id="Deposito-Rubro">{{deposito.getRubro}}</td>
+                <td id="Deposito-Telefono">{{deposito.getTelefono}}</td>
             </tr>
         {% endfor %}
     </tbody>

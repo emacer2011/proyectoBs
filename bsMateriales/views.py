@@ -109,7 +109,7 @@ def altaDeposito(request):
     if request.POST:
         deposito.inicializar(request.POST.get('direccionDeposito'),request.POST.get('telefonoDeposito'),request.POST.get('rubroDeposito'))
         deposito.save()
-        mensaje='Deposito dado de alta con direccion: '+deposito.direccion
+        mensaje='Deposito dado de alta con direccion: '+deposito.getDireccion()
         estado='alert alert-success'
     return render_to_response('gstDeposito/altaDeposito.html',{'estado':estado, 'rubros':rubros, 'mensaje': mensaje},context_instance=RequestContext(request))
 
@@ -130,7 +130,7 @@ def bajaDeposito(request):
         if request.GET:
             pk = request.GET.get('pkDeposito')
             deposito = Deposito.objects.get(pk = pk )
-            mensaje='Deposito con direccion: '+deposito.direccion+" eliminado"
+            mensaje='Deposito con direccion: '+deposito.getDireccion()+" eliminado"
             estado='alert alert-success'
             deposito.eliminarDeposito()
             return HttpResponse(str(estado)+"/"+str(mensaje))
@@ -148,7 +148,7 @@ def modificarDeposito(request):
         deposito = Deposito.objects.get(pk = request.POST.get('pkDeposito') )
         deposito.inicializar(request.POST.get('direccionDeposito'),request.POST.get('telefonoDeposito'),request.POST.get('rubroDeposito'))
         deposito.save()
-        mensaje='Deposito Modficiado con direccion: '+deposito.direccion
+        mensaje='Deposito Modficiado con direccion: '+deposito.getDireccion()
         estado='alert alert-success'
         
     return render_to_response('gstDeposito/modificarDeposito.html',{'depositos':depositos, 'rubros':rubros, 'mensaje': mensaje, 'estado': estado},context_instance=RequestContext(request)) 

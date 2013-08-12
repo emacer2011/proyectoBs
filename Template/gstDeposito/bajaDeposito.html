@@ -41,9 +41,9 @@
         {% for deposito in depositos %}
 
             <tr> 
-                <td id="BajaDeposito-Direccion">{{deposito.direccion}} </td>
-                <td id="BajaDeposito-Rubro">{{deposito.rubro}} </td>
-                <td id="BajaDeposito-Telefono">{{deposito.telefono}}</td>  
+                <td id="BajaDeposito-Direccion">{{deposito.getDireccion}} </td>
+                <td id="BajaDeposito-Rubro">{{deposito.getRubro}} </td>
+                <td id="BajaDeposito-Telefono">{{deposito.getTelefono}}</td>  
                 <td id="BajaDeposito-Accion"> <button class="btn btn-danger" onClick="bajaDeposito('{{deposito.pk}}')" type="submit"> <i class="icon-trash icon-white"></i> Eliminar </button> 
                 </td> 
             </tr>

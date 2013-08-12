@@ -37,9 +37,9 @@ class Rubro(models.Model):
 # = Clase Deposito =
 # ==================
 class Deposito(models.Model):
-    direccion = models.CharField(max_length = 40)
-    telefono = models.CharField(max_length = 15)
-    rubro = models.ForeignKey(Rubro)
+    __direccion = models.CharField(max_length = 40)
+    __telefono = models.CharField(max_length = 15)
+    __rubro = models.ForeignKey(Rubro)
     class Meta:
         permissions = (
             ("deposito", "Abm Depositos"),
@@ -48,22 +48,30 @@ class Deposito(models.Model):
         )
     def setDireccion(self, direccion):
         if re.match('\w+(\s\w+)*$', direccion):
-            self.direccion = direccion
+            self.__direccion = direccion
         else:
             raise ErrorDeposito()
 
+    def getDireccion(self):
+            return self.__direccion
+
     def setTelefono(self, telefono):
         if re.match('\d{7,13}$', telefono):
-            self.telefono = telefono
+            self.__telefono = telefono
         else:
             raise ErrorDeposito()
+
+    def getTelefono(self):
+        return self.__telefono
 
     def setRubro(self, pkRubro):
         try:
             unRubro = Rubro.objects.get(pk = pkRubro)        
-            self.rubro = unRubro
+            self.__rubro = unRubro
         except ObjectDoesNotExist:
             raise ErrorDeposito()
+    def getRubro(self):
+        return self.__rubro
 
     def puedoEliminarlo(self): 
         try:
@@ -85,7 +93,7 @@ class Deposito(models.Model):
         self.setRubro(rubro)
 
     def __unicode__(self):
-        return "%s" % self.direccion
+        return "%s" % self.getDireccion()
         
 # =======================
 # = Clase Tipo Producto =
