@@ -32,7 +32,7 @@
                                     Dep&oacutesito
                                     <select id="deposito" name="deposito">
                                         {% for deposito in depositos %}
-	      		              	           	<option value="{{deposito.pk}}">{{deposito.direccion}}</option>
+	      		              	           	<option value="{{deposito.pk}}">{{deposito.getDireccion}}</option>
             		    		        {% endfor %}
                                     </select>
                                 </div>

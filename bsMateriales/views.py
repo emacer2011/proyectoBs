@@ -162,6 +162,7 @@ def modificarDeposito(request):
 def venta(request):
     """docstring for venta"""
     productos = Producto.objects.all()
+    productos = filter(lambda x: x.getCantidad() != 0 , productos)
     mensaje = ""
     estado = ""
     if request.POST:
@@ -211,7 +212,7 @@ def cargarStock(request):
         Stock.cargarStock(disponibles,deposito, producto)
         producto.setCantidad(producto.cantidad + disponibles)
         producto.save()
-        mensaje='Se agrega '+str(disponibles) +' del producto '+producto.nombre+' en el deposito de '+deposito.direccion
+        mensaje='Se agrega '+str(disponibles) +' del producto '+producto.nombre+' en el deposito de '+deposito.getDireccion()
         estado='alert alert-success'
         
     return render_to_response('cargarStock.html',{'mensaje':mensaje, 'estado':estado, 'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 
