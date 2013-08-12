@@ -41,7 +41,7 @@
                   <select id="tipoProducto" name="tipoProducto">
                     {% for tipo in tipoProductos %}
     						<option value="{{tipo.pk}}">{{tipo}}</option>
-    					    <p>{{tipo.nombre}},{{tipo.pk}}</p>
+    					    <p>{{tipo.getNombre}},{{tipo.pk}}</p>
     				{% endfor %}
                   </select>  
                 </div>  

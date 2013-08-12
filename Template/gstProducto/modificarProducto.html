@@ -39,7 +39,7 @@
                                     Tipo de Producto
                                     <select name="tipoProducto" id="tipoProducto" style="margin-left:15px;" >
                                         {% for  tipoProducto in tipoProductos %}
-                                        <option value="{{tipoProducto.pk}}">{{tipoProducto.nombre}}</option>
+                                        <option value="{{tipoProducto.pk}}">{{tipoProducto.getNombre}}</option>
                                         {% endfor %}
                                     </select></div>
                             </div>

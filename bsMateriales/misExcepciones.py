@@ -11,3 +11,6 @@ class ErrorStock(Exception):
 
 class ErrorProducto(Exception):
     pass
+    
+class ErrorTipoProducto(Exception):
+	pass

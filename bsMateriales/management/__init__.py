@@ -15,8 +15,15 @@ def crearSingleton(sender, **kwargs):
     rubro.save()
     print rubro, ",", created
 
-    tipo, created = TipoProducto.objects.get_or_create(pk = 1, defaults = {"nombre":"Material de construccion", 
-                    "unidadMedida": 1, "rubro": rubro})
-    print tipo, ",", created
+    #TIPO DE PRODUCTO CREADO POR DEFECTO
+    tipoProducto = TipoProducto()
+    tipoProducto.inicializar("Material de Construccion","Materiales",1,"Metros", 1)
+    tipoProducto.save()
+    #tipo, created = TipoProducto.objects.get_or_create(pk = 1, defaults = {"nombre":"Material de construccion", 
+    #                "unidadMedida": 1, "rubro": rubro})
+    print tipoProducto, ",", created
+
+
+
 post_syncdb.connect(crearSingleton, sender=bsMateriales.models)
         

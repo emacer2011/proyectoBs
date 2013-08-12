@@ -32,7 +32,7 @@ class Rubro(models.Model):
     def __unicode__(self):
         return "%s" % self.getNombre()
 
-# TODO: FALTA FACTORIZAR TODO ESTE CODIGO
+
 # ==================
 # = Clase Deposito =
 # ==================
@@ -99,13 +99,50 @@ class Deposito(models.Model):
 # = Clase Tipo Producto =
 # =======================
 class TipoProducto(models.Model):
-    nombre = models.CharField(max_length = 40)
-    unidadMedida = models.CharField(max_length = 40)
-    descripcion = models.CharField(max_length = 40, blank=True)
-    rubro = models.ForeignKey(Rubro)    
+    __nombre = models.CharField(max_length = 40)
+    __unidadMedida = models.CharField(max_length = 40)
+    __descripcion = models.CharField(max_length = 40, blank=True)
+    __rubro = models.ForeignKey(Rubro)    
     
+
+    def getUnidadMedida(self):
+        return __unidadMedida
+
+    def setUnidadMedida(self, unidadMedida):
+        self.__unidadMedida = unidadMedida
+
+
+    def setRubro(self, pkRubro):
+        try:
+            unRubro = Rubro.objects.get(pk = pkRubro)        
+            self.__rubro = unRubro
+        except ObjectDoesNotExist:
+            raise ErrorTipoProducto()
+    
+    def getRubro(self):
+        return self.__rubro
+
+    def getNombre(self):
+        return self.__nombre
+
+    def setNombre(self, nombre):
+        self.__nombre= nombre
+
+    def getDescripcion(self):
+        return self.__descripcion
+        
+    def setDescripcion(self, descripcion):
+        self.__descripcion= descripcion
+
+    def inicializar(self, nombre, descripcion, rubro, unidadMedida, pk):
+        self.setNombre(nombre)
+        self.setDescripcion(descripcion)
+        self.setRubro(rubro)
+        self.setUnidadMedida(unidadMedida)
+        self.pk = pk
+
     def __unicode__(self):
-        return "%s" % self.nombre
+        return "%s" % self.getNombre()
 
 
 # ====================
@@ -122,6 +159,9 @@ class EstrategiaVenta(models.Model):
     def vender(self, producto, cantidad, fraccion):
         raise NotImplemented    
         
+
+
+# TODO: FALTA FACTORIZAR TODO ESTE CODIGO
 # ==================
 # = Clase Producto =
 # ==================
