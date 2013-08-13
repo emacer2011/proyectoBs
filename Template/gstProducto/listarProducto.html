@@ -36,12 +36,12 @@
         {% for producto in productos %}
 
         <tr>        
-            <td id="Producto-Nombre">{{producto.nombre}}</td>
-            <td id="Producto-Descripcion">{{producto.descripcion}}</td>
-            <td id="Producto-TipoProducto">{{producto.tipoProducto}}</td>
+            <td id="Producto-Nombre">{{producto.getNombre}}</td>
+            <td id="Producto-Descripcion">{{producto.getDescripcion}}</td>
+            <td id="Producto-TipoProducto">{{producto.getTipoProducto}}</td>
             <!-- <td id="Producto-Categoria">como se vende</td> -->
-            <td id="Producto-Cantidad">{{producto.cantidad}}</td>
-            <td id="Producto-Precio">{{producto.precio}}</td>
+            <td id="Producto-Cantidad">{{producto.getCantidad}}</td>
+            <td id="Producto-Precio">{{producto.getPrecio}}</td>
         </tr>
         {% endfor %}
     </tbody>

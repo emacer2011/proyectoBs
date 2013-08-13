@@ -15,7 +15,7 @@ function enviar() {
     var elArray = new Array();
     for (var i=0; i < tabla.rows.length; i++) {
         producto = tabla.rows[i];
-        productos.value= productos.value+producto.cells[4].innerHTML+"="+producto.cells[2].innerHTML+","
+        productos.value = productos.value + producto.cells[4].innerHTML + "=" + producto.cells[2].innerHTML + "=" + producto.cells[5].innerHTML + ","
     }
     productos.value = productos.value.substring(0, productos.value.length-1);    
 }
@@ -96,7 +96,7 @@ function buscarCompraExistente(pk,medida){
     var medidaFinal = parseInt(medida);
     for (var i = elementos.length - 1; i >= 0; i--) {
         if(elementos[i].cells[4].innerHTML == pk){
-            if(parseInt(elementos[i].cells[6].innerHTML) == medidaFinal){
+            if(parseInt(elementos[i].cells[5].innerHTML) == medidaFinal){
             return elementos[i];
             }
         }
@@ -143,14 +143,13 @@ function agregarProductoFraccionable(fila){
         var tabla = document.getElementById("Comprometidos");
         var unidades = prompt('Cantidad:',stock);
         cantidadComprada = parseInt(cantidadComprada);
-        var stockARestar = fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
-        if (stockARestar== -1) {
-            alert("Stock Insuficiente para la venta");
-            return 0;
-        };
-        if((isNaN(cantidadComprada)) || (cantidadComprada > stock) || (cantidadComprada<1)){return false;}
         var existente = buscarCompraExistente(pk, cantidadComprada);
         if(existente == null){
+            var stockARestar = fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
+            if (stockARestar== -1) {
+                alert("Stock Insuficiente para la venta");
+                return 0;
+            };
             var indice = tabla.rows.length;
             var nuevaFila = tabla.insertRow(indice);
             var celda = nuevaFila.insertCell(0);
@@ -158,7 +157,7 @@ function agregarProductoFraccionable(fila){
             celda = nuevaFila.insertCell(1);
             celda.innerHTML = fila.cells[1].innerHTML;
             celda = nuevaFila.insertCell(2);
-            celda.innerHTML = stockARestar;
+            celda.innerHTML = unidades;
             fila.cells[2].innerHTML = parseInt(fila.cells[2].innerHTML) - stockARestar;
             celda = nuevaFila.insertCell(3);
             celda.innerHTML = fila.cells[3].innerHTML;
@@ -166,24 +165,26 @@ function agregarProductoFraccionable(fila){
             celda.innerHTML = pk;
             celda.style.display="none";
             celda = nuevaFila.insertCell(5);
+            celda.innerHTML = cantidadComprada;
+            celda = nuevaFila.insertCell(6);
             celda.innerHTML = (cantidadComprada * parseInt(fila.cells[3].innerHTML))*unidades;
             nuevaFila.id=-parseInt(pk);
             nuevaFila.onclick = function(){devolverProducto(nuevaFila)};
-            celda = nuevaFila.insertCell(6);
-            celda.innerHTML = cantidadComprada;
             celda = nuevaFila.insertCell(7);
-            celda.innerHTML = unidades;
+            celda.innerHTML = stockARestar;
+            celda.style.display="none";
         }else{
-// 0 = Nombre; 1 = Descripcion; 2 = StockAfectado; 3 = Precion Unitario;
-// 4 = Pk; 5 = Total; 6 = Medida; 7 = Cantidad Comprada
-            stock = stock + parseInt(existente.cells[2].innerHTML);
-            unidades = parseInt(unidades) + parseInt(existente.cells[7].innerHTML);
+// 0 = Nombre; 1 = Descripcion; 3 = Precion Unitario;
+// 4 = Pk; 5 = medida;
+// 2 = unidades compradas; 6 = Total;
+            stock = stock + parseInt(existente.cells[7].innerHTML);
+            unidades = parseInt(unidades) + parseInt(existente.cells[2].innerHTML);
             stockARestar = fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
             if(stockARestar != -1){
+                    existente.cells[2].innerHTML = unidades;
+                    existente.cells[6].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseInt(existente.cells[3].innerHTML) * parseInt(existente.cells[5].innerHTML));
+                    existente.cells[7].innerHTML = stockARestar;
                     fila.cells[2].innerHTML = stock - stockARestar;
-                    existente.cells[2].innerHTML = fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
-                    existente.cells[7].innerHTML = unidades;
-                    existente.cells[5].innerHTML = (parseInt(existente.cells[7].innerHTML) * parseInt(existente.cells[3].innerHTML) * parseInt(existente.cells[6].innerHTML));
             }else{
                    alert("Stock Insuficiente para la venta");
             }
@@ -230,12 +231,14 @@ function verificarMedida(medidaMinima, medidaMaxima, medidaSolicitada){
         celda.innerHTML = pk;
         celda.style.display="none";
         celda = nuevaFila.insertCell(5);
+        celda.innerHTML = '-';
+        celda = nuevaFila.insertCell(6);
         celda.innerHTML = (cantidadComprada * parseInt(fila.cells[3].innerHTML));
         nuevaFila.id=-parseInt(pk);
         nuevaFila.onclick = function(){devolverProducto(nuevaFila)};
     }else{
         existente.cells[2].innerHTML = parseInt(existente.cells[2].innerHTML) + cantidadComprada;
-        existente.cells[5].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseInt(existente.cells[3].innerHTML));
+        existente.cells[6].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseInt(existente.cells[3].innerHTML));
         fila.cells[2].innerHTML = cantidad-cantidadComprada;
      }
 }

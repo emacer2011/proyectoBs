@@ -230,6 +230,9 @@ class Producto(models.Model):
         else:
             self.tipoProducto = tipoProducto
 
+    def getTipoProducto(self):
+        return self.tipoProducto
+    
     def obtenerEstrategiaDeVenta(self):
         if self.estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
             return NoFraccionable.instance()
