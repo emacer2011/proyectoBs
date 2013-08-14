@@ -59,7 +59,7 @@
         <table id="Disponibles" class="table table-striped" border="0" cellspacing="5" cellpadding="5">
             <tbody>
                 {% for producto in productos %}
-                    <tr onclick="agregarProducto(this);">
+                    <tr onclick="agregarProducto(this);" id="p{{producto.pk}}">
                         <td id="tabla-Nombre">{{producto.getNombre}}</td>
                         <td id="tabla-Descripcion">{{producto.getDescripcion}}</td>
                         <td id="{{producto.pk}}">{{producto.getCantidad}}</td>
