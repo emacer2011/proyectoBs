@@ -176,10 +176,16 @@ def venta(request):
         palabraParse = str(palabra).split(",")
         dic =  {}
         for i in palabraParse :
+            #producto = Producto.objects.get(pk = claveValor[0])
+            #if isinstance(producto.obtenerEstrategiaDeVenta(),Fraccionable):
+             #   pass
             claveValor = i.split("=")
             dic[Producto.objects.get(pk = claveValor[0])] = claveValor[1]
         productos =dic.keys()
         
+        #import pdb
+        #pdb.set_trace()
+
         for producto in productos:
             listaStock = producto.vender(cantidad = dic[producto])
             stocks = listaStock.keys()

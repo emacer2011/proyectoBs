@@ -173,7 +173,7 @@ class Producto(models.Model):
     tipoProducto = models.ForeignKey(TipoProducto)
     estrategiaVenta = models.ForeignKey('Fraccionable')
     cantidad = models.IntegerField(default= 0)
-    precio = models.IntegerField()
+    precio = models.FloatField() #TODO: CAMBIAR A FLOAT TODOS LOS PRECIOS
     class Meta:
         permissions = (
             ("producto", "puede manejar abm Producto"),
@@ -263,8 +263,8 @@ class Producto(models.Model):
 # =================
 
 class Fraccionable(EstrategiaVenta):
-    medida = models.IntegerField()
-    minimo = models.IntegerField()
+    medida = models.FloatField() # TODO: medidas a float
+    minimo = models.FloatField()
 
     def getMedida(self):
         return self.medida
@@ -485,7 +485,7 @@ class Detalle(models.Model):
         abstract = True
 
     cantidad = models.IntegerField()
-    subtotal = models.IntegerField()
+    subtotal = models.FloatField()
     producto = models.ForeignKey(Producto)
 
 
@@ -634,7 +634,7 @@ class NotaVenta(models.Model):
 class Factura(models.Model):
     fecha = models.datetime
     formaDePago = models.CharField(max_length = 15)
-    precioTotal = models.IntegerField()
+    precioTotal = models.FloatField()
     ventaNota = models.ForeignKey(NotaVenta)
 
     def getFecha(self):
