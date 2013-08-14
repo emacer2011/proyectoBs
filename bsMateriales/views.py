@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, NotaVenta, DetalleNotaVenta, NoFraccionable, Remito, DetalleFactura, Factura, DetalleRemito
+from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, NotaVenta, DetalleNotaVenta, NoFraccionable, Remito, DetalleFactura, Factura, DetalleRemito,Fraccionable
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
@@ -175,16 +175,18 @@ def venta(request):
         palabra = request.POST.get("productos")
         palabraParse = str(palabra).split(",")
         dic =  {}
-        for i in palabraParse :
-            #producto = Producto.objects.get(pk = claveValor[0])
-            #if isinstance(producto.obtenerEstrategiaDeVenta(),Fraccionable):
-             #   pass
+        for i in palabraParse :    
             claveValor = i.split("=")
-            dic[Producto.objects.get(pk = claveValor[0])] = claveValor[1]
+            
+            producto = Producto.objects.get(pk = claveValor[0])
+            if isinstance(producto.obtenerEstrategiaDeVenta(),Fraccionable):
+                dic[producto] = (claveValor[1],claveValor[2]) # SI ES FACCIONABLE GUARDO UNA TUPLA (CANTIDAD,MEDIDA)    
+            else:
+                dic[producto] = claveValor[1]
+        
         productos =dic.keys()
         
-        #import pdb
-        #pdb.set_trace()
+        
 
         for producto in productos:
             listaStock = producto.vender(cantidad = dic[producto])
