@@ -74,12 +74,12 @@
         {% for producto in productos %}
 
             <tr>        
-                <td id="CargaStock-Nombre">{{producto.nombre}}</td>
-                <td id="CargaStock-Descripcion">{{producto.descripcion}}</td>
-                <td id="CargaStock-TipoProducto">{{producto.tipoProducto}}</td>
+                <td id="CargaStock-Nombre">{{producto.getNombre}}</td>
+                <td id="CargaStock-Descripcion">{{producto.getDescripcion}}</td>
+                <td id="CargaStock-TipoProducto">{{producto.getTipoProducto}}</td>
                 <!-- <td id="CargaStock-Categoria">como se vende</td> -->
-                <td id="CargaStock-Cantidad">{{producto.cantidad}}</td>
-                <td id="CargaStock-Precio">{{producto.precio}}</td>
+                <td id="CargaStock-Cantidad">{{producto.getCantidad}}</td>
+                <td id="CargaStock-Precio">{{producto.getPrecio}}</td>
                 <td id="CargaStock-Cargar"><button onClick="popPropio('{{producto.pk}}')" class="btn btn-success" data-toggle="modal">
                     <i class="icon-plus icon-white"></i>
                     </button>

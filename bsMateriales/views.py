@@ -24,7 +24,7 @@ def cargarDetalles(request):
     for detalle in detalles:
         mensaje = mensaje + "<tr>"
         mensaje = mensaje + '<td style="visibility:hidden" id = "pkDetalle">'+ str(detalle.pk)+'</td>'
-        mensaje = mensaje + "<td>" + detalle.producto.nombre+ "</td>"
+        mensaje = mensaje + "<td>" + detalle.producto.getNombre()+ "</td>"
         mensaje = mensaje + "<td>" + str(detalle.cantidad)+ "</td>"
         if detalle.entregado:
             entregado = "checked DISABLED"
@@ -179,7 +179,7 @@ def venta(request):
             claveValor = i.split("=")
             
             producto = Producto.objects.get(pk = claveValor[0])
-            if isinstance(producto.obtenerEstrategiaDeVenta(),Fraccionable):
+            if producto.esFraccionable():
                 dic[producto] = (claveValor[1],claveValor[2]) # SI ES FACCIONABLE GUARDO UNA TUPLA (CANTIDAD,MEDIDA)    
             else:
                 dic[producto] = claveValor[1]
@@ -218,9 +218,9 @@ def cargarStock(request):
         disponibles = int(request.POST.get("disponible"))
         deposito=Deposito.objects.get(pk =request.POST.get("deposito"))
         Stock.cargarStock(disponibles,deposito, producto)
-        producto.setCantidad(producto.cantidad + disponibles)
+        producto.setCantidad(producto.getCantidad() + disponibles)
         producto.save()
-        mensaje='Se agrega '+str(disponibles) +' del producto '+producto.nombre+' en el deposito de '+deposito.getDireccion()
+        mensaje='Se agrega '+str(disponibles) +' del producto '+producto.getNombre()+' en el deposito de '+deposito.getDireccion()
         estado='alert alert-success'
         
     return render_to_response('cargarStock.html',{'mensaje':mensaje, 'estado':estado, 'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 
@@ -239,7 +239,7 @@ def altaProducto(request):
         producto= Producto()
         producto.inicializar(request.POST.get("nombreProducto"),request.POST.get("descripcionProducto"), TipoProducto.objects.get(pk = request.POST.get("tipoProducto")),request.POST.get("precioProducto"),NoFraccionable.objects.get(pk = 0))
         producto.save()
-        mensaje='Producto dado de alta con nombre: ' + producto.nombre
+        mensaje='Producto dado de alta con nombre: ' + producto.getNombre()
         estado='alert alert-success'
     return render_to_response('gstProducto/altaProducto.html',{'estado':estado, 'mensaje':mensaje, 'tipoProductos':tipoProductos},context_instance=RequestContext(request)) 
     

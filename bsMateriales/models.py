@@ -168,12 +168,12 @@ class EstrategiaVenta(models.Model):
 
 
 class Producto(models.Model):
-    nombre = models.CharField(max_length = 40)
-    descripcion = models.CharField(max_length = 40, blank = True)
-    tipoProducto = models.ForeignKey(TipoProducto)
-    estrategiaVenta = models.ForeignKey('Fraccionable')
-    cantidad = models.IntegerField(default= 0)
-    precio = models.FloatField() #TODO: CAMBIAR A FLOAT TODOS LOS PRECIOS
+    __nombre = models.CharField(max_length = 40)
+    __descripcion = models.CharField(max_length = 40, blank = True)
+    __tipoProducto = models.ForeignKey(TipoProducto)
+    __estrategiaVenta = models.ForeignKey('Fraccionable')
+    __cantidad = models.IntegerField(default= 0)
+    __precio = models.FloatField() #TODO: CAMBIAR A FLOAT TODOS LOS PRECIOS
     class Meta:
         permissions = (
             ("producto", "puede manejar abm Producto"),
@@ -182,7 +182,7 @@ class Producto(models.Model):
         )
     
     def __unicode__(self):
-        return "%s" % self.nombre
+        return "%s" % self.__nombre
 
     def puedeBorrarse(self):
         try:
@@ -193,56 +193,64 @@ class Producto(models.Model):
     
     def setNombre(self,nombre):
          if re.match('\w{3,30}$', nombre):
-            self.nombre = nombre
+            self.__nombre = nombre
          else:
             raise ErrorProducto()
 
     def getNombre(self):
-         return self.nombre
+         return self.__nombre
     
     def setDescripcion(self,descripcion):
-         self.descripcion = descripcion
+         self.__descripcion = descripcion
 
     def getDescripcion(self):
-         return self.descripcion
+         return self.__descripcion
 
     def setPrecio(self, precio):
          if precio>0:
-            self.precio = precio
+            self.__precio = precio
          else:
             raise ErrorProducto()
             
     def getPrecio(self):
-        return self.precio
+        return self.__precio
 
     def setCantidad(self, cantidad):
         if cantidad >= 0:
-            self.cantidad = cantidad
+            self.__cantidad = cantidad
         else:
             raise ErrorProducto()
 
     def getCantidad(self):
-         return self.cantidad
+         return self.__cantidad
 
     def setTipoProducto(self, tipoProducto):
         if (tipoProducto == None):
                 raise ErrorProducto()
         else:
-            self.tipoProducto = tipoProducto
+            self.__tipoProducto = tipoProducto
 
     def getTipoProducto(self):
-        return self.tipoProducto
+        return self.__tipoProducto
     
     def obtenerEstrategiaDeVenta(self):
-        if self.estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
+        if self.__estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
             return NoFraccionable.instance()
         return self.estrategiaVenta
+
+    def esFraccionable(self):
+        if self.__estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
+            return False
+        return True
+
+    def setEstrategiaDeVenta(self, estrategiaVenta):
+        self.__estrategiaVenta= estrategiaVenta
 
     def verificarCantidadStock(self):
         stockList = self.stock_set.all()
         cantidad = 0
         for stock in stockList:
-            cantidad += stock.disponibles
+            cantidad += stock.getDisponibles()
         return cantidad            
 
     def vender(self, cantidad = None, fraccion = 5):
@@ -256,7 +264,7 @@ class Producto(models.Model):
         self.setDescripcion(descripcion)
         self.setTipoProducto(tipoProducto)
         self.setPrecio(precio)
-        self.estrategiaVenta = estrategiaVenta 
+        self.setEstrategiaDeVenta(estrategiaVenta) 
 
 # =================
 # = Fraccionables =
@@ -403,7 +411,7 @@ class NoFraccionable(Fraccionable):
         if producto.verificarCantidadStock() >= cantidad:
             stocks = self.stocksAfectados(producto, cantidad)
 
-            producto.cantidad = producto.cantidad - cantidad
+            producto.setCantidad(producto.getCantidad() - cantidad)
             producto.save()
             for stock in stocks:
                 if cantidad > 0:
