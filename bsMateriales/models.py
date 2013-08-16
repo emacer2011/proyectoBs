@@ -271,14 +271,14 @@ class Producto(models.Model):
 # =================
 
 class Fraccionable(EstrategiaVenta):
-    medida = models.FloatField() # TODO: medidas a float
-    minimo = models.FloatField()
+    __medida = models.FloatField() # TODO: medidas a float
+    __minimo = models.FloatField()
 
     def getMedida(self):
-        return self.medida
+        return self.__medida
 
     def getMinimo(self):
-        return self.minimo
+        return self.__minimo
 
     def vender(self, producto, cantidad, fraccion):
         stockLista = producto.stock_set.all()
@@ -448,6 +448,18 @@ class Stock(models.Model):
     deposito = models.ForeignKey(Deposito, blank = True)
     producto = models.ForeignKey(Producto)
 
+    def getReservadoConfirmados(self):
+        return self.reservadosConfirmados
+
+    def getReservadoNoconfirmados(self):
+        return self.reservadosNoConfirmados
+
+    def setReservadoConfirmados(self, reservadosConfirmados):
+        self.reservadosConfirmados = reservadosConfirmados
+
+    def setReservadoNoconfirmados(self, reservadosNoConfirmados):
+        self.reservadosNoConfirmados = reservadosNoConfirmados
+
     def getDisponibles(self):
         return self.disponibles
     
@@ -460,9 +472,15 @@ class Stock(models.Model):
     def getDeposito(self):
         return self.deposito
 
+    def setDeposito(self, deposito):
+        self.deposito = deposito
+
     def getProducto(self):
         return self.producto
-    
+
+    def setProducto(self, producto):
+        self.producto = producto
+
     @classmethod
     def cargarStock(cls, disponibles, deposito, producto):
         """docstring for crearStock"""
@@ -603,14 +621,23 @@ class NotaVenta(models.Model):
         else:
             raise ErrorVenta()
 
+    def getNombre(self):
+        return self.nombreCliente
+
     def setApellido(self, apellido):
         if re.match('\w{3,}(\s\w+)*$', apellido):
             self.apellidoCliente = apellido
         else:
             raise ErrorVenta()
 
+    def getApellido(self):
+        return self.apellidoCliente
+
     def setFecha(self, fecha):
         self.fecha = fecha
+
+    def getFecha(self):
+        return self.fecha
 
     def getPrecioTotal(self):
         return self.precioTotal
@@ -626,6 +653,9 @@ class NotaVenta(models.Model):
 
     def setFacturada(self, factura):
         self.facturada = factura
+
+    def getFacturada(self):
+        return self.facturada
 
     def inicializar(self, nombrePersona= None, apellidoPersona= None):
         self.setNombre(nombrePersona)
