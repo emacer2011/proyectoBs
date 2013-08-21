@@ -153,13 +153,17 @@ ESTRATEGIA_NOFRACCIONABLE = 0
 
 class EstrategiaVenta(models.Model):
 
-    class Meta:
-        abstract = True
+#    class Meta:
+#     abstract = True
 
-    def vender(self, producto, cantidad, fraccion):
-        raise NotImplemented    
-        
+#    def vender(self, producto, cantidad, fraccion):
+ #       raise NotImplemented    
 
+    def getMedida(self):
+         return 0
+
+  #  def getMinimo(self):
+   #     return 0
 
 # TODO: FALTA FACTORIZAR TODO ESTE CODIGO
 # ==================
@@ -171,9 +175,9 @@ class Producto(models.Model):
     __nombre = models.CharField(max_length = 40)
     __descripcion = models.CharField(max_length = 40, blank = True)
     __tipoProducto = models.ForeignKey(TipoProducto)
-    __estrategiaVenta = models.ForeignKey('Fraccionable')
+    __estrategiaVenta = models.ForeignKey('EstrategiaVenta')
     __cantidad = models.IntegerField(default= 0)
-    __precio = models.FloatField() #TODO: CAMBIAR A FLOAT TODOS LOS PRECIOS
+    __precio = models.FloatField()
     class Meta:
         permissions = (
             ("producto", "puede manejar abm Producto"),
@@ -232,15 +236,25 @@ class Producto(models.Model):
 
     def getTipoProducto(self):
         return self.__tipoProducto
+
+    def getEstrategia(self):
+        return self.__estrategiaVenta
     
     def obtenerEstrategiaDeVenta(self):
-        if self.__estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
-            return NoFraccionable.instance()
-        return self.estrategiaVenta
-
+        if isinstance(self.__estrategiaVenta, Fraccionable):
+            self.__estrategiaVenta = Fraccionable(self.__estrategiaVenta)
+            import pdb
+            pdb.set_trace()
+            return self.__estrategiaVenta
+        else:
+            self.__estrategiaVenta = NoFraccionable(self.__estrategiaVenta)
+            import pdb
+            pdb.set_trace()
+            return self.__estrategiaVenta
+    
     def esFraccionable(self):
         if self.__estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
-            return False
+            return False     
         return True
 
     def setEstrategiaDeVenta(self, estrategiaVenta):
@@ -266,6 +280,66 @@ class Producto(models.Model):
         self.setPrecio(precio)
         self.setEstrategiaDeVenta(estrategiaVenta) 
 
+# ===================
+# = No Fraccionable =
+# ===================
+
+class NoFraccionable(EstrategiaVenta):
+
+    @classmethod
+    def instance(cls):
+        return NoFraccionable.objects.get(pk = ESTRATEGIA_NOFRACCIONABLE)    
+
+    
+    def stocksAfectados (self, producto, cantidad):
+        listaStocks = []
+        #Caso en que un solo deposito cumple con la totalidad de la demanda
+        stocksOrdenados = sorted(producto.stock_set.all(), key=lambda stock: stock.disponibles)
+        for stock in stocksOrdenados:
+            if stock.disponibles >= cantidad:
+                return [stock]
+        stocksOrdenados = sorted(producto.stock_set.all(), key=lambda stock: stock.disponibles, reverse=True)
+        #Caso contrario
+        for stock in stocksOrdenados:
+            listaStocks.append(stock)
+            cantidad = cantidad - stock.disponibles
+            if cantidad <= 0:   
+                return listaStocks
+
+    def vender(self, producto, cantidad, fraccion):
+
+        cantidad = int(cantidad)
+        depositosAfectados = {}
+        if producto.verificarCantidadStock() >= cantidad:
+            stocks = self.stocksAfectados(producto, cantidad)
+
+            producto.setCantidad(producto.getCantidad() - cantidad)
+            producto.save()
+            for stock in stocks:
+                if cantidad > 0:
+                    if stock.disponibles >= cantidad:
+                        stock.disponibles = stock.disponibles - cantidad
+                        stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + cantidad
+                        stock.save()
+                        depositosAfectados[stock] = cantidad
+                        cantidad = 0
+                        return depositosAfectados
+                    else:
+                        cantidad = cantidad - stock.disponibles
+                        stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + stock.disponibles
+                        cantidadTemporal= stock.disponibles
+                        stock.disponibles = 0
+                        stock.save()
+                        depositosAfectados[stock]= cantidadTemporal 
+            return depositosAfectados
+        else:
+            raise ErrorVenta()
+
+
+#    def __unicode__(self):
+#        return "NoFraccionable"
+
+
 # =================
 # = Fraccionables =
 # =================
@@ -274,10 +348,26 @@ class Fraccionable(EstrategiaVenta):
     __medida = models.FloatField() # TODO: medidas a float
     __minimo = models.FloatField()
 
+
+    def setMedida(self, medida):
+        if medida > 0:
+            self.__medida = medida
+        else:
+            raise ErrorProducto()
+
+    def setMinimo(self,minimo):
+        if minimo > 0:
+            self.__minimo = minimo
+        else:
+            raise ErrorProducto()
+
+
     def getMedida(self):
         return self.__medida
 
     def getMinimo(self):
+        import pdb
+        pdb.set_trace()
         return self.__minimo
 
     def vender(self, producto, cantidad, fraccion):
@@ -370,72 +460,10 @@ class Fraccionable(EstrategiaVenta):
         
         return stock
 
-    def __unicode__(self):
-        if self.pk == 0:
-            return "NoFraccionable"
-        else:
-            return "Fraccionable"
-# ===================
-# = No Fraccionable =
-# ===================
 
-class NoFraccionable(Fraccionable):
+#    def __unicode__(self):
+#        return "Fraccionable"
 
-    class Meta:
-        proxy = True
-
-    @classmethod
-    def instance(cls):
-        return NoFraccionable.objects.get(pk = ESTRATEGIA_NOFRACCIONABLE)    
-
-    
-    def stocksAfectados (self, producto, cantidad):
-        listaStocks = []
-        #Caso en que un solo deposito cumple con la totalidad de la demanda
-        stocksOrdenados = sorted(producto.stock_set.all(), key=lambda stock: stock.disponibles)
-        for stock in stocksOrdenados:
-            if stock.disponibles >= cantidad:
-                return [stock]
-        stocksOrdenados = sorted(producto.stock_set.all(), key=lambda stock: stock.disponibles, reverse=True)
-        #Caso contrario
-        for stock in stocksOrdenados:
-            listaStocks.append(stock)
-            cantidad = cantidad - stock.disponibles
-            if cantidad <= 0:   
-                return listaStocks
-
-    def vender(self, producto, cantidad, fraccion):
-
-        cantidad = int(cantidad)
-        depositosAfectados = {}
-        if producto.verificarCantidadStock() >= cantidad:
-            stocks = self.stocksAfectados(producto, cantidad)
-
-            producto.setCantidad(producto.getCantidad() - cantidad)
-            producto.save()
-            for stock in stocks:
-                if cantidad > 0:
-                    if stock.disponibles >= cantidad:
-                        stock.disponibles = stock.disponibles - cantidad
-                        stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + cantidad
-                        stock.save()
-                        depositosAfectados[stock] = cantidad
-                        cantidad = 0
-                        return depositosAfectados
-                    else:
-                        cantidad = cantidad - stock.disponibles
-                        stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + stock.disponibles
-                        cantidadTemporal= stock.disponibles
-                        stock.disponibles = 0
-                        stock.save()
-                        depositosAfectados[stock]= cantidadTemporal 
-            return depositosAfectados
-        else:
-            raise ErrorVenta()
-
-
-    def __unicode__(self):
-        return "NoFraccionable"
 
 # =========
 # = Stock =

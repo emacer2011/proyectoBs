@@ -125,7 +125,7 @@ function devolverProductoFraccionables(fila) {
 
 function agregarProducto(fila) {
 
-    if(fila.cells[5].innerHTML== "Fraccionable"){
+    if(fila.cells[5].innerHTML== "True"){
         agregarProductoFraccionable(fila);
     }else{
         agregarProductoNoFraccionable(fila);

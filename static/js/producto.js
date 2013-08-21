@@ -37,7 +37,7 @@
 
     function validarPrecio(campo){
         var valor = campo.value;
-        var entero = parseInt(valor)
+        var entero = parseFloat(valor)
         if (entero != "" && !isNaN(entero)){
                 if (entero>0){
                     return true;
@@ -53,10 +53,14 @@
 				return false;
 			}	
                
-               if(!validarPrecio(document.getElementById('precioProducto'))){
+      if(!validarPrecio(document.getElementById('precioProducto'))){
 				return false;
 			}	
-                 
+      if ((document.getElementById("fraccionable").checked)){
+        if (!validarDatosFraccionables()) {
+          return false;
+        };
+      };
 			return validarDescripcion(document.getElementById('descripcionProducto'));
 		}
     
@@ -127,3 +131,55 @@ function buscar(texto,idTabla){
                 elemento.style.display='';
       }
 }
+
+
+function mostrarDatosFraccionable(){
+  var datos = document.getElementById("datosFraccionable");
+  var check = document.getElementById("fraccionable");
+  if (check.checked){
+    datos.style.display = '';
+  }else{
+    datos.style.display = "none";
+  }
+}
+
+function validarDatosFraccionables(){
+
+  var medidaMinima = document.getElementById("medidaMinimaProducto");
+  medidaMinima = parseFloat(medidaMinima.value);
+  var medida = parseFloat(document.getElementById("medidaProducto").value);
+  if ((medida != "" && !isNaN(medida)) && (medidaMinima != "" && !isNaN(medidaMinima))){
+    if (medidaMinima>0 && medida > 0){
+      return true;
+    }
+  }   
+  alert("Error en Medidas (no pueden ser nulas ni menores a '0')");
+  return false; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

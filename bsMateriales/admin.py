@@ -1,5 +1,5 @@
 from django.contrib import admin
-from bsMateriales.models import NotaVenta, DetalleNotaVenta, Producto, Rubro, Stock, TipoProducto, Deposito, Fraccionable, Remito, Factura, DetalleFactura, DetalleRemito
+from bsMateriales.models import NotaVenta, DetalleNotaVenta, Producto, Rubro, Stock, TipoProducto, Deposito, Fraccionable, Remito, Factura, DetalleFactura, DetalleRemito, EstrategiaVenta, NoFraccionable
 
 admin.site.register(TipoProducto)
 admin.site.register(Rubro)
@@ -10,6 +10,8 @@ admin.site.register(Remito)
 admin.site.register(Factura)
 admin.site.register(DetalleFactura)
 admin.site.register(DetalleRemito)
+admin.site.register(NoFraccionable)
+admin.site.register(EstrategiaVenta)
 class StockInline(admin.TabularInline):
     model = Stock
 

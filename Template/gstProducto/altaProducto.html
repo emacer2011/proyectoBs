@@ -50,8 +50,29 @@
                 <label class="control-label" for="input01">Precio</label>  
                 <div class="controls">  
                   <input type="text" class="input-xlarge" id="precioProducto" name="precioProducto" placeholder="Precio">  
-                </div>  
+                </div>
+
+                <label class="control-label" for="input01">Fraccionable</label>  
+                <div  class="nuevoCheck">
+                  <input id="fraccionable" type="checkbox" onClick="mostrarDatosFraccionable()" name="fraccionable">
+                </div>
+
+              <div id="datosFraccionable" style="display:none">
+                <label class="control-label" for="input01">Medida Standar</label>  
+                <div class="controls">  
+                  <input type="text" class="input-xlarge" id="medidaProducto" name="medidaProducto" placeholder="Medida standar">  
+                </div>
+                <label class="control-label" for="input01">Medida M&iacutenima</label>  
+                <div class="controls">  
+                  <input type="text" class="input-xlarge" id="medidaMinimaProducto" name="medidaMinimaProducto" placeholder="Medida mínima">  
+                </div>
+
               </div>
+
+              </div>
+
+
+
         <div align="center">
                 <button type="submit" class="btn btn-primary">Guardar</button>          
         </div>

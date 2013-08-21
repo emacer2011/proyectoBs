@@ -237,8 +237,20 @@ def altaProducto(request):
     estado = ""
     if request.POST:
         producto= Producto()
-        producto.inicializar(request.POST.get("nombreProducto"),request.POST.get("descripcionProducto"), TipoProducto.objects.get(pk = request.POST.get("tipoProducto")),request.POST.get("precioProducto"),NoFraccionable.objects.get(pk = 0))
+        estrategiaVenta = ""
+        if (request.POST.getlist('fraccionable') == []):
+            print "NoFraccionable"
+            estrategiaVenta = NoFraccionable.objects.get(pk = 0)
+        else:
+            print "Fraccionable"
+            estrategiaVenta = Fraccionable()
+            estrategiaVenta.setMedida(request.POST.get("medidaProducto"))
+            estrategiaVenta.setMinimo(request.POST.get("medidaMinimaProducto"))
+            estrategiaVenta.save()
+
+        producto.inicializar(request.POST.get("nombreProducto"),request.POST.get("descripcionProducto"), TipoProducto.objects.get(pk = request.POST.get("tipoProducto")),request.POST.get("precioProducto"),estrategiaVenta)
         producto.save()
+        
         mensaje='Producto dado de alta con nombre: ' + producto.getNombre()
         estado='alert alert-success'
     return render_to_response('gstProducto/altaProducto.html',{'estado':estado, 'mensaje':mensaje, 'tipoProductos':tipoProductos},context_instance=RequestContext(request)) 
