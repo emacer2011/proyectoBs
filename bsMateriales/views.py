@@ -179,17 +179,7 @@ def venta(request):
             claveValor = i.split("=")
             
             producto = Producto.objects.get(pk = claveValor[0])
-            if producto.esFraccionable():
-                dic[producto] = (claveValor[1],claveValor[2]) # SI ES FACCIONABLE GUARDO UNA TUPLA (CANTIDAD,MEDIDA)    
-            else:
-                dic[producto] = claveValor[1]
-        
-        productos =dic.keys()
-        
-        
-
-        for producto in productos:
-            listaStock = producto.vender(cantidad = dic[producto])
+            listaStock=producto.vender(cantidad= claveValor[1], fraccion = claveValor[2])
             stocks = listaStock.keys()
             for stock in stocks:
                 detalle = DetalleNotaVenta()
@@ -253,6 +243,12 @@ def altaProducto(request):
         
         mensaje='Producto dado de alta con nombre: ' + producto.getNombre()
         estado='alert alert-success'
+
+        p1 = Producto.objects.get(pk= producto.pk)
+
+        import pdb
+        pdb.set_trace()
+
     return render_to_response('gstProducto/altaProducto.html',{'estado':estado, 'mensaje':mensaje, 'tipoProductos':tipoProductos},context_instance=RequestContext(request)) 
     
 @transaction.commit_on_success

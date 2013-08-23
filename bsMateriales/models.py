@@ -2,6 +2,7 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from misExcepciones import *
 from datetime import *
+import math
 import re
 
 # ===============
@@ -156,14 +157,45 @@ class EstrategiaVenta(models.Model):
 #    class Meta:
 #     abstract = True
 
-#    def vender(self, producto, cantidad, fraccion):
- #       raise NotImplemented    
+    def vender(self, producto, cantidad, fraccion = None):
+        try:
+            return self.fraccionable.vender(producto, cantidad, fraccion)
+        except ObjectDoesNotExist as ex:
+            return self.nofraccionable.vender(producto,cantidad, fraccion)
+    
+
+    def getEstrategia(self):
+        try:
+            return self.fraccionable
+        except ObjectDoesNotExist as ex:
+            return self.nofraccionable
+    
+
+    def setMedida(self, medida):
+        try:
+            self.fraccionable.setMedida(medida)
+        except ObjectDoesNotExist as ex:
+            pass
+
+    def setMinimo(self,minimo):
+        try:
+            self.nofraccionable.setMinimo(minimo)
+        except ObjectDoesNotExist as ex:
+            pass
+
 
     def getMedida(self):
-         return 0
+        try:
+            return self.fraccionable.getMedida()
+        except ObjectDoesNotExist as ex:
+            return 0
 
-  #  def getMinimo(self):
-   #     return 0
+    def getMinimo(self):
+        try:
+            return self.fraccionable.getMinimo()
+        except ObjectDoesNotExist as ex:
+            return 0
+
 
 # TODO: FALTA FACTORIZAR TODO ESTE CODIGO
 # ==================
@@ -175,7 +207,7 @@ class Producto(models.Model):
     __nombre = models.CharField(max_length = 40)
     __descripcion = models.CharField(max_length = 40, blank = True)
     __tipoProducto = models.ForeignKey(TipoProducto)
-    __estrategiaVenta = models.ForeignKey('EstrategiaVenta')
+    __estrategiaVenta = models.ForeignKey(EstrategiaVenta)
     __cantidad = models.IntegerField(default= 0)
     __precio = models.FloatField()
     class Meta:
@@ -237,20 +269,8 @@ class Producto(models.Model):
     def getTipoProducto(self):
         return self.__tipoProducto
 
-    def getEstrategia(self):
-        return self.__estrategiaVenta
-    
     def obtenerEstrategiaDeVenta(self):
-        if isinstance(self.__estrategiaVenta, Fraccionable):
-            self.__estrategiaVenta = Fraccionable(self.__estrategiaVenta)
-            import pdb
-            pdb.set_trace()
-            return self.__estrategiaVenta
-        else:
-            self.__estrategiaVenta = NoFraccionable(self.__estrategiaVenta)
-            import pdb
-            pdb.set_trace()
-            return self.__estrategiaVenta
+        return self.__estrategiaVenta.getEstrategia()        
     
     def esFraccionable(self):
         if self.__estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
@@ -306,7 +326,7 @@ class NoFraccionable(EstrategiaVenta):
             if cantidad <= 0:   
                 return listaStocks
 
-    def vender(self, producto, cantidad, fraccion):
+    def vender(self, producto, cantidad, fraccion = None):
 
         cantidad = int(cantidad)
         depositosAfectados = {}
@@ -336,10 +356,6 @@ class NoFraccionable(EstrategiaVenta):
             raise ErrorVenta()
 
 
-#    def __unicode__(self):
-#        return "NoFraccionable"
-
-
 # =================
 # = Fraccionables =
 # =================
@@ -366,8 +382,6 @@ class Fraccionable(EstrategiaVenta):
         return self.__medida
 
     def getMinimo(self):
-        import pdb
-        pdb.set_trace()
         return self.__minimo
 
     def vender(self, producto, cantidad, fraccion):
@@ -375,6 +389,12 @@ class Fraccionable(EstrategiaVenta):
         stockMinimo = None
         stockAfectados = {}
         ventaCompleta = False
+
+        if ((fraccion > self.getMedida() )or(fraccion< self.getMinimo())):
+            raise ErrorProducto 
+
+    # Llamar funcion que diga exactamente cuanto restar y crea los productos necesarios!
+        can 
         while not ventaCompleta:        
             if stockLista[0].disponibles > 0:
                 stockMinimo = stockLista[0]        
@@ -396,73 +416,16 @@ class Fraccionable(EstrategiaVenta):
             producto.save()
         return stockAfectados
 
-    def fraccionar(self, producto, fraccion, cantidad, stockMinimo = None):
-        print fraccion
-        descrip = "tiene medida: " + str(self.medida - fraccion)
-        resto = self.medida - fraccion
-        if resto > self.minimo:
-          	estrategiaVenta = Fraccionable(medida = resto, minimo = self.minimo)
-        else:
-            estrategiaVenta = NoFraccionable.instance()
-        
-        pSobra, created = Producto.objects.get_or_create(nombre = producto.nombre, descripcion = descrip, defaults = {
-                        'nombre': producto.nombre,
-                        'descripcion': descrip,
-                        'tipoProducto': producto.tipoProducto,
-                        'estrategiaVenta': estrategiaVenta
-                        })
-        if created:
-            stock = Stock()
-            stock.reservadosConfirmados = 0
-            stock.reservadosNoConfirmados = 0
-            stock.disponibles = cantidad
-            stock.deposito = stockMinimo.deposito
-            stock.producto = pSobra
-            stock.save()
-        else:
-            stock, created = Stock.objects.get_or_create(producto = prod, deposito = stockMinimo.deposito, defaults = {
-                             'reservadosConfirmados' : 0,
-                             'reservadosNoConfirmados' : 0,
-            				 'disponibles' : cantidad,
-            				 'deposito' : stockMinimo.deposito,
-            				 'producto' : pSobra
-                             })
-            if not created:            
-                stock.disponibles = stock.disponibles + cantidad
-                stock.save()
-    
-        descrip = "tiene medida: " + str(fraccion)
-        pVenta, created = Producto.objects.get_or_create(nombre = producto.nombre, descripcion = descrip, defaults = {
-                        'nombre' : producto.nombre,
-                        'descripcion' : "tiene medida: " + str(fraccion),
-                        'tipoProducto' : producto.tipoProducto,
-                        'estrategiaVenta' : NoFraccionable.instance()
-                        })
-        if created:
-            stock = Stock()
-            stock.reservadosConfirmados = 0
-            stock.reservadosNoConfirmados = cantidad
-            stock.disponibles = 0
-            stock.deposito = stockMinimo.deposito
-            stock.producto = pVenta
-            stock.save() 
-        else:           
-            stock, created = Stock.objects.get_or_create(producto = prod, deposito = stockMinimo.deposito, defaults = {
-                             'reservadosConfirmados' : 0,
-                             'reservadosNoConfirmados' : cantidad,
-                             'disponibles' : 0,
-                             'deposito' : stockMinimo.deposito,
-                             'producto' : pVenta
-                             })
-            if not created:
-                stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + cantidad
-                stock.save()
-        
-        return stock
+    def fraccionar(self, producto, fraccion, cantidad):
+        cantidadXunidad = math.floor(self.getMedida()/fraccion)
+        resto =(self.getMedida() % fraccion)
+        if ((resto<self.getMinimo()) and (resto != 0)):
+            cantidadXunidad = cantidadXunidad -1
+        cantidadAfectada = math.floor(cantidad / cantidadXunidad)
+        if (cantidad % cantidadXunidad) > 0:
+            cantidadAfectada = cantidadAfectada+1
 
-
-#    def __unicode__(self):
-#        return "Fraccionable"
+        return cantidadAfectada
 
 
 # =========
