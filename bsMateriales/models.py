@@ -196,6 +196,21 @@ class EstrategiaVenta(models.Model):
         except ObjectDoesNotExist as ex:
             return 0
 
+    def stocksAfectados (self, producto, cantidad):
+        listaStocks = []
+        #Caso en que un solo deposito cumple con la totalidad de la demanda
+        stocksOrdenados = sorted(producto.stock_set.all(), key=lambda stock: stock.disponibles)
+        for stock in stocksOrdenados:
+            if stock.disponibles >= cantidad:
+                return [stock]
+        stocksOrdenados = sorted(producto.stock_set.all(), key=lambda stock: stock.disponibles, reverse=True)
+        #Caso contrario
+        for stock in stocksOrdenados:
+            listaStocks.append(stock)
+            cantidad = cantidad - stock.disponibles
+            if cantidad <= 0:   
+                return listaStocks
+
 
 # TODO: FALTA FACTORIZAR TODO ESTE CODIGO
 # ==================
@@ -204,12 +219,12 @@ class EstrategiaVenta(models.Model):
 
 
 class Producto(models.Model):
-    __nombre = models.CharField(max_length = 40)
-    __descripcion = models.CharField(max_length = 40, blank = True)
-    __tipoProducto = models.ForeignKey(TipoProducto)
-    __estrategiaVenta = models.ForeignKey(EstrategiaVenta)
-    __cantidad = models.IntegerField(default= 0)
-    __precio = models.FloatField()
+    nombre = models.CharField(max_length = 40)
+    descripcion = models.CharField(max_length = 40, blank = True)
+    tipoProducto = models.ForeignKey(TipoProducto)
+    estrategiaVenta = models.ForeignKey(EstrategiaVenta)
+    cantidad = models.IntegerField(default= 0)
+    precio = models.FloatField()
     class Meta:
         permissions = (
             ("producto", "puede manejar abm Producto"),
@@ -218,7 +233,7 @@ class Producto(models.Model):
         )
     
     def __unicode__(self):
-        return "%s" % self.__nombre
+        return "%s" % self.nombre
 
     def puedeBorrarse(self):
         try:
@@ -229,56 +244,56 @@ class Producto(models.Model):
     
     def setNombre(self,nombre):
          if re.match('\w{3,30}$', nombre):
-            self.__nombre = nombre
+            self.nombre = nombre
          else:
             raise ErrorProducto()
 
     def getNombre(self):
-         return self.__nombre
+         return self.nombre
     
     def setDescripcion(self,descripcion):
-         self.__descripcion = descripcion
+         self.descripcion = descripcion
 
     def getDescripcion(self):
-         return self.__descripcion
+         return self.descripcion
 
     def setPrecio(self, precio):
          if precio>0:
-            self.__precio = precio
+            self.precio = precio
          else:
             raise ErrorProducto()
             
     def getPrecio(self):
-        return self.__precio
+        return self.precio
 
     def setCantidad(self, cantidad):
         if cantidad >= 0:
-            self.__cantidad = cantidad
+            self.cantidad = cantidad
         else:
             raise ErrorProducto()
 
     def getCantidad(self):
-         return self.__cantidad
+         return self.cantidad
 
     def setTipoProducto(self, tipoProducto):
         if (tipoProducto == None):
                 raise ErrorProducto()
         else:
-            self.__tipoProducto = tipoProducto
+            self.tipoProducto = tipoProducto
 
     def getTipoProducto(self):
-        return self.__tipoProducto
+        return self.tipoProducto
 
     def obtenerEstrategiaDeVenta(self):
-        return self.__estrategiaVenta.getEstrategia()        
+        return self.estrategiaVenta.getEstrategia()        
     
     def esFraccionable(self):
-        if self.__estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
+        if self.estrategiaVenta.pk == ESTRATEGIA_NOFRACCIONABLE:
             return False     
         return True
 
     def setEstrategiaDeVenta(self, estrategiaVenta):
-        self.__estrategiaVenta= estrategiaVenta
+        self.estrategiaVenta= estrategiaVenta
 
     def verificarCantidadStock(self):
         stockList = self.stock_set.all()
@@ -309,22 +324,6 @@ class NoFraccionable(EstrategiaVenta):
     @classmethod
     def instance(cls):
         return NoFraccionable.objects.get(pk = ESTRATEGIA_NOFRACCIONABLE)    
-
-    
-    def stocksAfectados (self, producto, cantidad):
-        listaStocks = []
-        #Caso en que un solo deposito cumple con la totalidad de la demanda
-        stocksOrdenados = sorted(producto.stock_set.all(), key=lambda stock: stock.disponibles)
-        for stock in stocksOrdenados:
-            if stock.disponibles >= cantidad:
-                return [stock]
-        stocksOrdenados = sorted(producto.stock_set.all(), key=lambda stock: stock.disponibles, reverse=True)
-        #Caso contrario
-        for stock in stocksOrdenados:
-            listaStocks.append(stock)
-            cantidad = cantidad - stock.disponibles
-            if cantidad <= 0:   
-                return listaStocks
 
     def vender(self, producto, cantidad, fraccion = None):
 
@@ -361,71 +360,143 @@ class NoFraccionable(EstrategiaVenta):
 # =================
 
 class Fraccionable(EstrategiaVenta):
-    __medida = models.FloatField() # TODO: medidas a float
-    __minimo = models.FloatField()
+    medida = models.FloatField() # TODO: medidas a float
+    minimo = models.FloatField()
 
 
     def setMedida(self, medida):
         if medida > 0:
-            self.__medida = medida
+            self.medida = medida
         else:
             raise ErrorProducto()
 
     def setMinimo(self,minimo):
         if minimo > 0:
-            self.__minimo = minimo
+            self.minimo = minimo
         else:
             raise ErrorProducto()
 
 
     def getMedida(self):
-        return self.__medida
+        return self.medida
 
     def getMinimo(self):
-        return self.__minimo
+        return self.minimo
 
     def vender(self, producto, cantidad, fraccion):
-        stockLista = producto.stock_set.all()
-        stockMinimo = None
-        stockAfectados = {}
-        ventaCompleta = False
+        depositosAfectados = {}        
+        cantidad = int(cantidad)
+        fraccion = float(fraccion)
 
-        if ((fraccion > self.getMedida() )or(fraccion< self.getMinimo())):
+        if ((fraccion > self.getMedida()) or (fraccion< self.getMinimo())):
             raise ErrorProducto 
+        medidas = self.fraccionar(fraccion, cantidad)
+        productosAfectados = medidas['productosMaximaFraccion'] + medidas['productoMinimaFraccion']
+        listaStocks = self.stocksAfectados(producto, productosAfectados)
+        if (medidas['productosMaximaFraccion'] != 0):
+            depositosAfectados = self.realizarVenta(depositosAfectados, producto, listaStocks, medidas['productosMaximaFraccion'],medidas['cantidadXunidad'], fraccion)
+        if (medidas['productoMinimaFraccion'] != 0):
+            depositosAfectados = self.realizarVenta(depositosAfectados, producto, listaStocks, 1,medidas['productoMinimaFraccion'], fraccion)
+        return  depositosAfectados
 
-    # Llamar funcion que diga exactamente cuanto restar y crea los productos necesarios!
-        can 
-        while not ventaCompleta:        
-            if stockLista[0].disponibles > 0:
-                stockMinimo = stockLista[0]        
-            for elementoLista in stockLista:
-                if stockMinimo != None:
-                    if (elementoLista.disponibles != 0) and (elementoLista.disponibles < stockMinimo.disponibles):
-                        stockMinimo = elementoLista
-                    else:
-                        continue
-                elif elementoLista.disponibles > 0:
-                    stockMinimo = elementoLista
-            if stockMinimo.disponibles >= cantidad:
-                producto = self.fraccionar(producto, fraccion, cantidad)
-                stockAfectados[stockMinimo] = cantidad
+
+    def realizarVenta(self, depositosAfectados, producto, stocks, cantidadProductos, cantidadXunidad, fraccion):
+        cantidad = cantidadProductos
+        for stock in stocks:
+            if cantidad > 0:
+                if (stock.disponibles >= cantidad):
+                    stock.disponibles -= cantidad
+                    stock.reservadosNoConfirmados += cantidad
+                    stock.save()
+                    try:
+                        depositosAfectados[stock] += cantidad * cantidadXunidad
+                    except KeyError as ex:
+                        depositosAfectados[stock] = cantidad * cantidadXunidad
+                    cantidad = 0
+                else:
+                    cantidad -= stock.disponibles
+                    stock.reservadosNoConfirmados += stock.disponibles
+                    cantidadTemporal = stock.disponibles
+                    stock.disponibles = 0
+                    stock.save()
+                    try:
+                        depositosAfectados[stock] += cantidadTemporal * cantidadXunidad
+                    except KeyError as ex:
+                        depositosAfectados[stock] = cantidadTemporal * cantidadXunidad
             else:
-                producto = self.fraccionar(producto, fraccion, stockMinimo.disponibles, stockMinimo)
-                stockAfectados[stockMinimo] = cantidad - stockMinimo.disponibles
-                prod = self.vender(producto, cantidad = cantidad - stockMinimo.disponibles, fraccion = fraccion)
-            producto.save()
-        return stockAfectados
+                break
+        producto.setCantidad(producto.getCantidad() - cantidadProductos)
+        producto.save()
+        medidaNueva = self.getMedida() - (cantidadXunidad * fraccion)
+        if (medidaNueva != 0):
+        
+            if (medidaNueva > self.getMinimo()):
+                estrategia = Fraccionable()
+                estrategia.setMedida(medidaNueva)
+                estrategia.setMinimo(self.getMinimo())
+                estrategia.save()
+            else:
+                estrategia = EstrategiaVenta.objects.get(pk = 0)
+            """
+            CONSULTA PARA BUSCAR SI YA EXISTE EL NUEVO PRODUCTO
+            """
+            if (isinstance(estrategia,Fraccionable)):
+                qs = Producto.objects.filter(nombre=producto.getNombre(),estrategiaVenta__fraccionable__medida=medidaNueva)
+            else:
+                qs = Producto.objects.filter(nombre=producto.getNombre(),estrategiaVenta__nofraccionable__isnull=False)
+            if (qs.count() != 0):
+                productoExistente = qs[0]
+                stocks = depositosAfectados.keys()
+                for stock in stocks:
+                    """
+                    VERIFICO SI EL PRODUCTO EXISTENTE TIENE STOCK EN EL MISMO DEPOSITO
+                    """
+                    qs1 = Stock.objects.filter(deposito = stock.getDeposito(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=medidaNueva)
+                    if (qs1.count() != 0):
+                        stockExistente = qs1[0]
+                        stockExistente.setDisponibles(stockExistente.getDisponibles() + cantidadProductos)
+                        stockExistente.save()
+                    else:
+                        stockNuevo = Stock()
+                        stockNuevo.setReservadoNoconfirmados(0)
+                        stockNuevo.setReservadoConfirmados(0)
+                        stockNuevo.setDisponibles(cantidadProductos)
+                        stockNuevo.setDeposito(stock.getDeposito())
+                        stockNuevo.setProducto(productoExistente)
+                        stockNuevo.save()    
+                productoExistente.setCantidad(productoExistente.getCantidad() + cantidadProductos)
+                productoExistente.save()
+            else:
+                productoNuevo = Producto()
+                productoNuevo.setNombre(producto.getNombre())
+                productoNuevo.setDescripcion(producto.getNombre() + " de " + str(medidaNueva))
+                productoNuevo.setTipoProducto(producto.getTipoProducto())
+                productoNuevo.setPrecio(producto.getPrecio())
+                productoNuevo.setCantidad(cantidadProductos)
+                productoNuevo.setEstrategiaDeVenta(estrategia)
+                productoNuevo.save()
 
-    def fraccionar(self, producto, fraccion, cantidad):
+                stocks = depositosAfectados.keys()
+                for stock in stocks:
+                    stockNuevo = Stock()
+                    stockNuevo.setReservadoNoconfirmados(0)
+                    stockNuevo.setReservadoConfirmados(0)
+                    stockNuevo.setDisponibles(cantidadProductos)
+                    stockNuevo.setDeposito(stock.getDeposito())
+                    stockNuevo.setProducto(productoNuevo)
+                    stockNuevo.save()
+        return depositosAfectados
+
+    def fraccionar(self, fraccion, cantidad):
+        valoresDeMedidas = {}
         cantidadXunidad = math.floor(self.getMedida()/fraccion)
         resto =(self.getMedida() % fraccion)
         if ((resto<self.getMinimo()) and (resto != 0)):
             cantidadXunidad = cantidadXunidad -1
-        cantidadAfectada = math.floor(cantidad / cantidadXunidad)
-        if (cantidad % cantidadXunidad) > 0:
-            cantidadAfectada = cantidadAfectada+1
-
-        return cantidadAfectada
+        valoresDeMedidas['productosMaximaFraccion'] = math.floor(cantidad / cantidadXunidad)
+        valoresDeMedidas['cantidadXunidad'] = cantidadXunidad
+        valoresDeMedidas['productoMinimaFraccion'] = cantidad % cantidadXunidad
+        return valoresDeMedidas
 
 
 # =========

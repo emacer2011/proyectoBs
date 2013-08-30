@@ -245,10 +245,6 @@ def altaProducto(request):
         estado='alert alert-success'
 
         p1 = Producto.objects.get(pk= producto.pk)
-
-        import pdb
-        pdb.set_trace()
-
     return render_to_response('gstProducto/altaProducto.html',{'estado':estado, 'mensaje':mensaje, 'tipoProductos':tipoProductos},context_instance=RequestContext(request)) 
     
 @transaction.commit_on_success
