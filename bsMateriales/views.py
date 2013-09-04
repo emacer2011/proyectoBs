@@ -158,6 +158,9 @@ def modificarDeposito(request):
 # = Venta =
 # =========
 @transaction.commit_on_success
+#TODO: hacer permisos de usuario
+#@user_passes_test(lambda u: u.groups.filter(name='administrativo').count() == 0, login_url='/')
+#@user_passes_test(lambda u: u.groups.filter(name='encargadoDeposito').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def venta(request):
     """docstring for venta"""
