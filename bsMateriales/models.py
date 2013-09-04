@@ -10,20 +10,20 @@ import re
 # ===============
 
 class Rubro(models.Model):
-    __nombre = models.CharField(max_length = 40)
-    __descripcion = models.CharField(max_length = 40, blank=True)
+    nombre = models.CharField(max_length = 40)
+    descripcion = models.CharField(max_length = 40, blank=True)
     
     def getNombre(self):
-        return self.__nombre
+        return self.nombre
 
     def setNombre(self, nombre):
-        self.__nombre= nombre
+        self.nombre= nombre
 
     def getDescripcion(self):
-        return self.__descripcion
+        return self.descripcion
         
     def setDescripcion(self, descripcion):
-        self.__descripcion= descripcion
+        self.descripcion= descripcion
 
     def inicializar(self, nombre, descripcion, pk=None):
         self.setDescripcion(descripcion)
@@ -38,9 +38,9 @@ class Rubro(models.Model):
 # = Clase Deposito =
 # ==================
 class Deposito(models.Model):
-    __direccion = models.CharField(max_length = 40)
-    __telefono = models.CharField(max_length = 15)
-    __rubro = models.ForeignKey(Rubro)
+    direccion = models.CharField(max_length = 40)
+    telefono = models.CharField(max_length = 15)
+    rubro = models.ForeignKey(Rubro)
     class Meta:
         permissions = (
             ("deposito", "Abm Depositos"),
@@ -49,30 +49,30 @@ class Deposito(models.Model):
         )
     def setDireccion(self, direccion):
         if re.match('\w+(\s\w+)*$', direccion):
-            self.__direccion = direccion
+            self.direccion = direccion
         else:
             raise ErrorDeposito()
 
     def getDireccion(self):
-            return self.__direccion
+            return self.direccion
 
     def setTelefono(self, telefono):
         if re.match('\d{7,13}$', telefono):
-            self.__telefono = telefono
+            self.telefono = telefono
         else:
             raise ErrorDeposito()
 
     def getTelefono(self):
-        return self.__telefono
+        return self.telefono
 
     def setRubro(self, pkRubro):
         try:
             unRubro = Rubro.objects.get(pk = pkRubro)        
-            self.__rubro = unRubro
+            self.rubro = unRubro
         except ObjectDoesNotExist:
             raise ErrorDeposito()
     def getRubro(self):
-        return self.__rubro
+        return self.rubro
 
     def puedoEliminarlo(self): 
         try:
@@ -100,40 +100,40 @@ class Deposito(models.Model):
 # = Clase Tipo Producto =
 # =======================
 class TipoProducto(models.Model):
-    __nombre = models.CharField(max_length = 40)
-    __unidadMedida = models.CharField(max_length = 40)
-    __descripcion = models.CharField(max_length = 40, blank=True)
-    __rubro = models.ForeignKey(Rubro)    
+    nombre = models.CharField(max_length = 40)
+    unidadMedida = models.CharField(max_length = 40)
+    descripcion = models.CharField(max_length = 40, blank=True)
+    rubro = models.ForeignKey(Rubro)    
     
 
     def getUnidadMedida(self):
-        return __unidadMedida
+        return unidadMedida
 
     def setUnidadMedida(self, unidadMedida):
-        self.__unidadMedida = unidadMedida
+        self.unidadMedida = unidadMedida
 
 
     def setRubro(self, pkRubro):
         try:
             unRubro = Rubro.objects.get(pk = pkRubro)        
-            self.__rubro = unRubro
+            self.rubro = unRubro
         except ObjectDoesNotExist:
             raise ErrorTipoProducto()
     
     def getRubro(self):
-        return self.__rubro
+        return self.rubro
 
     def getNombre(self):
-        return self.__nombre
+        return self.nombre
 
     def setNombre(self, nombre):
-        self.__nombre= nombre
+        self.nombre= nombre
 
     def getDescripcion(self):
-        return self.__descripcion
+        return self.descripcion
         
     def setDescripcion(self, descripcion):
-        self.__descripcion= descripcion
+        self.descripcion= descripcion
 
     def inicializar(self, nombre, descripcion, rubro, unidadMedida, pk):
         self.setNombre(nombre)
@@ -153,9 +153,6 @@ class TipoProducto(models.Model):
 ESTRATEGIA_NOFRACCIONABLE = 0
 
 class EstrategiaVenta(models.Model):
-
-#    class Meta:
-#     abstract = True
 
     def vender(self, producto, cantidad, fraccion = None):
         try:
