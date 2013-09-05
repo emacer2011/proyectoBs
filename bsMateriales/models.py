@@ -743,7 +743,7 @@ class Factura(models.Model):
 
     class Meta:
         permissions = (
-            ("producto", "puede cobrar"),
+            ("cobrar", "puede cobrar"),
             ("change_task_status", "Can change the status of tasks"),
             ("close_task", "Can remove a task by setting its status as closed"),
         )
