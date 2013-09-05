@@ -43,7 +43,7 @@ class Deposito(models.Model):
     rubro = models.ForeignKey(Rubro)
     class Meta:
         permissions = (
-            ("deposito", "Abm Depositos"),
+            ("deposito", "puede manejar abm Deposito"),
             ("change_task_status", "Can change the status of tasks"),
             ("close_task", "Can remove a task by setting its status as closed"),
         )
@@ -507,6 +507,13 @@ class Stock(models.Model):
     deposito = models.ForeignKey(Deposito, blank = True)
     producto = models.ForeignKey(Producto)
 
+    class Meta:
+        permissions = (
+            ("stock", "puede cargar/eliminar stock"),
+            ("change_task_status", "Can change the status of tasks"),
+            ("close_task", "Can remove a task by setting its status as closed"),
+        )
+
     def getReservadoConfirmados(self):
         return self.reservadosConfirmados
 
@@ -733,6 +740,14 @@ class Factura(models.Model):
     formaDePago = models.CharField(max_length = 15)
     precioTotal = models.FloatField()
     ventaNota = models.ForeignKey(NotaVenta)
+
+    class Meta:
+        permissions = (
+            ("cobrar", "puede cobrar"),
+            ("change_task_status", "Can change the status of tasks"),
+            ("close_task", "Can remove a task by setting its status as closed"),
+        )
+
 
     def getFecha(self):
         return self.fecha

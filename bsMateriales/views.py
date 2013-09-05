@@ -13,6 +13,9 @@ from django.db import transaction
 # = Funciones Ajax =
 # ==================
 
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 def cargarDetalles(request):
     """docstring for cargarDetalle"""
     detalles = DetalleRemito.objects.filter(remito = request.GET.get('pkRemito'))              
@@ -36,6 +39,9 @@ def cargarDetalles(request):
     mensaje = mensaje+"</table>"
     return HttpResponse(mensaje)
 
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 def cargarEntregados(request):
     """docstring for cargarEntregados"""
     pkDetalle = request.GET.get('pkDetalle')
@@ -46,6 +52,9 @@ def cargarEntregados(request):
     detalle.save()  
     return HttpResponseRedirect("/cargarDetalles")
 
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 def actualizarEntregados(request):
     pkRemito = request.GET.get('pkRemito')
     remito = Remito.objects.get(pk = pkRemito )
@@ -98,6 +107,9 @@ def index(request):
 # ====================
 # = GESTION DEPOSITO =
 # ====================
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @transaction.commit_on_success
 @login_required(login_url='/login')
 def altaDeposito(request):
@@ -113,12 +125,18 @@ def altaDeposito(request):
         estado='alert alert-success'
     return render_to_response('gstDeposito/altaDeposito.html',{'estado':estado, 'rubros':rubros, 'mensaje': mensaje},context_instance=RequestContext(request))
 
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def listarDeposito(request):
     """docstring for listarDeposito"""
     depositos = Deposito.objects.all()
     return render_to_response('gstDeposito/listarDeposito.html',{'depositos':depositos},context_instance=RequestContext(request)) 
 
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 @transaction.commit_on_success
 def bajaDeposito(request):
@@ -136,6 +154,9 @@ def bajaDeposito(request):
             return HttpResponse(str(estado)+"/"+str(mensaje))
     return render_to_response('gstDeposito/bajaDeposito.html',{'depositos':depositos, 'mensaje': mensaje, 'estado': estado},context_instance=RequestContext(request)) 
 
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 @transaction.commit_on_success
 def modificarDeposito(request):
@@ -158,9 +179,9 @@ def modificarDeposito(request):
 # = Venta =
 # =========
 @transaction.commit_on_success
-#TODO: hacer permisos de usuario
-#@user_passes_test(lambda u: u.groups.filter(name='administrativo').count() == 0, login_url='/')
-#@user_passes_test(lambda u: u.groups.filter(name='encargadoDeposito').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def venta(request):
     """docstring for venta"""
@@ -204,6 +225,9 @@ def venta(request):
 # ================
 # = Cargar Stock =
 # ================
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @transaction.commit_on_success
 @login_required(login_url='/login')
 def cargarStock(request):
@@ -227,6 +251,9 @@ def cargarStock(request):
 # =======================
 # = Gestion de Producto =
 # =======================
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @transaction.commit_on_success
 @login_required(login_url='/login')
 def altaProducto(request):
@@ -256,6 +283,9 @@ def altaProducto(request):
         p1 = Producto.objects.get(pk= producto.pk)
     return render_to_response('gstProducto/altaProducto.html',{'estado':estado, 'mensaje':mensaje, 'tipoProductos':tipoProductos},context_instance=RequestContext(request)) 
     
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @transaction.commit_on_success
 @login_required(login_url='/login')    
 def bajaProducto(request):
@@ -275,6 +305,10 @@ def bajaProducto(request):
         return HttpResponse(str(estado)+"/"+str(mensaje))
     return render_to_response('gstProducto/bajaProducto.html',{'estado':estado, 'mensaje':mensaje, 'productos':productos},context_instance=RequestContext(request)) 
 
+
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @transaction.commit_on_success
 @login_required(login_url='/login')        
 def modificarProducto(request):
@@ -295,6 +329,9 @@ def modificarProducto(request):
             estado='alert alert-error'
     return render_to_response('gstProducto/modificarProducto.html',{'estado':estado, 'mensaje':mensaje, 'tipoProductos':tipoProductos, 'productos': productos},context_instance=RequestContext(request)) 
 
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def listarProducto(request):
     """docstring for listarProducto"""
@@ -304,6 +341,9 @@ def listarProducto(request):
 # ======================
 # = Entrega Materiales =
 # ======================
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @transaction.commit_on_success
 @login_required(login_url='/login')
 def entregaMateriales(request):
@@ -315,6 +355,9 @@ def entregaMateriales(request):
 ## =====================
 # = Cobro de Facturas =
 # =====================
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @transaction.commit_on_success
 @login_required(login_url='/login')
 def cobro(request):
