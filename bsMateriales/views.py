@@ -186,7 +186,10 @@ def venta(request):
             stocks = listaStock.keys()
             for stock in stocks:
                 detalle = DetalleNotaVenta()
-                detalle.inicializar(stock.getProducto(),listaStock[stock],((producto.getPrecio() * listaStock[stock])*float(claveValor[2])), stock.getDeposito(),notaVenta)
+                if (producto.esFraccionable()):
+                    detalle.inicializar(stock.getProducto(),listaStock[stock],((producto.getPrecio() * listaStock[stock])*float(claveValor[2])), stock.getDeposito(),notaVenta)
+                else:
+                    detalle.inicializar(stock.getProducto(),listaStock[stock],(producto.getPrecio() * listaStock[stock]), stock.getDeposito(),notaVenta)
                 detalle.save()
                 notaVenta.incrementarTotal(detalle.getSubTotal())
                 mensaje ="Venta Realizada Con Exito" 
