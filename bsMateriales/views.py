@@ -61,6 +61,26 @@ def actualizarEntregados(request):
     remito.actualizarEntregados()
     return HttpResponseRedirect("/cargarDetalles")
 
+# ==========================================================================================================
+# ==========================================================================================================
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
+def cargarDepositos(request):
+    """docstring for cargarDepositos"""
+    pkProducto = request.GET.get('pkProducto')
+    deposito = Deposito.objects.get(pk = request.POST.get('pkDeposito') )
+#    detalle = DetalleRemito.objects.get(pk = pkDetalle )
+#    entregado = not detalle.entregado
+#    detalle.entregado = entregado
+#    detalle.confirmarStock()
+#    detalle.save()  
+    return HttpResponseRedirect("/cargarDetalles")
+
+# ==========================================================================================================
+# ==========================================================================================================
+
+
 # =======================
 # = GESTION DE USUARIOS =
 # =======================
@@ -204,6 +224,8 @@ def venta(request):
             
             producto = Producto.objects.get(pk = claveValor[0])
             listaStock=producto.vender(cantidad= claveValor[1], fraccion = claveValor[2])
+            if claveValor[2] == '-':
+                claveValor[2] = 1 
             stocks = listaStock.keys()
             for stock in stocks:
                 detalle = DetalleNotaVenta()

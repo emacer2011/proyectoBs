@@ -46,7 +46,7 @@
 
     
 </div>
-    <div id="CabeceraLDTablas">
+<!--    <div id="CabeceraLDTablas">
         <form class="navbar-search pull-left" style="padding-left:20px">
             <input type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='buscar(this.value,"tablaProductos");' ><br>
         </form><br>
@@ -57,19 +57,35 @@
                     <th class="table-head" id="CargaStock-Nombre">Producto</th>
                     <th class="table-head" id="CargaStock-Titulo-Descripcion">Descripci&oacuten</th>
                     <th class="table-head" id="CargaStock-TipoProducto">T.Producto</th>
-                    <!--<th class="table-head" id="CargaStock-Categoria">Categoria</th>-->
+                    <!-<th class="table-head" id="CargaStock-Categoria">Categoria</th>->
                     <th class="table-head" id="CargaStock-Titulo-Cantidad">Cant.</th>
                     <th class="table-head" id="CargaStock-Precio">$</th>
                     <th class="table-head" id="CargaStock-Cargar">Cargar</th>
+                    <th class="table-head" id="CargaStock-Descontar">Descontar</th>
                 </tr>    
             </thead>
         </table>
     </div>
+-->
 
-
+<form class="navbar-search pull-left" style="padding-left:20px">
+    <label for="buscarProducto"> Buscar: </label>
+            <input name="buscarProducto" type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='buscar(this.value,"tablaProductos");' ><br>
+        </form><br>
 <div id="ContenedorTabla">
 <table id="tablaProductos" cellpadding="0" cellspacing="0" class="table table-striped">
-    </thead>
+                <thead>
+                <tr>
+                    <th style="display:none" >pk</th>
+                    <th class="table-head" id="CargaStock-Nombre">Producto</th>
+                    <th class="table-head" id="CargaStock-Titulo-Descripcion">Descripci&oacuten</th>
+                    <th class="table-head" id="CargaStock-TipoProducto">T.Producto</th>
+                    <th class="table-head" id="CargaStock-Titulo-Cantidad">Cant.</th>
+                    <th class="table-head" id="CargaStock-Precio">$</th>
+                    <th class="table-head" id="CargaStock-Cargar">Cargar</th>
+                    <th class="table-head" id="CargaStock-Descontar">Descontar</th>
+                </tr>    
+            </thead>
     <tbody>
         {% for producto in productos %}
 
@@ -82,6 +98,11 @@
                 <td id="CargaStock-Precio">{{producto.getPrecio}}</td>
                 <td id="CargaStock-Cargar"><button onClick="popPropio('{{producto.pk}}')" class="btn btn-success" data-toggle="modal">
                     <i class="icon-plus icon-white"></i>
+                    </button>
+                </td>
+                <td id="CargaStock-Descontar">
+                    <button onClick="popPropio2('{{producto.pk}}')" class="btn btn-danger" data-toggle="modal">
+                    <i class="icon-minus icon-white"></i>
                     </button>
                 </td>
             </tr>

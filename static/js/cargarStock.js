@@ -10,6 +10,30 @@ function popPropio(pk){
         elemento.className="modal-backdrop fade in";
         document.getElementById("paraFondo").appendChild(elemento);
 }
+
+function popPropio2(pk){
+        var campo = document.getElementById("pkProducto");
+        campo.value= pk;
+        var elemento=document.getElementById("modalPropio");
+        elemento.className="modal hide fade in";
+        elemento.style.display="block";
+        elemento.setAttribute("aria-hidden",false);
+        elemento = document.createElement('div');
+        elemento.setAttribute('id','nuevoPop');
+        elemento.className="modal-backdrop fade in";
+        document.getElementById("paraFondo").appendChild(elemento);
+        cargarTabla(pk);
+}
+
+function cargarTabla(pk){
+  $.get ("/cargarDepositos",{ pkProducto: pk },function(data){
+        tabla = document.getElementById("tablaDetalles");
+        tabla.innerHTML = data;
+    }
+      );
+}
+
+
     
 function volver(){
         var elemento=document.getElementById("modalPropio");
