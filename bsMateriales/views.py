@@ -224,8 +224,6 @@ def venta(request):
             
             producto = Producto.objects.get(pk = claveValor[0])
             listaStock=producto.vender(cantidad= claveValor[1], fraccion = claveValor[2])
-            if claveValor[2] == '-':
-                claveValor[2] = 1 
             stocks = listaStock.keys()
             for stock in stocks:
                 detalle = DetalleNotaVenta()
