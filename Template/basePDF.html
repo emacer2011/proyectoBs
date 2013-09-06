@@ -1,0 +1,37 @@
+<html>
+	<head>
+	        <!-- <link href="{{STATIC_URL}}bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">
+	         <link rel="stylesheet" href="{{STATIC_URL}}css/estilosPrincipal.css" type="text/css">-->
+<!--	       	 <img src="/static/img/Logo.jpg"/>-->
+	</head>
+
+		   
+	<body bgcolor="#FF0000"> 
+	    
+		<div style="float:auto">
+			<div style="float:left">
+				<img src="static/img/Logo.jpg"/>
+							<div align="center" style="padding-top:30px">
+				<h1>
+						Cabecera 
+						{% block cabecera %}
+					        
+					    {% endblock %}
+				</h1>
+			</div>
+			</div>
+
+		</div>
+
+
+		<div style="padding-top:50px">
+
+						Cabecera 
+						
+		        {% block contenedor %}
+		            
+		        {% endblock %}
+		</div>
+	</body>
+
+<html>

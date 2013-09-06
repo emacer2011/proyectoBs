@@ -9,6 +9,66 @@ from django.http import HttpResponseRedirect, HttpResponse
 from misExcepciones import *
 from datetime import *
 from django.db import transaction
+
+
+
+
+# ============================
+# = Funciones para genera PDF=
+# ============================
+
+import ho.pisa as pisa
+import cStringIO as StringIO
+import cgi
+from django import http
+from django.template.loader import render_to_string
+from django.template import Context
+from django.template.loader import get_template
+
+
+def generar_pdf(html):
+    # Función para generar el archivo PDF y devolverlo mediante HttpResponse
+    result = StringIO.StringIO()
+    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("UTF-8")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), mimetype='application/pdf')
+    return HttpResponse('Error al generar el PDF: %s' % cgi.escape(html))
+
+def generar_pdf2(request):
+    html  = render_to_string('basePDF.html', { 'pagesize' : 'A4', }, context_instance=RequestContext(request))
+    result = StringIO.StringIO()
+    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("UTF-8")), dest=result)
+    if not pdf.err:
+        print "Sin Errores en PDF!"
+        return HttpResponse(result.getvalue(), mimetype='application/pdf')
+    return HttpResponse('Gremlins ate your pdf! %s' % cgi.escape(html))
+
+
+
+
+
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
+@login_required(login_url='/login')
+def listarDepositoPDF(request):
+    depositos = Deposito.objects.all()
+    #html = render_to_string('basePDF.html', {'pagesize':'A4', 'depositos':depositos}, context_instance=RequestContext(request))
+    return generar_pdf2(request)
+
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
+@login_required(login_url='/login')
+def listarProductoPDF(request):
+    """docstring for listarProducto"""
+    productos = Producto.objects.all()
+    return render_to_response('basePDF.html',context_instance=RequestContext(request))
+    #html = render_to_string(    'gstProducto/listarProducto.html', {'pagesize':'A4', 'productos':productos}, context_instance=RequestContext(request))
+    #return generar_pdf(html)
+
+
+
 # ==================
 # = Funciones Ajax =
 # ==================
@@ -152,6 +212,9 @@ def altaDeposito(request):
 def listarDeposito(request):
     """docstring for listarDeposito"""
     depositos = Deposito.objects.all()
+
+#    html = render_to_string('gstDeposito/listarDeposito.html', {'pagesize':'A4', 'depositos':depositos}, context_instance=RequestContext(request))
+ #   return generar_pdf(html)
     return render_to_response('gstDeposito/listarDeposito.html',{'depositos':depositos},context_instance=RequestContext(request)) 
 
 @user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
@@ -219,21 +282,27 @@ def venta(request):
         palabra = request.POST.get("productos")
         palabraParse = str(palabra).split(",")
         dic =  {}
-        for i in palabraParse :    
-            claveValor = i.split("=")
-            
-            producto = Producto.objects.get(pk = claveValor[0])
-            listaStock=producto.vender(cantidad= claveValor[1], fraccion = claveValor[2])
-            stocks = listaStock.keys()
-            for stock in stocks:
-                detalle = DetalleNotaVenta()
-                detalle.inicializar(stock.getProducto(),listaStock[stock],((producto.getPrecio() * listaStock[stock])*float(claveValor[2])), stock.getDeposito(),notaVenta)
-                detalle.save()
-                notaVenta.incrementarTotal(detalle.getSubTotal())
-                mensaje ="Venta Realizada Con Exito" 
-                estado = 'alert alert-success'
-        notaVenta.save()
+        try:
+            for i in palabraParse :    
+                claveValor = i.split("=")
                 
+                producto = Producto.objects.get(pk = claveValor[0])
+                listaStock=producto.vender(cantidad= claveValor[1], fraccion = claveValor[2])
+                stocks = listaStock.keys()
+                for stock in stocks:
+                    detalle = DetalleNotaVenta()
+                    if (producto.esFraccionable()):
+                        detalle.inicializar(stock.getProducto(),listaStock[stock],((producto.getPrecio() * listaStock[stock])*float(claveValor[2])), stock.getDeposito(),notaVenta)
+                    else:
+                        detalle.inicializar(stock.getProducto(),listaStock[stock],(producto.getPrecio() * listaStock[stock]), stock.getDeposito(),notaVenta)
+                    detalle.save()
+                    notaVenta.incrementarTotal(detalle.getSubTotal())
+                    mensaje ="Venta Realizada Con Exito" 
+                    estado = 'alert alert-success'
+            notaVenta.save()
+        except ErrorVenta:
+                mensaje ="La venta no se pudo realizar" 
+                estado = 'alert alert-danger'
     return render_to_response('venta.html',{'productos':productos,'estado': estado, 'mensaje':mensaje},context_instance=RequestContext(request)) 
 
 # ================

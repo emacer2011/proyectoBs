@@ -201,7 +201,7 @@ function agregarProductoFraccionable(fila){
         var tabla = document.getElementById("Comprometidos");
         var unidades = prompt('Cantidad:',stock);
         cantidadComprada = parseFloat(cantidadComprada);
-        if((isNaN(cantidadComprada)) || (cantidadComprada<1)){return false;} //TODO: PROBAR ESTO
+        if((isNaN(unidades)) || (unidades<1)){return false;} //TODO: PROBAR ESTO
         var existente = buscarCompraExistente(pk, cantidadComprada);
         if(existente == null){
             var stockARestar = fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
