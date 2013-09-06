@@ -262,21 +262,27 @@ def venta(request):
         palabra = request.POST.get("productos")
         palabraParse = str(palabra).split(",")
         dic =  {}
-        for i in palabraParse :    
-            claveValor = i.split("=")
-            
-            producto = Producto.objects.get(pk = claveValor[0])
-            listaStock=producto.vender(cantidad= claveValor[1], fraccion = claveValor[2])
-            stocks = listaStock.keys()
-            for stock in stocks:
-                detalle = DetalleNotaVenta()
-                detalle.inicializar(stock.getProducto(),listaStock[stock],((producto.getPrecio() * listaStock[stock])*float(claveValor[2])), stock.getDeposito(),notaVenta)
-                detalle.save()
-                notaVenta.incrementarTotal(detalle.getSubTotal())
-                mensaje ="Venta Realizada Con Exito" 
-                estado = 'alert alert-success'
-        notaVenta.save()
+        try:
+            for i in palabraParse :    
+                claveValor = i.split("=")
                 
+                producto = Producto.objects.get(pk = claveValor[0])
+                listaStock=producto.vender(cantidad= claveValor[1], fraccion = claveValor[2])
+                stocks = listaStock.keys()
+                for stock in stocks:
+                    detalle = DetalleNotaVenta()
+                    if (producto.esFraccionable()):
+                        detalle.inicializar(stock.getProducto(),listaStock[stock],((producto.getPrecio() * listaStock[stock])*float(claveValor[2])), stock.getDeposito(),notaVenta)
+                    else:
+                        detalle.inicializar(stock.getProducto(),listaStock[stock],(producto.getPrecio() * listaStock[stock]), stock.getDeposito(),notaVenta)
+                    detalle.save()
+                    notaVenta.incrementarTotal(detalle.getSubTotal())
+                    mensaje ="Venta Realizada Con Exito" 
+                    estado = 'alert alert-success'
+            notaVenta.save()
+        except ErrorVenta:
+                mensaje ="La venta no se pudo realizar" 
+                estado = 'alert alert-danger'
     return render_to_response('venta.html',{'productos':productos,'estado': estado, 'mensaje':mensaje},context_instance=RequestContext(request)) 
 
 # ================
