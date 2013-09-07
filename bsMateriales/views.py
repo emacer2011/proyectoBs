@@ -275,9 +275,13 @@ def bajaDeposito(request):
         if request.GET:
             pk = request.GET.get('pkDeposito')
             deposito = Deposito.objects.get(pk = pk )
-            mensaje='Deposito con direccion: '+deposito.getDireccion()+" eliminado"
-            estado='alert alert-success'
-            deposito.eliminarDeposito()
+            try:
+                deposito.eliminarDeposito()
+                mensaje='Deposito con direccion: '+deposito.getDireccion()+" eliminado"
+                estado='alert alert-success'
+            except ErrorDeposito:
+                mensaje='Deposito con direccion: '+deposito.getDireccion()+" tiene stocks relacionados"
+                estado='alert alert-danger'
             return HttpResponse(str(estado)+"/"+str(mensaje))
     return render_to_response('gstDeposito/bajaDeposito.html',{'depositos':depositos, 'mensaje': mensaje, 'estado': estado},context_instance=RequestContext(request)) 
 
@@ -344,6 +348,7 @@ def venta(request):
                     mensaje ="Venta Realizada Con Exito" 
                     estado = 'alert alert-success'
             notaVenta.save()
+            productos = filter(lambda x: x.getCantidad() != 0 , productos)
         except ErrorVenta:
                 mensaje ="La venta no se pudo realizar" 
                 estado = 'alert alert-danger'

@@ -75,14 +75,16 @@ class Deposito(models.Model):
         return self.rubro
 
     def puedoEliminarlo(self): 
-        try:
-            stocks = Stock.objects.get(deposito = self)
+        stocks = Stock.objects.filter(deposito = self)
+        if (stocks.count() != 0):
+            for stock in stocks:
+                if (stock.getDisponibles() == 0) and (stock.getReservadoConfirmados() == 0) and (stock.getReservadoNoconfirmados() == 0):
+                    return True
             return False
-        except ObjectDoesNotExist:
+        else:
             return True
             
     def eliminarDeposito(self):
-        print str(self.puedoEliminarlo())
         if self.puedoEliminarlo():
             self.delete()
         else:
@@ -565,7 +567,7 @@ class Stock(models.Model):
                 stock.save()
     
     def __unicode__(self):
-        return "%d en deposido: %s" % (self.getDisponibles(), self.getDeposito())
+        return "%d en deposito: %s" % (self.getDisponibles(), self.getDeposito())
 
 # ===========
 # = Detalle =
@@ -887,18 +889,92 @@ class DetalleRemito(models.Model):
 # =============
 
 class Descuento(models.Model):
-    nroDescuento = models.IntegerField()
     fecha = models.datetime
     cantidad = models.IntegerField()
     producto = models.ForeignKey(Producto)
+    deposito = models.ForeignKey(Deposito)
+    descripcion = models.CharField(max_length = 100, blank = True)
     tipoDescuento = models.ForeignKey('TipoDescuento')
+
+    def getFecha(self):
+        return self.fecha
+
+    def setFecha(self, fecha):
+        self.fecha = fecha
+
+    def getCantidad(self):
+        return self.cantidad
+
+    def setCantidad(self, cantidad):
+        if (int(cantidad) > 0) and (self.producto.getCantidad() > cantidad):
+            self.cantidad = cantidad
+        else:
+            raise ErrorDescuento()
+
+    def getProducto(self):
+        return self.producto
+
+    def setProducto(self, producto):
+        self.producto = producto
+
+    def getDeposito(self):
+        return self.deposito 
+
+    def setDeposito(self, deposito):
+        self.deposito = deposito
+
+    def getDescripcion(self):
+        return self.descripcion
+
+    def setDescripcion(self, descripcion):
+        self.descripcion = descripcion
+
+    def getTipoDescruento(self):
+        return  self.tipoDescuento
+
+    def setTipoDescuento(self, tipo, beneficiario = None):
+        if (tipo == "Donacion"):
+            tipoDescuento = TipoDescuento()
+            tipoDescuento.setNombre(tipo)
+            tipoDescuento.setBeneficiario(beneficiario)
+            tipoDescuento.save()
+            self.tipoDescuento = tipoDescuento
+        else:
+            descuento, created = TipoDescuento.objects.get_or_create(nombre = tipo, defaults = {'nombre' : tipo})
+            descuento.save()
+            self.tipoDescuento = descuento
+             
+    def descontarStock(self):
+        try:
+            stock = Stock.objects.get(deposito = self.deposito, producto = self.producto)
+            stock.setDisponibles(stock.getDisponibles() - self.cantidad)
+            self.getProducto().setCantidad(self.getProducto().getCantidad() - self.cantidad)
+            stock.save()
+        except ObjectDoesNotExist:
+            raise ErrorDescuento() 
+
+    def inicializar(self, cantidad, producto, deposito, descripcion, tipoDescuento, beneficiario = None):
+        self.setProducto(producto)
+        self.setDeposito(deposito)
+        self.setCantidad(cantidad)
+        self.setDescripcion(descripcion)
+        self.setTipoDescuento(tipoDescuento,beneficiario)
+        self.descontarStock()
+
 
 # =================
 # = TipoDescuento =
 # =================
 
-class TipoDescuento(Descuento):
+class TipoDescuento(models.Model):
+    nombre = models.CharField(max_length = 40)
     beneficiario = models.CharField(max_length = 40, blank = True)
+
+    def setNombre(self, nombre):
+        self.nombre = nombre
+
+    def setBeneficiario(self, beneficiario):
+        self.beneficiario = beneficiario
     
     def __unicode__(self):
         return "%s" % self.beneficiario        
