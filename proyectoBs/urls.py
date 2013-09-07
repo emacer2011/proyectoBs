@@ -34,6 +34,8 @@ urlpatterns = patterns('',
     url(r'^actualizarEntregados/$', 'bsMateriales.views.actualizarEntregados'),
     url(r'^cargarDetalles/$', 'bsMateriales.views.cargarDetalles'),
     url(r'^cargarEntregados/$', 'bsMateriales.views.cargarEntregados'),
+    url(r'^cargarDepositos/$', 'bsMateriales.views.cargarDepositos'),
+    url(r'^actualizarStocks/$', 'bsMateriales.views.actualizarStocks'),
     url(r'^admin/', include(admin.site.urls)),
 )
 

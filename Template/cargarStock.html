@@ -17,35 +17,35 @@
 
 {% block contenedor %}
 
-<div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
     <div class="modal-header">
         <button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">Cargar Stock</h3>
     </div>
     
     <div class="modal-body">
-    <form method="POST" action="" onSubmit="return validarDisponibles(disponible.value)">
-                            <input id="pkProducto" name="pkProducto" value = "{{producto.pk}}" type="hidden">
-                                <div align="center">
-                                    Disponible
-                                    <input id="disponible" name="disponible" style="height:27px;margin-left:10px;" type="text" placeholder="Disponibles"><br>
-                                    Dep&oacutesito
-                                    <select id="deposito" name="deposito">
-                                        {% for deposito in depositos %}
-	      		              	           	<option value="{{deposito.pk}}">{{deposito.getDireccion}}</option>
-            		    		        {% endfor %}
-                                    </select>
-                                </div>
-                        
-    </div>
-    <div class="modal-footer">
-        <input class="btn btn-primary" type="submit" value="Guardar" >
-    </form>        
-        <button class="btn" data-dismiss="modal" aria-hidden="true" onClick="volver()">Cancelar</button>
-    </div>
+        <form method="POST" action="" onSubmit="return validarDisponibles(disponible.value)">
+                                <input id="pkProducto" name="pkProducto" value = "{{producto.pk}}" type="hidden">
+                                    <div align="center">
+                                        Disponible
+                                        <input id="disponible" name="disponible" style="height:27px;margin-left:10px;" type="text" placeholder="Disponibles"><br>
+                                        Dep&oacutesito
+                                        <select id="deposito" name="deposito">
+                                            {% for deposito in depositos %}
+    	      		              	           	<option value="{{deposito.pk}}">{{deposito.getDireccion}}</option>
+                		    		        {% endfor %}
+                                        </select>
+                                    </div>
+                            
+        </div>
+        <div class="modal-footer">
+            <input class="btn btn-primary" type="submit" value="Guardar" >
+            </form>        
+            <button class="btn" data-dismiss="modal" aria-hidden="true" onClick="volver()">Cancelar</button>
+        </div>
 
     
-</div>
+    </div>
 <!--    <div id="CabeceraLDTablas">
         <form class="navbar-search pull-left" style="padding-left:20px">
             <input type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='buscar(this.value,"tablaProductos");' ><br>
@@ -68,12 +68,12 @@
     </div>
 -->
 
-<form class="navbar-search pull-left" style="padding-left:20px">
-    <label for="buscarProducto"> Buscar: </label>
+        <form class="navbar-search pull-left" style="padding-left:20px">
+            <label for="buscarProducto"> Buscar: </label>
             <input name="buscarProducto" type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='buscar(this.value,"tablaProductos");' ><br>
         </form><br>
-<div id="ContenedorTabla">
-<table id="tablaProductos" cellpadding="0" cellspacing="0" class="table table-striped">
+    <div id="ContenedorTabla">
+        <table id="tablaProductos" cellpadding="0" cellspacing="0" class="table table-striped">
                 <thead>
                 <tr>
                     <th style="display:none" >pk</th>
@@ -86,28 +86,28 @@
                     <th class="table-head" id="CargaStock-Descontar">Descontar</th>
                 </tr>    
             </thead>
-    <tbody>
+            <tbody>
         {% for producto in productos %}
 
-            <tr>        
-                <td id="CargaStock-Nombre">{{producto.getNombre}}</td>
-                <td id="CargaStock-Descripcion">{{producto.getDescripcion}}</td>
-                <td id="CargaStock-TipoProducto">{{producto.getTipoProducto}}</td>
-                <!-- <td id="CargaStock-Categoria">como se vende</td> -->
-                <td id="CargaStock-Cantidad">{{producto.getCantidad}}</td>
-                <td id="CargaStock-Precio">{{producto.getPrecio}}</td>
-                <td id="CargaStock-Cargar"><button onClick="popPropio('{{producto.pk}}')" class="btn btn-success" data-toggle="modal">
-                    <i class="icon-plus icon-white"></i>
-                    </button>
-                </td>
-                <td id="CargaStock-Descontar">
-                    <button onClick="popPropio2('{{producto.pk}}')" class="btn btn-danger" data-toggle="modal">
-                    <i class="icon-minus icon-white"></i>
-                    </button>
-                </td>
-            </tr>
+                <tr>        
+                    <td id="CargaStock-Nombre">{{producto.getNombre}}</td>
+                    <td id="CargaStock-Descripcion">{{producto.getDescripcion}}</td>
+                    <td id="CargaStock-TipoProducto">{{producto.getTipoProducto}}</td>
+                    <!-- <td id="CargaStock-Categoria">como se vende</td> -->
+                    <td id="CargaStock-Cantidad">{{producto.getCantidad}}</td>
+                    <td id="CargaStock-Precio">{{producto.getPrecio}}</td>
+                    <td id="CargaStock-Cargar"><button onClick="popPropio('{{producto.pk}}')" class="btn btn-success" data-toggle="modal">
+                        <i class="icon-plus icon-white"></i>
+                        </button>
+                    </td>
+                    <td id="CargaStock-Descontar">
+                        <button onClick="popPropio2('{{producto.pk}}')" class="btn btn-danger" data-toggle="modal">
+                        <i class="icon-minus icon-white"></i>
+                        </button>
+                    </td>
+                </tr>
         {% endfor %}
-    </tbody>
+            </tbody>
     <div id="paraFondo"></div>
 </table>
 
@@ -121,6 +121,7 @@
             <h3 id="myModalLabel">Stock Depositos</h3>
         </div>
         
+
         <div class="modal-body" style="OVERFLOW:auto; height:100px;">
             <input id="pkRemito" name="pkRemito" type="hidden">
                 <div align="center" style="OVERFLOW:auto" height="50">
@@ -129,9 +130,37 @@
                     </table>
                 </div>
         </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" type="submit" onClick="actualizarEntregados();"> Guardar</button>
-            
+
+
+        <div id="divDescripcionDescuento" class="modal-footerDescuento" style="display:none">
+            <div style="float:left">
+                <div style="float:auto">
+                    <select id="motivoDescuento">
+                        <option value="Averia">Averia</option>
+                        <option value="Extravio">Extravio</option>
+                        <option value="Robo">Robo</option>
+                        <option value="Donacion">Donacion</option>
+                    </select>
+                </div>
+
+
+                <div style="float:auto">
+                    <input id="cantidadDescuento" name="cantidadDescuento" type="text"></input>
+                    <input id="beneficiarioDescuento" name="beneficiario" type="text"></input>
+                </div>
+            </div>
+
+
+            <div style="float:right">
+                <textarea id="descripcionDescuento" rows="4" cols="50"></textarea>
+            </div>
+
+
+        </div>
+
+
+        <div class="modal-footer" style="clear:left">
+            <button class="btn btn-primary" type="submit" onClick="actualizarStocks();"> Guardar</button>
         </div>
     </div>
 

@@ -25,7 +25,7 @@ function actualizarEntregados(){
     }
   );    
     
-}   
+}
 
 function cerrar(){
     var check,filaActual;

@@ -1,3 +1,6 @@
+var Deposito;
+var Producto;
+
 function popPropio(pk){
         var campo = document.getElementById("pkProducto");
         campo.value= pk;
@@ -15,7 +18,7 @@ function popPropio2(pk){
         var campo = document.getElementById("pkProducto");
         campo.value= pk;
         var elemento=document.getElementById("modalPropio2");
-        elemento.className="modal hide fade in";
+        elemento.className="modalDescuento hide fade in";
         elemento.style.display="block";
         elemento.setAttribute("aria-hidden",false);
         elemento = document.createElement('div');
@@ -25,6 +28,28 @@ function popPropio2(pk){
         cargarTabla(pk);
 }
 
+
+function validarNumeros(pk,e){
+  cantidad = document.getElementById('d'+String(pk)).value;
+  var filtro = /([A-z])+/;
+  if(filtro.test(cantidad)){
+    alert("Error al cargar datos: verifique que el valor sea correcto");
+    cantidad.focus();
+  }
+}
+
+
+
+function verificarDescuento(pk,e){
+  cantidad = document.getElementById('d'+String(pk)).value;
+  elemento = document.getElementById('s'+String(pk));
+    validarNumeros(pk,e);
+    if(parseInt(cantidad) > 0 && parseInt(elemento.cells[2].innerHTML) >= parseInt(cantidad)){
+      return alert("Descontando Stock!!!!");
+    }
+}
+
+
 function cargarTabla(pk){
   $.get ("/cargarDepositos",{ pkProducto: pk },function(data){
         tabla = document.getElementById("tablaDetalles");
@@ -32,6 +57,17 @@ function cargarTabla(pk){
     }
       );
 }
+
+
+function mostrarDetalles(fila){
+  Deposito = fila.cells[0].innerHTML;
+  Producto = fila.id;
+  div = document.getElementById("divDescripcionDescuento");
+  div.style.display="block";
+}
+
+
+
 
 
     
@@ -92,6 +128,22 @@ function buscar(texto,idTabla){
     }
 
 }
+
+
+function actualizarStocks(){
+//    var pk = document.getElementById("pkDeposito").value;
+    var pk = document.getElementById(Producto).cells[0].innerHTML;
+    cantidad = document.getElementById("cantidadDescuento").value;
+    motivo = document.getElementById("motivoDescuento").value;
+    beneficiario = document.getElementById("beneficiarioDescuento").value;
+    descripcion = document.getElementById("descripcionDescuento").value;
+    $.get ("/actualizarStocks",{ pkDeposito: pk, pkProducto: Producto, cantidadDescuento: cantidad,
+                motivoDescuento: motivo, beneficiarioDescuento: beneficiario, descripcionDescuento:descripcion},function(data){
+        window.location.reload();
+    });
+}
+
+
     
     function restaurar(idTabla){
         var tabla,filas,elemento;

@@ -130,25 +130,54 @@ def actualizarEntregados(request):
 def cargarDepositos(request):
     """docstring for cargarDepositos"""
     pkProducto = request.GET.get('pkProducto')
-    stoks = Stock.objects.get(producto = request.POST.get('pkProducto'))
-    import pdb
-    pdb.set_trace()
-
+    producto = Producto.objects.get(pk = pkProducto)
+    stocks = Stock.objects.filter(producto = producto)
     mensaje = '<table>'
     mensaje = mensaje + "<th></th>"
     mensaje = mensaje + "<th>Direccion Deposito</th>"
-    mensaje = mensaje + "<th>Nro Tel</th>"
-    mensaje = mensaje + "<th>Cantidad</th>"
-    for stock in stoks:
-        mensaje = mensaje + "<tr>"
-        mensaje = mensaje + '<td style="visibility:hidden" id = "pkDetalle">'+ str(stock.pk)+'</td>'
-        mensaje = mensaje + "<td>" + stock.getDeposito().getDireccion()+ "</td>"
-        mensaje = mensaje + "<td>" + stock.getDeposito().getTelefono()+ "</td>"
-        mensaje = mensaje + "<td>" + str(stock.getDisponibles())+ "</td>"
-        pk = str(stock.pk)
-        mensaje = mensaje +"</tr>"
+    mensaje = mensaje + "<th>Telefono</th>"
+    mensaje = mensaje + "<th>Cantidad Actual</th>"
+    for stock in stocks:
+        if stock.getDisponibles() != 0:
+            mensaje = mensaje + "<tr id='s"+str(pkProducto)+"' onClick='mostrarDetalles(this)'>"
+            mensaje = mensaje + '<td style="visibility:hidden">'+ str(stock.getDeposito().pk)+'</td>'
+            mensaje = mensaje + "<td title='Tel: "+str(stock.getDeposito().getTelefono())+"'>" + stock.getDeposito().getDireccion()+ "</td>"
+            mensaje = mensaje + "<td>" + stock.getDeposito().getTelefono()+ "</td>"
+            mensaje = mensaje + "<td>"+str(stock.getDisponibles())+ "</td>"
+            """mensaje = mensaje + '<td><input id="d'+str(stock.pk)+'"type="text" onchange="verificarDescuento('+str(stock.pk)+',event)"> </td>'
+            mensaje = mensaje + '<td><select>'
+            mensaje = mensaje + '<option value="Averia">Averia</option>'
+            mensaje = mensaje + '<option value="Extravio">Extravio</option>'
+            mensaje = mensaje + '<option value="Robo">Robo</option>'
+            mensaje = mensaje + '<option value="Donacion">Donacion</option>'
+            mensaje = mensaje + '</select>'
+            mensaje = mensaje + '</td>'"""
+            pk = str(stock.pk)
+            mensaje = mensaje +"</tr>"
     mensaje = mensaje+"</table>"
     return HttpResponse(mensaje)
+
+
+
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
+def actualizarStocks(request):
+    pkProducto = request.GET.get('pkProducto').split('s')[1] 
+    deposito = Deposito.objects.get(pk=request.GET.get('pkDeposito'))
+    producto = Producto.objects.get(pk = pkProducto)
+    cantidad = request.GET.get('cantidadDescuento')
+    descripcion = request.GET.get('descripcionDescuento')
+    beneficiario = request.GET.get('beneficiarioDescuento')
+    motivo = request.GET.get('motivoDescuento')
+    import pdb
+    pdb.set_trace()
+
+
+    print "ENTRO"
+    """descuento = Descuento.objects.get(pk = pkRemito )
+    remito.actualizarEntregados()"""
+    return HttpResponseRedirect("/cargarDetalles")
 
 
 
