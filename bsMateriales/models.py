@@ -950,6 +950,7 @@ class Descuento(models.Model):
             stock.setDisponibles(stock.getDisponibles() - self.cantidad)
             self.getProducto().setCantidad(self.getProducto().getCantidad() - self.cantidad)
             stock.save()
+            self.getProducto().save()
         except ObjectDoesNotExist:
             raise ErrorDescuento() 
 
@@ -959,7 +960,6 @@ class Descuento(models.Model):
         self.setCantidad(cantidad)
         self.setDescripcion(descripcion)
         self.setTipoDescuento(tipoDescuento,beneficiario)
-        self.descontarStock()
 
 
 # =================
@@ -977,4 +977,4 @@ class TipoDescuento(models.Model):
         self.beneficiario = beneficiario
     
     def __unicode__(self):
-        return "%s" % self.beneficiario        
+        return "%s" % self.nombre       

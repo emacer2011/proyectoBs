@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, NotaVenta, DetalleNotaVenta, NoFraccionable, Remito, DetalleFactura, Factura, DetalleRemito,Fraccionable
+from bsMateriales.models import Rubro, Deposito, Producto, TipoProducto, Stock, NotaVenta, DetalleNotaVenta, NoFraccionable, Remito, DetalleFactura, Factura, DetalleRemito,Fraccionable, Descuento
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
@@ -170,13 +170,10 @@ def actualizarStocks(request):
     descripcion = request.GET.get('descripcionDescuento')
     beneficiario = request.GET.get('beneficiarioDescuento')
     motivo = request.GET.get('motivoDescuento')
-    import pdb
-    pdb.set_trace()
-
-
-    print "ENTRO"
-    """descuento = Descuento.objects.get(pk = pkRemito )
-    remito.actualizarEntregados()"""
+    descuento = Descuento()
+    descuento.inicializar(int(cantidad),producto,deposito,descripcion,motivo,beneficiario)
+    descuento.descontarStock()
+    descuento.save()
     return HttpResponseRedirect("/cargarDetalles")
 
 
