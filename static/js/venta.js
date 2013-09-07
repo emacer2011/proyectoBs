@@ -17,7 +17,7 @@ function enviar() {
         producto = tabla.rows[i];
         productos.value = productos.value + producto.cells[4].innerHTML + "=" + producto.cells[2].innerHTML + "=" + producto.cells[5].innerHTML + ","
     }
-    productos.value = productos.value.substring(0, productos.value.length-1);    
+    productos.value = productos.value.substring(0, productos.value.length-1);
 }
 
 function validarTabla(tabla){
@@ -47,7 +47,9 @@ function validaVenta(){
 		if(!validarNombreApellido(document.getElementById('apellidoPersona'))){
 			return false;
 		}
-		return validarTabla(document.getElementById('Comprometidos'));
+		resultado = validarTabla(document.getElementById('Comprometidos'));
+        window.location.reload();
+        return resultado;
 	}
 
 

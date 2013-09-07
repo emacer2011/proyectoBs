@@ -1,4 +1,6 @@
 function popPropio(pk){
+        var depositos = document.getElementById("deposito").options;
+        if (depositos.length == 0) {alert("No hay depositos cargados");return false;};
         var campo = document.getElementById("pkProducto");
         campo.value= pk;
         var elemento=document.getElementById("modalPropio");
