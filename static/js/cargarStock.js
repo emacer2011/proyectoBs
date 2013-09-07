@@ -14,7 +14,7 @@ function popPropio(pk){
 function popPropio2(pk){
         var campo = document.getElementById("pkProducto");
         campo.value= pk;
-        var elemento=document.getElementById("modalPropio");
+        var elemento=document.getElementById("modalPropio2");
         elemento.className="modal hide fade in";
         elemento.style.display="block";
         elemento.setAttribute("aria-hidden",false);
@@ -37,6 +37,16 @@ function cargarTabla(pk){
     
 function volver(){
         var elemento=document.getElementById("modalPropio");
+        elemento.className="modal hide fade";
+        elemento.style.display="none";
+        elemento.setAttribute("aria-hidden",true);
+        elemento = document.getElementById("paraFondo");
+        var remover = document.getElementById("nuevoPop");
+        elemento.removeChild(remover);
+}
+
+function volver2(){
+        var elemento=document.getElementById("modalPropio2");
         elemento.className="modal hide fade";
         elemento.style.display="none";
         elemento.setAttribute("aria-hidden",true);

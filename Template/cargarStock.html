@@ -111,4 +111,30 @@
     <div id="paraFondo"></div>
 </table>
 
+
+
+
+
+    <div id="modalPropio2" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button onClick="volver2()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Stock Depositos</h3>
+        </div>
+        
+        <div class="modal-body" style="OVERFLOW:auto; height:100px;">
+            <input id="pkRemito" name="pkRemito" type="hidden">
+                <div align="center" style="OVERFLOW:auto" height="50">
+                    <table id="tablaDetalles">
+                        
+                    </table>
+                </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="submit" onClick="actualizarEntregados();"> Guardar</button>
+            
+        </div>
+    </div>
+
+
+
 {% endblock %}

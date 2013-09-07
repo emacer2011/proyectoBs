@@ -18,6 +18,7 @@ from django.db import transaction
 # ============================
 
 import ho.pisa as pisa
+#import xhtml2pdf.pisa as pisa
 import cStringIO as StringIO
 import cgi
 from django import http
@@ -129,13 +130,27 @@ def actualizarEntregados(request):
 def cargarDepositos(request):
     """docstring for cargarDepositos"""
     pkProducto = request.GET.get('pkProducto')
-    deposito = Deposito.objects.get(pk = request.POST.get('pkDeposito') )
-#    detalle = DetalleRemito.objects.get(pk = pkDetalle )
-#    entregado = not detalle.entregado
-#    detalle.entregado = entregado
-#    detalle.confirmarStock()
-#    detalle.save()  
-    return HttpResponseRedirect("/cargarDetalles")
+    stoks = Stock.objects.get(producto = request.POST.get('pkProducto'))
+    import pdb
+    pdb.set_trace()
+
+    mensaje = '<table>'
+    mensaje = mensaje + "<th></th>"
+    mensaje = mensaje + "<th>Direccion Deposito</th>"
+    mensaje = mensaje + "<th>Nro Tel</th>"
+    mensaje = mensaje + "<th>Cantidad</th>"
+    for stock in stoks:
+        mensaje = mensaje + "<tr>"
+        mensaje = mensaje + '<td style="visibility:hidden" id = "pkDetalle">'+ str(stock.pk)+'</td>'
+        mensaje = mensaje + "<td>" + stock.getDeposito().getDireccion()+ "</td>"
+        mensaje = mensaje + "<td>" + stock.getDeposito().getTelefono()+ "</td>"
+        mensaje = mensaje + "<td>" + str(stock.getDisponibles())+ "</td>"
+        pk = str(stock.pk)
+        mensaje = mensaje +"</tr>"
+    mensaje = mensaje+"</table>"
+    return HttpResponse(mensaje)
+
+
 
 # ==========================================================================================================
 # ==========================================================================================================
