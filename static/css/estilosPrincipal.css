@@ -21,18 +21,11 @@
         position:top-left;
 }
 
-#CabeceraPDF{
-        
-        font:40px italic arial;
-        width: 90%;
-        background-color:#6699FF;
-        margin-top:20px;
-        margin-left:55px;
-        text-align:center;
-        vertical-align:text-center;
-        position:top-left;
-}
+#checkFraccionable{
+  text-align: right;
+  vertical-align: top;
 
+}
 
 #CabeceraFija{
     float:auto;
