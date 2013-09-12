@@ -4,14 +4,12 @@
 {% block cabecera %}
     Carga de Stock
     <script language="javascript" type="text/javascript" src="/static/js/cargarStock.js"></script>
-        
 {% endblock %}
 
 
 {% block mensaje %}
-    <div class="{{estado}}">
-        {{mensaje}}
-    </div>
+    <div id="mensaje" class="{{estado}}">{{mensaje}}</div>
+    <script type="text/javascript">verificarCarga();</script>
 {% endblock %}
 
 
@@ -143,18 +141,35 @@
                     </select>
                 </div>
 
+                <div class="control-group">
+                    <div>
+                        <label for="cantidadDescuento" > Cantidad a Descontar </label>
+                    </div>
+                    <div style="float:auto">
+                        <input id="cantidadDescuento" name="cantidadDescuento" type="text"></input>
+                    </div>
+                </div>
 
-                <div style="float:auto">
-                    <input id="cantidadDescuento" name="cantidadDescuento" type="text"></input>
-                    <input id="beneficiarioDescuento" name="beneficiario" type="text"></input>
+                <div class="control-group">
+                    <div>
+                        <label for="beneficiarioDescuento" > Beneficiario </label>
+                    </div>
+                    <div>
+                        <input id="beneficiarioDescuento" name="beneficiarioDescuento" type="text"></input>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="control-group" style="float:right">
+                <div>
+                    <label for="descripcionDescuento"> Descripci&oacuten</label>
+                </div>
+                <div style="float:right">
+                    <textarea id="descripcionDescuento" name="descripcionDescuento" rows="5" cols="50"></textarea>
                 </div>
             </div>
-
-
-            <div style="float:right">
-                <textarea id="descripcionDescuento" rows="4" cols="50"></textarea>
-            </div>
-
 
         </div>
 

@@ -5,7 +5,7 @@
                var mensajes = estado.split("/") ;
                div.className = mensajes[0];
                div.innerHTML = mensajes[1];
-               setTimeout("window.location.reload()",3000);
+               setTimeout("window.location.reload()",1500);
     }
   );    
  

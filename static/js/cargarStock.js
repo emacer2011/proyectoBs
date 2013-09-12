@@ -1,6 +1,15 @@
 var Deposito;
 var Producto;
 
+function verificarCarga(){
+  var mensaje = document.getElementById("mensaje").innerHTML;
+  if(mensaje != ""){
+    setTimeout("location.href=location.href",2000);
+  }
+
+}
+
+
 function popPropio(pk){
         var depositos = document.getElementById("deposito").options;
         if (depositos.length == 0) {alert("No hay depositos cargados");return false;};
