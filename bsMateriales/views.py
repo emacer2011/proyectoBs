@@ -372,7 +372,7 @@ def cargarStock(request):
         Stock.cargarStock(disponibles,deposito, producto)
         producto.setCantidad(producto.getCantidad() + disponibles)
         producto.save()
-        mensaje='Se agrega '+str(disponibles) +' del producto '+producto.getNombre()+' en el deposito de '+deposito.getDireccion()
+        mensaje='Se agrega '+str(disponibles) +' unidades del producto '+producto.getNombre()+' en el deposito de '+deposito.getDireccion()
         estado='alert alert-success'
         
     return render_to_response('cargarStock.html',{'mensaje':mensaje, 'estado':estado, 'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 

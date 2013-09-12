@@ -32,48 +32,48 @@
 
 
 <div id="ContenedorTabla">
-<table id="tablaRemito" cellpadding="0" cellspacing="0" class="table table-striped">
-    </thead>
-    <tbody>
-        {% for remito in remitos %}
+    <table id="tablaRemito" cellpadding="0" cellspacing="0" class="table table-striped">
+        </thead>
+        <tbody>
+            {% for remito in remitos %}
 
-            <tr>        
-                <td id="TamNroRemito">
-                    {{remito.pk}}
-                </td>
-                <td>
-                    {{remito.factura.ventaNota.apellidoCliente}}, {{remito.factura.ventaNota.nombreCliente}}
-                </td>
-                <td>
-                    <button onClick="popPropio('{{remito.pk}}')" class="btn btn-success" data-toggle="modal">
-                    <i class="icon-plus icon-white"></i>
-                </button></td>
-            </tr>
-        {% endfor %}
-    </tbody>
-    <div id="paraFondo"></div>
-</table>
+                <tr>        
+                    <td id="TamNroRemito">
+                        {{remito.pk}}
+                    </td>
+                    <td>
+                        {{remito.factura.ventaNota.apellidoCliente}}, {{remito.factura.ventaNota.nombreCliente}}
+                    </td>
+                    <td>
+                        <button onClick="popPropio('{{remito.pk}}')" class="btn btn-success" data-toggle="modal">
+                        <i class="icon-plus icon-white"></i>
+                    </button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <div id="paraFondo"></div>
+    </table>
 
 
 
-<div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-header">
-        <button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">Entrega Materiales</h3>
-    </div>
-    
-    <div class="modal-body" style="OVERFLOW:auto; height:100px;">
-        <input id="pkRemito" name="pkRemito" type="hidden">
-            <div align="center" style="OVERFLOW:auto" height="50">
-                <table id="tablaDetalles">
-                    
-                </table>
+    <div id="modalPropio" class="modal hide fade" tabindex="100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button onClick="volver()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Entrega Materiales</h3>
         </div>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" type="submit" onClick="actualizarEntregados();"> Guardar</button>
         
-</div>
+        <div class="modal-body" style="OVERFLOW:auto; height:100px;">
+            <input id="pkRemito" name="pkRemito" type="hidden">
+                <div align="center" style="OVERFLOW:auto" height="50">
+                    <table id="tablaDetalles">
+                        
+                    </table>
+                </div>
+            </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="submit" onClick="actualizarEntregados();"> Guardar</button>
+            
+    </div>
 </div>
 
     
