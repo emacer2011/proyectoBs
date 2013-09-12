@@ -14,6 +14,7 @@ function popPropio(pk){
         elemento.setAttribute('id','nuevoPop');
         elemento.className="modal-backdrop fade in";
         document.getElementById("paraFondo").appendChild(elemento);
+        
 }
 
 function popPropio2(pk){

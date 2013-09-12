@@ -9,9 +9,11 @@ from django.http import HttpResponseRedirect, HttpResponse
 from misExcepciones import *
 from datetime import *
 from django.db import transaction
-
-
-
+from proyectoBs.settings import TEMPLATE_DIRS
+import os
+from relatorio.templates.opendocument import Template
+import relatorio
+import subprocess
 
 # ============================
 # = Funciones para genera PDF=
@@ -27,35 +29,24 @@ from django.template import Context
 from django.template.loader import get_template
 
 
-def generar_pdf(html):
-    # Función para generar el archivo PDF y devolverlo mediante HttpResponse
-    result = StringIO.StringIO()
-    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("UTF-8")), result)
-    if not pdf.err:
-        return HttpResponse(result.getvalue(), mimetype='application/pdf')
-    return HttpResponse('Error al generar el PDF: %s' % cgi.escape(html))
-
-def generar_pdf2(request):
-    html  = render_to_string('basePDF.html', { 'pagesize' : 'A4', }, context_instance=RequestContext(request))
-    result = StringIO.StringIO()
-    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("UTF-8")), dest=result)
-    if not pdf.err:
-        print "Sin Errores en PDF!"
-        return HttpResponse(result.getvalue(), mimetype='application/pdf')
-    return HttpResponse('Gremlins ate your pdf! %s' % cgi.escape(html))
-
-
-
-
-
 @user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
 @user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
 @user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def listarDepositoPDF(request):
     depositos = Deposito.objects.all()
-    #html = render_to_string('basePDF.html', {'pagesize':'A4', 'depositos':depositos}, context_instance=RequestContext(request))
-    return generar_pdf2(request)
+    repos = relatorio.ReportRepository()
+    inv = depositos
+    basic = Template(source="", filepath=TEMPLATE_DIRS+'/gstDeposito/listarDepositoBase.odt')
+    file(TEMPLATE_DIRS+'/gstDeposito/listarDeposito.odt', 'wb').write(basic.generate(o=inv).render().getvalue())
+    p = subprocess.Popen('unoconv -f pdf '+TEMPLATE_DIRS+'/gstDeposito/listarDeposito.odt', shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    with open(TEMPLATE_DIRS+'/gstDeposito/listarDeposito.pdf', 'r') as pdf:
+        response = HttpResponse(pdf.read(), mimetype='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=some_file.pdf'
+        pdf.closed        
+        return response
+
+
 
 @user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
 @user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
@@ -63,8 +54,8 @@ def listarDepositoPDF(request):
 @login_required(login_url='/login')
 def listarProductoPDF(request):
     """docstring for listarProducto"""
-    productos = Producto.objects.all()
-    return render_to_response('basePDF.html',context_instance=RequestContext(request))
+    depositos = Deposito.objects.all()
+    return render_to_response('gstDeposito/listadoDepositoPDF.html',{'depositos':depositos},context_instance=RequestContext(request))
     #html = render_to_string(    'gstProducto/listarProducto.html', {'pagesize':'A4', 'productos':productos}, context_instance=RequestContext(request))
     #return generar_pdf(html)
 
@@ -518,3 +509,16 @@ def cobro(request):
             stock.save()
         notaVenta.save()
     return render_to_response('cobro.html',{'notas':notas},context_instance=RequestContext(request))
+
+
+
+# =====================================
+# = Funciones para la ayuda en linea  =
+# =====================================
+
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
+@login_required(login_url='/login')
+def ayuda(request):
+    return render_to_response('ayudaEnLinea/ayudaPrincipal.html',context_instance=RequestContext(request))

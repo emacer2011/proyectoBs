@@ -15,6 +15,7 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^$', 'bsMateriales.views.index'),
+    url(r'^ayuda/$', 'bsMateriales.views.ayuda'),
     url(r'^altaDeposito/$', 'bsMateriales.views.altaDeposito'),
     url(r'^bajaDeposito/$', 'bsMateriales.views.bajaDeposito'),
     url(r'^modificarDeposito/$', 'bsMateriales.views.modificarDeposito'),
