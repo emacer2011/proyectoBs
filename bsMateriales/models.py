@@ -339,7 +339,7 @@ class NoFraccionable(EstrategiaVenta):
                         stock.disponibles = stock.disponibles - cantidad
                         stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + cantidad
                         stock.save()
-                        depositosAfectados[stock] = cantidad
+                        depositosAfectados[stock] = (cantidad, producto)
                         cantidad = 0
                         return depositosAfectados
                     else:
@@ -348,7 +348,7 @@ class NoFraccionable(EstrategiaVenta):
                         cantidadTemporal= stock.disponibles
                         stock.disponibles = 0
                         stock.save()
-                        depositosAfectados[stock]= cantidadTemporal 
+                        depositosAfectados[stock]= (cantidadTemporal, producto)
             return depositosAfectados
         else:
             raise ErrorVenta()
@@ -405,27 +405,29 @@ class Fraccionable(EstrategiaVenta):
             if cantidad > 0:
                 if (stock.disponibles >= cantidad):
                     stock.disponibles -= cantidad
-                    stock.reservadosNoConfirmados += cantidad
                     stock.save()
                     try:
-                        depositosAfectados[stock] += cantidad * cantidadXunidad
+                        depositosAfectados[stock] += (cantidad * cantidadXunidad,None)
                     except KeyError as ex:
-                        depositosAfectados[stock] = cantidad * cantidadXunidad
+                        depositosAfectados[stock] = (cantidad * cantidadXunidad, None)
                     cantidad = 0
                 else:
                     cantidad -= stock.disponibles
-                    stock.reservadosNoConfirmados += stock.disponibles
                     cantidadTemporal = stock.disponibles
                     stock.disponibles = 0
                     stock.save()
                     try:
-                        depositosAfectados[stock] += cantidadTemporal * cantidadXunidad
+                        depositosAfectados[stock] += (cantidadTemporal * cantidadXunidad,None)
                     except KeyError as ex:
-                        depositosAfectados[stock] = cantidadTemporal * cantidadXunidad
+                        depositosAfectados[stock] = (cantidadTemporal * cantidadXunidad,None)
             else:
                 break
         producto.setCantidad(producto.getCantidad() - cantidadProductos)
         producto.save()
+        self.generarProductoNuevo(depositosAfectados, cantidadXunidad, fraccion, producto, cantidadProductos)
+        return self.generarProductoVendido(depositosAfectados, fraccion, producto)
+
+    def generarProductoNuevo(self, depositosAfectados, cantidadXunidad, fraccion, producto, cantidadProductos):
         medidaNueva = self.getMedida() - (cantidadXunidad * fraccion)
         if (medidaNueva != 0):
         
@@ -484,7 +486,69 @@ class Fraccionable(EstrategiaVenta):
                     stockNuevo.setDeposito(stock.getDeposito())
                     stockNuevo.setProducto(productoNuevo)
                     stockNuevo.save()
+        return
+
+    def generarProductoVendido(self, depositosAfectados, fraccion, producto):
+        if (fraccion > self.getMinimo()):
+            estrategia = Fraccionable()
+            estrategia.setMedida(fraccion)
+            estrategia.setMinimo(self.getMinimo())
+            estrategia.save()
+        else:
+            estrategia = EstrategiaVenta.objects.get(pk = 0)
+        """
+        CONSULTA PARA BUSCAR SI YA EXISTE EL PRODUCTO QUE SE GENERO AL VENDER
+        """
+        if (isinstance(estrategia,Fraccionable)):
+            qs = Producto.objects.filter(nombre=producto.getNombre(),estrategiaVenta__fraccionable__medida=fraccion)
+        else:
+            qs = Producto.objects.filter(nombre=producto.getNombre(),estrategiaVenta__nofraccionable__isnull=False)
+        if (qs.count() != 0):
+            productoExistente = qs[0]
+            stocks = depositosAfectados.keys()
+            for stock in stocks:
+                """
+                VERIFICO SI EL PRODUCTO EXISTENTE TIENE STOCK EN EL MISMO DEPOSITO
+                """
+                qs1 = Stock.objects.filter(deposito = stock.getDeposito(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=fraccion)
+                if (qs1.count() != 0):
+                    stockExistente = qs1[0]
+                    stockExistente.setReservadoNoconfirmados(stockExistente.getReservadoNoconfirmados() + depositosAfectados[stock][0])
+                    stockExistente.save()
+                else:
+                    stockNuevo = Stock()
+                    stockNuevo.setReservadoNoconfirmados(depositosAfectados[stock][0])
+                    stockNuevo.setReservadoConfirmados(0)
+                    stockNuevo.setDisponibles(0)
+                    stockNuevo.setDeposito(stock.getDeposito())
+                    stockNuevo.setProducto(productoExistente)
+                    stockNuevo.save()
+                depositosAfectados[stock] = (depositosAfectados[stock][0], productoExistente)
+            productoExistente.save()
+        else:
+            productoNuevo = Producto()
+            productoNuevo.setNombre(producto.getNombre())
+            productoNuevo.setDescripcion(producto.getNombre() + " de " + str(fraccion))
+            productoNuevo.setTipoProducto(producto.getTipoProducto())
+            productoNuevo.setPrecio(producto.getPrecio())
+            productoNuevo.setCantidad(0)
+            productoNuevo.setEstrategiaDeVenta(estrategia)
+            productoNuevo.save()
+
+            stocks = depositosAfectados.keys()
+            for stock in stocks:
+                stockNuevo = Stock()
+                stockNuevo.setReservadoNoconfirmados(depositosAfectados[stock][0])
+                import pdb
+                pdb.set_trace()
+                stockNuevo.setReservadoConfirmados(0)
+                stockNuevo.setDisponibles(0)
+                stockNuevo.setDeposito(stock.getDeposito())
+                stockNuevo.setProducto(productoNuevo)
+                stockNuevo.save()
+                depositosAfectados[stock] = (depositosAfectados[stock][0], productoNuevo)
         return depositosAfectados
+        
 
     def fraccionar(self, fraccion, cantidad):
         valoresDeMedidas = {}
