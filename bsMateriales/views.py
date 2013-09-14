@@ -15,43 +15,11 @@ import os
 from relatorio.templates.opendocument import Template
 import relatorio
 import subprocess
-
-# ============================
-
-# ============================
-
-
-"""import ho.pisa as pisa
-#import xhtml2pdf.pisa as pisa
-import cStringIO as StringIO
-import cgi
-from django import http
-from django.template.loader import render_to_string
-from django.template import Context
-from django.template.loader import get_template"""
+from utiles import AdaptadorFactura
 
 # ============================
 # ============================
-
-class AdaptadorFactura():
-    """"""
-    pk = None
-    nombreCliente = None
-    apellidoCliente = None
-    ventaNota = None
-    detalles = None
-    fecha = None
-    total = None
-
-    def inicializar(self, notaVenta):
-        factura = Factura.objects.get(ventaNota = notaVenta)
-        pk = factura.pk
-        fecha = factura.fecha
-        total = factura.precioTotal
-        ventaNota = factura.ventaNota
-        apellidoCliente = factura.ventaNota.apellidoCliente
-        nombreCliente = factura.ventaNota.nombreCliente
-        detalles = DetalleFactura.objects.filter(factura = factura)
+# ============================
 
 
 def generarFactura(request):
@@ -60,23 +28,13 @@ def generarFactura(request):
         nroNota = request.GET.get("nroNota")
         notaVenta = NotaVenta.objects.get(pk = nroNota)
         af = AdaptadorFactura()
+        af.inicializar(notaVenta)
 
     except ObjectDoesNotExist:
         raise ErrorCobro()
 
-    factura = Factura.objects.get(ventaNota = notaVenta)
-    af.pk = factura.pk
-    #af.fecha =  datetime.strftime("%d%m%Y",factura.fecha)
-    af.fecha = factura.fecha
-    af.total = factura.precioTotal
-    af.ventaNota = factura.ventaNota
-    af.apellidoCliente = factura.ventaNota.apellidoCliente
-    af.nombreCliente = factura.ventaNota.nombreCliente
-    af.detalles = DetalleFactura.objects.filter(factura = factura)
-
     print "path = " + TEMPLATE_DIRS+'/facturaBase.odt'
     af.inicializar(notaVenta)
-    #        af = Factura.objects.get(ventaNota = notaVenta)
     repos = relatorio.ReportRepository()
     basic = Template(source="", filepath=TEMPLATE_DIRS+'/facturaBase.odt')
 
