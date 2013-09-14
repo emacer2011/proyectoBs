@@ -37,6 +37,7 @@ urlpatterns = patterns('',
     url(r'^cargarEntregados/$', 'bsMateriales.views.cargarEntregados'),
     url(r'^cargarDepositos/$', 'bsMateriales.views.cargarDepositos'),
     url(r'^actualizarStocks/$', 'bsMateriales.views.actualizarStocks'),
+    url(r'^generarFactura/$', 'bsMateriales.views.generarFactura'),
     url(r'^admin/', include(admin.site.urls)),
 )
 

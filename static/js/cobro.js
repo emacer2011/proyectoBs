@@ -12,6 +12,20 @@ function popPropio(pk, precio){
         elemento.className="modal-backdrop fade in";
         document.getElementById("paraFondo").appendChild(elemento);
 }
+
+
+function generarFactura(){
+    var precio = document.getElementById("precioNota").value;
+    var nroNota = document.getElementById("nroNota").value;
+    var formaPago = document.getElementById("formaPago").value;
+
+    $.get ("/cobro",{ precioNota: precio, nroNota: nroNota, formaPago: formaPago },function(estado){
+         ventana = window.open("/generarFactura/?nroNota="+nroNota, this.target, 'width=600,hei ght=400,top=100px,left=100px');
+         window.location.reload();
+      }
+    ); 
+
+}
     
 function volver(){
         var elemento=document.getElementById("modalPropio");

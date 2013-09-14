@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, HttpResponse
 from misExcepciones import *
 from datetime import *
+from time import strftime 
 from django.db import transaction
 from proyectoBs.settings import TEMPLATE_DIRS
 import os
@@ -16,17 +17,83 @@ import relatorio
 import subprocess
 
 # ============================
-# = Funciones para genera PDF=
+
 # ============================
 
-import ho.pisa as pisa
+
+"""import ho.pisa as pisa
 #import xhtml2pdf.pisa as pisa
 import cStringIO as StringIO
 import cgi
 from django import http
 from django.template.loader import render_to_string
 from django.template import Context
-from django.template.loader import get_template
+from django.template.loader import get_template"""
+
+# ============================
+# ============================
+
+class AdaptadorFactura():
+    """"""
+    pk = None
+    nombreCliente = None
+    apellidoCliente = None
+    ventaNota = None
+    detalles = None
+    fecha = None
+    total = None
+
+    def inicializar(self, notaVenta):
+        factura = Factura.objects.get(ventaNota = notaVenta)
+        pk = factura.pk
+        fecha = factura.fecha
+        total = factura.precioTotal
+        ventaNota = factura.ventaNota
+        apellidoCliente = factura.ventaNota.apellidoCliente
+        nombreCliente = factura.ventaNota.nombreCliente
+        detalles = DetalleFactura.objects.filter(factura = factura)
+
+
+def generarFactura(request):
+    
+    try:
+        nroNota = request.GET.get("nroNota")
+        notaVenta = NotaVenta.objects.get(pk = nroNota)
+        af = AdaptadorFactura()
+
+    except ObjectDoesNotExist:
+        raise ErrorCobro()
+
+    factura = Factura.objects.get(ventaNota = notaVenta)
+    af.pk = factura.pk
+    #af.fecha =  datetime.strftime("%d%m%Y",factura.fecha)
+    af.fecha = factura.fecha
+    af.total = factura.precioTotal
+    af.ventaNota = factura.ventaNota
+    af.apellidoCliente = factura.ventaNota.apellidoCliente
+    af.nombreCliente = factura.ventaNota.nombreCliente
+    af.detalles = DetalleFactura.objects.filter(factura = factura)
+
+    print "path = " + TEMPLATE_DIRS+'/facturaBase.odt'
+    af.inicializar(notaVenta)
+    #        af = Factura.objects.get(ventaNota = notaVenta)
+    repos = relatorio.ReportRepository()
+    basic = Template(source="", filepath=TEMPLATE_DIRS+'/facturaBase.odt')
+
+    file(TEMPLATE_DIRS+'/factura.odt', 'wb').write(basic.generate(factura=af, detalles=af.detalles).render().getvalue())        
+    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/factura.odt')
+    with open(TEMPLATE_DIRS+'/factura.pdf', 'r') as pdf:
+        response = HttpResponse(pdf.read(), mimetype='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=some_file.pdf'
+        pdf.close()
+        return response
+
+
+
+
+# ============================
+# ============================
+
 
 
 @user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
@@ -34,17 +101,36 @@ from django.template.loader import get_template
 @user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def listarDepositoPDF(request):
-    depositos = Deposito.objects.all()
+    listasDepos=[] #VARIABLE GLOBAL PARA LOS DEPOSITOS PDF    
+
+#    p = subprocess.Popen('unoconv -f pdf -o '+TEMPLATE_DIRS+'/gstDeposito/listarDeposito.pdf '+TEMPLATE_DIRS+'/gstDeposito/enBlanco.odt', shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    filtro = request.GET.get("filtro")
+
+    if filtro == "":
+        listasDepos = Deposito.objects.all()    
+    else:
+        listasDeposDir = list(Deposito.objects.filter(direccion__contains=filtro))
+        listasDeposTel = list(Deposito.objects.filter(telefono__contains=filtro))
+        listasDepos = set(listasDeposDir + listasDeposTel)
+
+    if listasDepos.__len__() == 0:
+        depositos= Deposito.objects.all()    
+    else:
+        depositos= listasDepos
+
     repos = relatorio.ReportRepository()
     inv = depositos
     basic = Template(source="", filepath=TEMPLATE_DIRS+'/gstDeposito/listarDepositoBase.odt')
+
     file(TEMPLATE_DIRS+'/gstDeposito/listarDeposito.odt', 'wb').write(basic.generate(o=inv).render().getvalue())
-    p = subprocess.Popen('unoconv -f pdf '+TEMPLATE_DIRS+'/gstDeposito/listarDeposito.odt', shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    #    p = subprocess.Popen('unoconv -f pdf '+TEMPLATE_DIRS+'/gstDeposito/listarDeposito.odt', shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/gstDeposito/listarDeposito.odt')
     with open(TEMPLATE_DIRS+'/gstDeposito/listarDeposito.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
-        pdf.closed        
+        pdf.close()
         return response
+
 
 
 
@@ -483,11 +569,11 @@ def entregaMateriales(request):
 def cobro(request):
     """docstring for cobro"""
     notas = NotaVenta.objects.filter(facturada = False)
-    if request.POST:
-        notaVenta =  NotaVenta.objects.get(pk = request.POST.get("nroNota"))
+    if request.is_ajax():
+        notaVenta =  NotaVenta.objects.get(pk = request.GET.get("nroNota"))      
         notaVenta.facturada = True
         factura = Factura()
-        factura.inicializar(request.POST.get("formaPago"), request.POST.get("precioNota"), notaVenta)
+        factura.inicializar(request.GET.get("formaPago"), request.GET.get("precioNota"), notaVenta)
         factura.save()
         detalles  = DetalleNotaVenta.objects.filter(nota = notaVenta)
         for detalle in detalles:

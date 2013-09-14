@@ -8,11 +8,16 @@
 {% endblock %}
 
 
+{% block mensaje %}
+<button onClick="imprimirPDF()" class="btn btn-success" data-toggle="modal">Imprimir PDF </button></td>
+
+{% endblock %}
+
 {% block contenedor %}
 
     <div id="CabeceraLDTablas">
         <form class="navbar-search pull-left" style="padding-left:20px">
-            <input type="text" class="search-query" style="height:27px" placeholder="Dirección o Telefono" onKeyUp='buscar(this.value,"tablaDeposito")' ><br>
+            <input id="filtro" type="text" class="search-query" style="height:27px" placeholder="Dirección o Telefono" onKeyUp='buscar(this.value,"tablaDeposito")' ><br>
         </form><br>
         <table class="table table-striped" style="margin-top:20px">
             <thead>
@@ -35,6 +40,7 @@
                 <td id="Deposito-Direccion">{{deposito.getDireccion}}</td>
                 <td id="Deposito-Rubro">{{deposito.getRubro}}</td>
                 <td id="Deposito-Telefono">{{deposito.getTelefono}}</td>
+                <td id="Deposito-Pk">{{deposito.pk}}</td>
             </tr>
         {% endfor %}
     </tbody>

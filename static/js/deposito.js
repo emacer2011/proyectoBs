@@ -8,9 +8,15 @@
                setTimeout("window.location.reload()",1500);
     }
   );    
- 
-        
-        
+    }
+
+    
+    function imprimirPDF(){
+      var filtro = document.getElementById("filtro").value;
+       
+      
+      ventana = window.open("/listarDepositoPDF/?filtro="+filtro, this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      
     }
     
     function validarTelefono(campo) {
@@ -104,5 +110,5 @@ function buscar(texto,idTabla){
       for(i=0;i<=filas.length;i++){
                 elemento = filas[i];
                 elemento.style.display='';
-      }
 }
+      }

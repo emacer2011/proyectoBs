@@ -673,7 +673,7 @@ class DetalleFactura(Detalle):
 class NotaVenta(models.Model):
     nombreCliente = models.CharField(max_length = 40)
     apellidoCliente = models.CharField(max_length = 20)
-    fecha = models.datetime
+    fecha = models.CharField(max_length = 11)
     precioTotal = models.IntegerField(default=0)
     facturada = models.BooleanField(default=False)
     class Meta:
@@ -728,7 +728,7 @@ class NotaVenta(models.Model):
     def inicializar(self, nombrePersona= None, apellidoPersona= None):
         self.setNombre(nombrePersona)
         self.setApellido(apellidoPersona)
-        self.setFecha(date.today())
+        self.setFecha(date.today().__str__())
 
         
 
@@ -738,10 +738,11 @@ class NotaVenta(models.Model):
 # ===========
 
 class Factura(models.Model):
-    fecha = models.datetime
+    fecha = models.CharField(max_length = 11)
     formaDePago = models.CharField(max_length = 15)
     precioTotal = models.FloatField()
     ventaNota = models.ForeignKey(NotaVenta)
+
 
     class Meta:
         permissions = (
@@ -779,7 +780,8 @@ class Factura(models.Model):
         self.setFormaDePago(formaDePago)
         self.setPrecioTotal(precioTotal)
         self.setVentaNota(ventaNota)
-        self.setFecha(date.today())
+        self.setFecha(date.today().__str__())
+
 
 
 # ==========

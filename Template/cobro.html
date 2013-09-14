@@ -23,7 +23,7 @@
     </div>
     
     <div class="modal-body">
-    <form method="POST" action="">
+    <form >
                             <input id="pkProducto" name="pkProducto" value = "{{remito.pk}}" type="hidden">
                                 <div align="center">
                                     Forma de Pago
@@ -39,7 +39,7 @@
                         
     </div>
     <div class="modal-footer">
-        <input class="btn btn-primary" type="submit" value="Cobrar" >
+        <input class="btn btn-primary" type="button" value="Cobrar" onClick="generarFactura()">
     </form>        
         <button class="btn" data-dismiss="modal" aria-hidden="true" onClick="volver()">Cancelar</button>
     </div>

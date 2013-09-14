@@ -18,4 +18,6 @@ class ErrorTipoProducto(Exception):
 class ErrorDescuento(Exception):
 	pass
 	
+class ErrorCobro(Exception):
+	pass
 		
