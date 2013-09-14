@@ -7,12 +7,17 @@
         
 {% endblock %}
 
+{% block mensaje %}
+<button onClick="imprimirPDF()" class="btn btn-success" data-toggle="modal"><i class="icon-print icon-white"></i> Imprimir PDF </button></td>
+
+{% endblock %}
+
 
 {% block contenedor %}
 
     <div id="CabeceraLDTablas">
         <form class="navbar-search pull-left" style="padding-left:20px">
-            <input type="text" class="search-query" style="height:27px" placeholder="Dirección o Telefono" onKeyUp='buscar(this.value,"tablaProducto");' ><br>
+            <input id="filtro" type="text" class="search-query" style="height:27px" placeholder="Dirección o Telefono" onKeyUp='buscar(this.value,"tablaProducto");' ><br>
         </form><br>
         <table class="table table-striped" style="margin-top:20px">
             <thead>

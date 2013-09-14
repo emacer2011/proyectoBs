@@ -10,6 +10,13 @@
  }
 
 
+
+     function imprimirPDF(){
+      var filtro = document.getElementById("filtro").value;
+      ventana = window.open("/listarProductoPDF/?filtro="+filtro, this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      
+    }
+
     function validarNombre(campo) {
         var RegExPattern = /^\w{3,30}$/;
         var errorMessage = 'Nombre de producto invalido';
