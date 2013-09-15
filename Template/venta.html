@@ -16,9 +16,13 @@
     <div id="CabeceraNotaVenta">
         <form class="well" method="POST" onSubmit="return validaVenta()">
             <input id="apellidoPersona" name="apellidoPersona" type="text" class="span3" placeholder="Apellido Cliente">  
-            <input id="nombrePersona" name="nombrePersona" type="text" class="span3" placeholder="Nombre Cliente">  <br>
+            <input id="nombrePersona" name="nombrePersona" type="text" class="span3" placeholder="Nombre Cliente">  
+            <br>
             <input id="productos" name="productos" type="hidden">
-            <button type="submit" class="btn">Generar Nota Venta</button>  
+            <button type="submit" class="btn">Generar Nota Venta</button>
+             <label class="span3">TOTAL:</label>
+            <label id="total" class="span3" name="total">0</label>
+            
         </form> 
 
     </div>
@@ -90,4 +94,6 @@
             
         </table>
     </div>
+
+    <script type="text/javascript">actualizarTotal();</script>
 {% endblock %}

@@ -736,7 +736,7 @@ class NotaVenta(models.Model):
     nombreCliente = models.CharField(max_length = 40)
     apellidoCliente = models.CharField(max_length = 20)
     fecha = models.CharField(max_length = 11)
-    precioTotal = models.IntegerField(default=0)
+    precioTotal = models.FloatField(default = 0)
     facturada = models.BooleanField(default=False)
     class Meta:
         permissions = (
