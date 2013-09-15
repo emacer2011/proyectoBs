@@ -190,6 +190,8 @@ function mostrarDatosFraccionable(){
 
 function validarDatosFraccionables(){
 
+  var medidaMinima = document.getElementById("medidaMinimaProducto").value;
+  document.getElementById("medidaMinimaProducto").value = valoresConComa(medidaMinima);
   var medidaMinima = document.getElementById("medidaMinimaProducto");
   medidaMinima = parseFloat(medidaMinima.value);
   var medida = parseFloat(document.getElementById("medidaProducto").value);

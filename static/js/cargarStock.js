@@ -8,7 +8,6 @@ function verificarCarga(){
   }
 }
 
-
 function popPropio(pk){
         var depositos = document.getElementById("deposito").options;
         if (depositos.length == 0) {alert("No hay depositos cargados");return false;};
@@ -73,9 +72,13 @@ function mostrarDetalles(fila){
   Deposito = fila.cells[0].innerHTML;
   Producto = fila.id;
   div = document.getElementById("divDescripcionDescuento");
-  div.style.display="block";
-  deposito = document.getElementById("pkDeposito");
-  deposito.value = fila.id;
+  if(div.style.display == "none"){
+    div.style.display="block";
+    deposito = document.getElementById("pkDeposito");
+    deposito.value = fila.id;
+  }else{
+    div.style.display = "none";
+  }
 }
 
 
@@ -145,4 +148,14 @@ function buscar(texto,idTabla){
                 elemento = filas[i];
                 elemento.style.display='';
       }
+}
+
+function verificarEnvio(){
+  div = document.getElementById("divDescripcionDescuento");
+  if(div.style.display == "none"){
+    volver2();
+    return false;
+  }
+  return true;
+
 }

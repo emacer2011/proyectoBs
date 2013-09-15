@@ -250,6 +250,9 @@ form {
 #CargaStock-Nombre{
     width:18%;    
 }
+#CargaStock-Nombre2{
+    width:16%;    
+}
 
 #Producto-Titulo-Nombre{
     width:18%;    
@@ -260,7 +263,10 @@ form {
 }
 
 #CargaStock-Descripcion{
-    width:27%;    
+    width:35%;    
+}
+#CargaStock-Descripcion2{
+    width:32%;
 }
 
 #Producto-Descripcion{
@@ -268,7 +274,7 @@ form {
 }
 
 #CargaStock-Titulo-Descripcion{
-    width:27%;    
+    width:35%;
 }
 
 #Producto-Titulo-Descripcion{
@@ -276,7 +282,10 @@ form {
 }
 
 #CargaStock-TipoProducto{
-    width:24%;    
+    width:22%;
+}
+#CargaStock-TipoProducto2{
+    width:20%;
 }
 
 #Producto-TipoProducto{
@@ -296,11 +305,14 @@ form {
 }
 
 #CargaStock-Cantidad{
+    width:9%;
+}
+#CargaStock-Cantidad2{
     width:6%;
 }
 
 #CargaStock-Titulo-Cantidad{
-    width:6%;
+    width:8%;
 }
 
 #Producto-Titulo-Cantidad{
@@ -312,7 +324,10 @@ form {
 }
 
 #CargaStock-Precio{
-    width:10%;
+    width:9%;
+}
+#CargaStock-Precio2{
+    width:8%;
 }
 
 #Producto-Precio{
@@ -324,6 +339,18 @@ form {
 }
 
 #CargaStock-Cargar{
+    width:20%;
+    
+}
+#CargaStock-Cargar2{
+    text-align:center;
+}
+
+#CargaStock-Descontar{
+    width:50%;
+    text-align:left;
+}
+#CargaStock-Descontar2{
     text-align:center;
 }
 
@@ -380,6 +407,26 @@ form {
 
 #Deposito-Direccion{
     width:40%;
+}
+
+#ventaProducto-Nombre{
+    width:20%;
+}
+
+#ventaProducto-Descripcion{
+    width:20%;
+}
+#ventaProducto-Descripcion2{
+    width:20%;
+}
+#ventaProducto-Medida{
+    width:20%;
+}
+#ventaProducto-Cantidad{
+    width:20%;
+}
+#ventaProducto-Precio{
+    width:20%;
 }
 
 #Deposito-Titulo-Rubro{
