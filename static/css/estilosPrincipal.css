@@ -232,11 +232,15 @@ form {
 
 
 #tabla-Nombre{
-    width:30%;
+    width:28%;
 }
 
 #tabla-Descripcion{
-    width:40%;
+    width:36%;
+}
+
+#tabla-Medida{
+    width:10%; 
 }
 
 #tabla-Precio{
@@ -410,21 +414,32 @@ form {
 }
 
 #ventaProducto-Nombre{
-    width:20%;
+    width:28%;
+}
+#ventaProducto-Nombre2{
+    width:18%;
 }
 
 #ventaProducto-Descripcion{
-    width:20%;
+    width:36%;
 }
+
 #ventaProducto-Descripcion2{
-    width:20%;
+    width:19%;
 }
 #ventaProducto-Medida{
-    width:20%;
+    width:9%;
 }
 #ventaProducto-Cantidad{
     width:20%;
 }
+#ventaProducto-Medida2{
+    width:13%;
+}
+#ventaProducto-Cantidad2{
+    width:16%;
+}
+
 #ventaProducto-Precio{
     width:20%;
 }

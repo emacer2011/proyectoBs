@@ -33,11 +33,12 @@
         </form>
             <table class="table table-striped">
                 <thead>
-                <tr><th id="ventaProducto-Nombre" class="table-head">Producto</th>
+                <tr>
+                    <th id="ventaProducto-Nombre" class="table-head">Producto</th>
                     <th id="ventaProducto-Descripcion" class="table-head">Descripci&oacuten</th>
-                    <th id="ventaProducto-Medida" class="table-head">Medida</th>
-                    <th id="ventaProducto-Cantidad" class="table-head">Cantidad</th>
-                    <th id="ventaProducto-Precio" class="table-head">Precio</th>
+                    <th id="ventaProducto-Medida" class="table-head">Med</th>
+                    <th id="ventaProducto-Cantidad" class="table-head">Cant</th>
+                    <th id="ventaProducto-Precio" class="table-head"> $ </th>
                 </tr>    
                 </thead>
             </table>
@@ -49,11 +50,13 @@
         </form>
         <table class="table table-striped">
             <thead>
-                <tr><th class="table-headVenta">Producto</th>
-                    <th class="table-headVenta">Descripci&oacuten</th>
-                    <th class="table-headVenta">Cantidad</th>
-                    <th class="table-headVenta">P/Unitario</th>
-                    <th class="table-headVenta">Total</th>
+                <tr>
+                    <th id="ventaProducto-Nombre2" class="table-headVenta">Producto</th>
+                    <th id="ventaProducto-Descripcion2" class="table-headVenta">Descripci&oacuten</th>
+                    <th id="ventaProducto-Medida2" class="table-headVenta">Med</th>
+                    <th id="ventaProducto-Cantidad2" class="table-headVenta">Cant</th>
+                    <th id="ventaProducto-Precio2"class="table-headVenta">P/Unit</th>
+                    <th id="ventaProducto-Total" class="table-headVenta">Total</th>
                 </tr>    
             </thead>
         </table>
@@ -62,23 +65,15 @@
     <div id="SubContenedor">
         <table id="Disponibles" class="table table-striped" border="0" cellspacing="5" cellpadding="5">
             <tbody>
-                <tr style="display:none">
-                    <td id="ventaProducto-Nombre2"></td>
-                    <td id="ventaProducto-Descripcion2"></td>
-                    <td id="ventaProducto-Medida2"></td>
-                    <td id="ventaProducto-Cantidad2"></td>
-                    <td id="ventaProducto-Precio2"></td>
-                </tr>
                 {% for producto in productos %}
                     <tr onclick="agregarProducto(this);" id="p{{producto.pk}}">
                         <td id="tabla-Nombre">{{producto.getNombre}}</td>
                         <td id="tabla-Descripcion">{{producto.getDescripcion}}</td>
-                        <td id="{{producto.pk}}">{{producto.getMedida}}</td>
+                        <td id="tabla-Medida">{{producto.obtenerEstrategiaDeVenta.getMedida}}</td>
                         <td id="{{producto.pk}}">{{producto.getCantidad}}</td>
                         <td id="tabla-Precio">{{producto.getPrecio}}</td>
                         <td class="Oculto">{{producto.pk}}</td>
                         <td class="Oculto">{{producto.esFraccionable}}</td>
-                        <td class="Oculto">{{producto.obtenerEstrategiaDeVenta.getMedida}}</td>
                         <td class="Oculto">{{producto.obtenerEstrategiaDeVenta.getMinimo}}</td>
                     </tr>                    
                 {% endfor %}

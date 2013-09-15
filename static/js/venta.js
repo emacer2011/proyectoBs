@@ -153,7 +153,7 @@ function devolverProductoFraccionables(fila) {
 
 function agregarProducto(fila) {
 
-    if(fila.cells[5].innerHTML== "True"){
+    if(fila.cells[6].innerHTML== "True"){
         agregarProductoFraccionable(fila);
     }else{
         agregarProductoNoFraccionable(fila);
@@ -220,6 +220,154 @@ function validarPrompt(medida){
 
 function agregarProductoFraccionable(fila){
     var stock = 1;
+    var medida = fila.cells[2].innerHTML;
+    var medidaMinima = fila.cells[7].innerHTML;
+    var cantidadComprada = prompt('Medida:'+medida+'\t Medida Minima:'+ medidaMinima+'\nMedida Deseada:',medidaMinima);
+    cantidadComprada = validarPrompt(cantidadComprada);
+    cantidadComprada = parseFloat(cantidadComprada);
+    if(verificarMedida(medidaMinima, medida, cantidadComprada)){
+        var stock = parseInt(fila.cells[3].innerHTML);
+        var pk = fila.cells[5].innerHTML;
+        var tabla = document.getElementById("Comprometidos");
+        var unidades = prompt('Cantidad:',stock);
+        cantidadComprada = parseFloat(cantidadComprada);
+        if((isNaN(unidades)) || (unidades<1)){return false;} //TODO: PROBAR ESTO
+        var existente = buscarCompraExistente(pk, cantidadComprada);
+        if(existente == null){
+            var stockARestar = fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
+            if (stockARestar== -1) {
+                alert("Stock Insuficiente para la venta");
+                return 0;
+            };
+            var indice = tabla.rows.length;
+            var nuevaFila = tabla.insertRow(indice);
+            var celda = nuevaFila.insertCell(0);
+            celda.innerHTML = fila.cells[0].innerHTML;  
+            celda = nuevaFila.insertCell(1);
+            celda.innerHTML = fila.cells[1].innerHTML;
+            celda = nuevaFila.insertCell(2);
+            celda.innerHTML = unidades;
+            fila.cells[2].innerHTML = parseInt(fila.cells[3].innerHTML) - stockARestar;
+            celda = nuevaFila.insertCell(3);
+            celda.innerHTML = fila.cells[4].innerHTML;
+            celda = nuevaFila.insertCell(4);
+            celda.innerHTML = pk;
+            celda.style.display="none";
+            celda = nuevaFila.insertCell(5);
+            celda.innerHTML = cantidadComprada;
+            celda = nuevaFila.insertCell(6);
+            celda.innerHTML = ((cantidadComprada * parseFloat(fila.cells[4].innerHTML))*unidades).toFixed(2);
+            nuevaFila.id=-parseInt(pk);
+            nuevaFila.onclick = function(){devolverProducto(nuevaFila)};
+            celda = nuevaFila.insertCell(7);
+            celda.innerHTML = stockARestar;
+            celda.style.display="none";
+        }else{
+            stock = stock + parseInt(existente.cells[7].innerHTML);
+            unidades = parseInt(unidades) + parseInt(existente.cells[3].innerHTML);
+            stockARestar = fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
+            if(stockARestar != -1){
+                    existente.cells[3].innerHTML = unidades;
+                    existente.cells[6].innerHTML = (parseInt(existente.cells[3].innerHTML) * parseFloat(existente.cells[3].innerHTML) * parseFloat(existente.cells[6].innerHTML).toFixed(2));
+                    existente.cells[7].innerHTML = stockARestar;
+                    fila.cells[3].innerHTML = stock - stockARestar;
+            }else{
+                   alert("Stock Insuficiente para la venta");
+            }
+            
+         }
+
+    }
+
+}
+
+function verificarMedida(medidaMinima, medidaMaxima, medidaSolicitada){
+    medidaSolicitada = parseFloat(medidaSolicitada);
+    medidaMinima = parseFloat(medidaMinima);
+    medidaMaxima = parseFloat(medidaMaxima);
+    var resto = medidaMaxima - medidaSolicitada;
+    if(medidaSolicitada < medidaMinima || (resto < medidaMinima && resto != 0) || medidaSolicitada > medidaMaxima){
+        alert('Imposible Vender la cantidad Solicitada (Violacion de Medidas Minimas/Maximas)');
+        return false;
+    }
+    return true;
+}
+
+ function agregarProductoNoFraccionableRespaldo(fila) {
+    var cantidad = parseInt(fila.cells[2].innerHTML);
+    var pk =fila.cells[4].innerHTML;
+    var tabla = document.getElementById("Comprometidos");
+    var cantidadComprada = prompt('Cantidad:',cantidad);
+    cantidadComprada = parseInt(cantidadComprada);
+    if((isNaN(cantidadComprada)) || (cantidadComprada > cantidad) || (cantidadComprada<1)){return false;}
+    var existente = document.getElementById(-parseInt(pk));
+    if(existente == null){
+        var indice = tabla.rows.length;
+        var nuevaFila = tabla.insertRow(indice);
+        var celda = nuevaFila.insertCell(0);
+        celda.innerHTML = fila.cells[0].innerHTML;
+        celda = nuevaFila.insertCell(1);
+        celda.innerHTML = fila.cells[1].innerHTML;
+        celda = nuevaFila.insertCell(2);
+        celda.innerHTML = cantidadComprada;
+        fila.cells[2].innerHTML = cantidad-cantidadComprada;
+        celda = nuevaFila.insertCell(3);
+        celda.innerHTML = fila.cells[3].innerHTML;
+        celda = nuevaFila.insertCell(4);
+        celda.innerHTML = pk;
+        celda.style.display="none";
+        //celda = nuevaFila.insertCell(5);
+        celda = document.createElement("td");
+        celda.innerHTML = '-';
+        celda.setAttribute("width","30%");
+        celda = nuevaFila.insertCell(6);
+        celda.innerHTML = (cantidadComprada * parseFloat(fila.cells[3].innerHTML)).toFixed(2);
+        nuevaFila.id=-parseInt(pk);
+        nuevaFila.onclick = function(){devolverProducto(nuevaFila)};
+    }else{
+        existente.cells[2].innerHTML = parseInt(existente.cells[2].innerHTML) + cantidadComprada;
+        existente.cells[6].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseInt(existente.cells[3].innerHTML).toFixed(2));
+        fila.cells[2].innerHTML = cantidad-cantidadComprada;
+     }
+}
+
+  	function buscar(texto,idTabla){
+		var tabla, txt, filas, elemento,aComparar, aComparar2,rta, rtaTel;
+		txt = texto.toUpperCase();
+		tabla = document.getElementById(idTabla);
+		filas = tabla.getElementsByTagName('tr');
+		for(i=0;i<=filas.length;i++){
+		    elemento = filas[i];
+		    elemento.style.display='none';
+		    aComparar = elemento.cells[0].textContent;
+		    aComparar = aComparar.toUpperCase();
+		    rta = aComparar.indexOf(txt);
+		    if(rta != -1){
+                elemento.style.display='';
+            }
+		    aComparar2 = (elemento.cells[1].textContent).toUpperCase();
+		    rtaTel= aComparar2.indexOf(txt);
+		    if(rtaTel != -1){
+		          elemento.style.display='';
+		     }
+		}
+		
+	}
+        
+        function restaurar(idTabla){
+            var tabla,filas,elemento;
+                tabla = document.getElementById(idTabla);
+		        filas = tabla.getElementsByTagName('tr');
+		        for(i=0;i<=filas.length;i++){
+                    elemento = filas[i];
+                    elemento.style.display='';
+		        }
+    }
+
+
+
+    function agregarProductoFraccionableResguardo(fila){
+    var stock = 1;
     var medida = fila.cells[6].innerHTML;
     var medidaMinima = fila.cells[7].innerHTML;
     var cantidadComprada = prompt('Medida:'+medida+'\t Medida Minima:'+ medidaMinima+'\nMedida Deseada:',medidaMinima);
@@ -278,24 +426,11 @@ function agregarProductoFraccionable(fila){
          }
 
     }
-
-}
-
-function verificarMedida(medidaMinima, medidaMaxima, medidaSolicitada){
-    medidaSolicitada = parseFloat(medidaSolicitada);
-    medidaMinima = parseFloat(medidaMinima);
-    medidaMaxima = parseFloat(medidaMaxima);
-    var resto = medidaMaxima - medidaSolicitada;
-    if(medidaSolicitada < medidaMinima || (resto < medidaMinima && resto != 0) || medidaSolicitada > medidaMaxima){
-        alert('Imposible Vender la cantidad Solicitada (Violacion de Medidas Minimas/Maximas)');
-        return false;
-    }
-    return true;
 }
 
  function agregarProductoNoFraccionable(fila) {
-    var cantidad = parseInt(fila.cells[2].innerHTML);
-    var pk =fila.cells[4].innerHTML;
+    var cantidad = parseInt(fila.cells[3].innerHTML);
+    var pk =fila.cells[5].innerHTML;
     var tabla = document.getElementById("Comprometidos");
     var cantidadComprada = prompt('Cantidad:',cantidad);
     cantidadComprada = parseInt(cantidadComprada);
@@ -312,52 +447,19 @@ function verificarMedida(medidaMinima, medidaMaxima, medidaSolicitada){
         celda.innerHTML = cantidadComprada;
         fila.cells[2].innerHTML = cantidad-cantidadComprada;
         celda = nuevaFila.insertCell(3);
-        celda.innerHTML = fila.cells[3].innerHTML;
+        celda.innerHTML = fila.cells[4].innerHTML;
         celda = nuevaFila.insertCell(4);
         celda.innerHTML = pk;
         celda.style.display="none";
         celda = nuevaFila.insertCell(5);
         celda.innerHTML = '-';
         celda = nuevaFila.insertCell(6);
-        celda.innerHTML = (cantidadComprada * parseFloat(fila.cells[3].innerHTML)).toFixed(2);
+        celda.innerHTML = (cantidadComprada * parseFloat(fila.cells[4].innerHTML)).toFixed(2);
         nuevaFila.id=-parseInt(pk);
         nuevaFila.onclick = function(){devolverProducto(nuevaFila)};
     }else{
-        existente.cells[2].innerHTML = parseInt(existente.cells[2].innerHTML) + cantidadComprada;
-        existente.cells[6].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseInt(existente.cells[3].innerHTML).toFixed(2));
-        fila.cells[2].innerHTML = cantidad-cantidadComprada;
+        existente.cells[3].innerHTML = parseInt(existente.cells[3].innerHTML) + cantidadComprada;
+        existente.cells[6].innerHTML = (parseInt(existente.cells[3].innerHTML) * parseInt(existente.cells[4].innerHTML).toFixed(2));
+        fila.cells[3].innerHTML = cantidad-cantidadComprada;
      }
 }
-
-  	function buscar(texto,idTabla){
-		var tabla, txt, filas, elemento,aComparar, aComparar2,rta, rtaTel;
-		txt = texto.toUpperCase();
-		tabla = document.getElementById(idTabla);
-		filas = tabla.getElementsByTagName('tr');
-		for(i=0;i<=filas.length;i++){
-		    elemento = filas[i];
-		    elemento.style.display='none';
-		    aComparar = elemento.cells[0].textContent;
-		    aComparar = aComparar.toUpperCase();
-		    rta = aComparar.indexOf(txt);
-		    if(rta != -1){
-                elemento.style.display='';
-            }
-		    aComparar2 = (elemento.cells[1].textContent).toUpperCase();
-		    rtaTel= aComparar2.indexOf(txt);
-		    if(rtaTel != -1){
-		          elemento.style.display='';
-		     }
-		}
-		
-	}
-        
-        function restaurar(idTabla){
-            var tabla,filas,elemento;
-                tabla = document.getElementById(idTabla);
-		        filas = tabla.getElementsByTagName('tr');
-		        for(i=0;i<=filas.length;i++){
-                    elemento = filas[i];
-                    elemento.style.display='';
-		        }
-    }
