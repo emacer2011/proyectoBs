@@ -7,12 +7,26 @@ function cargar(){
     }
 }
 
-   function verificarCarga(){
+function verificarCarga(){
         var div = document.getElementById("mensaje")
         var mensaje=div.innerHTML;
         if(mensaje != ""){
+
           setTimeout("location.href=location.href",2000);
   }
+}
+
+
+function actualizarTotal(){
+    var tabla = document.getElementById("Comprometidos");
+    var elArray = new Array();
+    total = 0;
+    for (var i=0; i < tabla.rows.length; i++) {
+        producto = tabla.rows[i];
+        total = parseFloat(producto.cells[6].innerHTML)+total;
+    }
+    document.getElementById("total").innerHTML = total.toFixed(2);
+
 }
 
 
@@ -76,10 +90,13 @@ function cargarDatosProducto(nombre, cantidad, precio, pk){
 
 function devolverProducto(fila) {
     if (fila.cells[5].innerHTML == "-") {
-        return devolverProductoNoFraccionables(fila);
+        retorno =  devolverProductoNoFraccionables(fila);
 
-    };
-    return devolverProductoFraccionables(fila);
+    }else{
+        retorno = devolverProductoFraccionables(fila);
+    }
+    actualizarTotal();
+    return retorno;
 }
 
 
@@ -93,7 +110,7 @@ function devolverProductoNoFraccionables(fila) {
         return false;}
     celda.innerHTML = parseInt(cantidadDevuelta) + parseInt(celda.innerHTML);
     fila.cells[2].innerHTML = parseInt(fila.cells[2].innerHTML) - parseInt(cantidadDevuelta);
-    fila.cells[6].innerHTML = parseFloat(fila.cells[3].innerHTML) *parseInt(fila.cells[2].innerHTML);
+    fila.cells[6].innerHTML = (parseFloat(fila.cells[3].innerHTML) *parseInt(fila.cells[2].innerHTML).toFixed(2));
     if(parseInt(fila.cells[2].innerHTML) == 0){ 
         fila.parentNode.deleteRow(fila.rowIndex);
     }
@@ -123,7 +140,7 @@ function devolverProductoFraccionables(fila) {
     var cantidadComprada = parseFloat(fila.cells[5].innerHTML);
     var stockARestar = fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
     fila.cells[2].innerHTML = unidades;
-    fila.cells[6].innerHTML = (parseInt(fila.cells[2].innerHTML) * parseFloat(fila.cells[3].innerHTML) * parseFloat(fila.cells[5].innerHTML));
+    fila.cells[6].innerHTML = (parseInt(fila.cells[2].innerHTML) * parseFloat(fila.cells[3].innerHTML) * parseFloat(fila.cells[5].innerHTML)).toFixed(2);
     fila.cells[7].innerHTML = stockARestar;
     productoOriginal.cells[2].innerHTML = stock - stockARestar;
 
@@ -141,6 +158,8 @@ function agregarProducto(fila) {
     }else{
         agregarProductoNoFraccionable(fila);
     }
+    actualizarTotal();
+
 }
 
 function buscarCompraExistente(pk,medida){
@@ -237,7 +256,7 @@ function agregarProductoFraccionable(fila){
             celda = nuevaFila.insertCell(5);
             celda.innerHTML = cantidadComprada;
             celda = nuevaFila.insertCell(6);
-            celda.innerHTML = (cantidadComprada * parseFloat(fila.cells[3].innerHTML))*unidades;
+            celda.innerHTML = ((cantidadComprada * parseFloat(fila.cells[3].innerHTML))*unidades).toFixed(2);
             nuevaFila.id=-parseInt(pk);
             nuevaFila.onclick = function(){devolverProducto(nuevaFila)};
             celda = nuevaFila.insertCell(7);
@@ -249,7 +268,7 @@ function agregarProductoFraccionable(fila){
             stockARestar = fraccionarProducto(medidaMinima, medida, stock,cantidadComprada,unidades);
             if(stockARestar != -1){
                     existente.cells[2].innerHTML = unidades;
-                    existente.cells[6].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseFloat(existente.cells[3].innerHTML) * parseFloat(existente.cells[5].innerHTML));
+                    existente.cells[6].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseFloat(existente.cells[3].innerHTML) * parseFloat(existente.cells[5].innerHTML).toFixed(2));
                     existente.cells[7].innerHTML = stockARestar;
                     fila.cells[2].innerHTML = stock - stockARestar;
             }else{
@@ -300,12 +319,12 @@ function verificarMedida(medidaMinima, medidaMaxima, medidaSolicitada){
         celda = nuevaFila.insertCell(5);
         celda.innerHTML = '-';
         celda = nuevaFila.insertCell(6);
-        celda.innerHTML = (cantidadComprada * parseFloat(fila.cells[3].innerHTML));
+        celda.innerHTML = (cantidadComprada * parseFloat(fila.cells[3].innerHTML)).toFixed(2);
         nuevaFila.id=-parseInt(pk);
         nuevaFila.onclick = function(){devolverProducto(nuevaFila)};
     }else{
         existente.cells[2].innerHTML = parseInt(existente.cells[2].innerHTML) + cantidadComprada;
-        existente.cells[6].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseInt(existente.cells[3].innerHTML));
+        existente.cells[6].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseInt(existente.cells[3].innerHTML).toFixed(2));
         fila.cells[2].innerHTML = cantidad-cantidadComprada;
      }
 }
