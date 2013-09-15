@@ -6,7 +6,6 @@ function verificarCarga(){
   if(mensaje != ""){
     setTimeout("location.href=location.href",2000);
   }
-
 }
 
 
@@ -27,7 +26,7 @@ function popPropio(pk){
 }
 
 function popPropio2(pk){
-        var campo = document.getElementById("pkProducto");
+        var campo = document.getElementById("pkProductoDescuento");
         campo.value= pk;
         var elemento=document.getElementById("modalPropio2");
         elemento.className="modalDescuento hide fade in";
@@ -49,7 +48,6 @@ function validarNumeros(pk,e){
     cantidad.focus();
   }
 }
-
 
 
 function verificarDescuento(pk,e){
@@ -76,13 +74,11 @@ function mostrarDetalles(fila){
   Producto = fila.id;
   div = document.getElementById("divDescripcionDescuento");
   div.style.display="block";
+  deposito = document.getElementById("pkDeposito");
+  deposito.value = fila.id;
 }
 
 
-
-
-
-    
 function volver(){
         var elemento=document.getElementById("modalPropio");
         elemento.className="modal hide fade";
@@ -138,23 +134,7 @@ function buscar(texto,idTabla){
             elemento.style.display='';
        }
     }
-
 }
-
-
-function actualizarStocks(){
-//    var pk = document.getElementById("pkDeposito").value;
-    var pk = document.getElementById(Producto).cells[0].innerHTML;
-    cantidad = document.getElementById("cantidadDescuento").value;
-    motivo = document.getElementById("motivoDescuento").value;
-    beneficiario = document.getElementById("beneficiarioDescuento").value;
-    descripcion = document.getElementById("descripcionDescuento").value;
-    $.get ("/actualizarStocks",{ pkDeposito: pk, pkProducto: Producto, cantidadDescuento: cantidad,
-                motivoDescuento: motivo, beneficiarioDescuento: beneficiario, descripcionDescuento:descripcion},function(data){
-        window.location.reload();
-    });
-}
-
 
     
     function restaurar(idTabla){

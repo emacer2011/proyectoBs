@@ -123,12 +123,14 @@ def cargarDetalles(request):
         mensaje = mensaje + "<th></th>"
         mensaje = mensaje + "<th>Producto</th>"
         mensaje = mensaje + "<th>Cantidad</th>"
+        mensaje = mensaje + "<th>Medida solicitada</th>"
         mensaje = mensaje + "<th>Entregado</th>"
         for detalle in detalles:
             mensaje = mensaje + "<tr>"
             mensaje = mensaje + '<td style="visibility:hidden" id = "pkDetalle">'+ str(detalle.pk)+'</td>'
             mensaje = mensaje + "<td>" + detalle.producto.getNombre()+ "</td>"
             mensaje = mensaje + "<td>" + str(detalle.cantidad)+ "</td>"
+            mensaje = mensaje + "<td>" + str(detalle.producto.obtenerEstrategiaDeVenta().getMedida())+ "</td>"
             if detalle.entregado:
                 entregado = "checked DISABLED"
             else:
@@ -201,20 +203,19 @@ def cargarDepositos(request):
 @user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
 @user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 def actualizarStocks(request):
-    if request.is_ajax():
-        pkProducto = request.GET.get('pkProducto').split('s')[1] 
-        deposito = Deposito.objects.get(pk=request.GET.get('pkDeposito'))
-        producto = Producto.objects.get(pk = pkProducto)
-        cantidad = request.GET.get('cantidadDescuento')
-        descripcion = request.GET.get('descripcionDescuento')
-        beneficiario = request.GET.get('beneficiarioDescuento')
-        motivo = request.GET.get('motivoDescuento')
-        descuento = Descuento()
-        descuento.inicializar(int(cantidad),producto,deposito,descripcion,motivo,beneficiario)
-        descuento.descontarStock()
-        descuento.save()
-        return HttpResponseRedirect("/cargarDetalles")
-    return HttpResponseRedirect("/")
+    pkProducto = request.POST.get('pkProductoDescuento')
+    deposito = Deposito.objects.get(pk=request.POST.get('pkDeposito').split('s')[1])
+    producto = Producto.objects.get(pk = pkProducto)
+    cantidad = request.POST.get('cantidadDescuento')
+    descripcion = request.POST.get('descripcionDescuento')
+    beneficiario = request.POST.get('beneficiarioDescuento')
+    motivo = request.POST.get('motivoDescuento')
+    descuento = Descuento()
+    descuento.inicializar(int(cantidad),producto,deposito,descripcion,motivo,beneficiario)
+    descuento.descontarStock()
+    descuento.save()
+    mensaje = "se descontaron "+str(cantidad)+" del producto "+producto.getNombre()+" del deposito "+deposito.getDireccion()
+    return (mensaje,"alert alert-success")
 
 
 
@@ -311,10 +312,10 @@ def bajaDeposito(request):
             deposito = Deposito.objects.get(pk = pk )
             try:
                 deposito.eliminarDeposito()
-                mensaje='Deposito con direccion: '+deposito.getDireccion()+" eliminado"
+                mensaje='Deposito '+deposito.getDireccion()+", ha sido Eliminado"
                 estado='alert alert-success'
             except ErrorDeposito:
-                mensaje='Deposito con direccion: '+deposito.getDireccion()+" tiene stocks relacionados"
+                mensaje='Deposito '+deposito.getDireccion()+" no puede ser Eliminado porque tiene stocks relacionados"
                 estado='alert alert-danger'
             return HttpResponse(str(estado)+"/"+str(mensaje))
     return render_to_response('gstDeposito/bajaDeposito.html',{'depositos':depositos, 'mensaje': mensaje, 'estado': estado},context_instance=RequestContext(request)) 
@@ -334,7 +335,7 @@ def modificarDeposito(request):
         deposito = Deposito.objects.get(pk = request.POST.get('pkDeposito') )
         deposito.inicializar(request.POST.get('direccionDeposito'),request.POST.get('telefonoDeposito'),request.POST.get('rubroDeposito'))
         deposito.save()
-        mensaje='Deposito Modficiado con direccion: '+deposito.getDireccion()
+        mensaje='Deposito '+deposito.getDireccion()+', ha sido modificado'
         estado='alert alert-success'
         
     return render_to_response('gstDeposito/modificarDeposito.html',{'depositos':depositos, 'rubros':rubros, 'mensaje': mensaje, 'estado': estado},context_instance=RequestContext(request)) 
@@ -402,15 +403,25 @@ def cargarStock(request):
     depositos = Deposito.objects.all()
     mensaje = ""
     estado= ""
-    if request.POST:        
-        producto =Producto.objects.get(pk = request.POST.get("pkProducto"))
-        disponibles = int(request.POST.get("disponible"))
-        deposito=Deposito.objects.get(pk =request.POST.get("deposito"))
-        Stock.cargarStock(disponibles,deposito, producto)
-        producto.setCantidad(producto.getCantidad() + disponibles)
-        producto.save()
-        mensaje='Se agrega '+str(disponibles) +' unidades del producto '+producto.getNombre()+' en el deposito de '+deposito.getDireccion()
-        estado='alert alert-success'
+    if request.POST:
+        operacion = request.POST.get("tipo")
+        if operacion == "agregarStock":
+            producto =Producto.objects.get(pk = request.POST.get("pkProducto"))
+            disponibles = int(request.POST.get("disponible"))
+            deposito=Deposito.objects.get(pk =request.POST.get("deposito"))
+            Stock.cargarStock(disponibles,deposito, producto)
+            producto.setCantidad(producto.getCantidad() + disponibles)
+            producto.save()
+            mensaje='Se agrega '+str(disponibles) +' unidades del producto '+producto.getNombre()+' en el deposito de '+deposito.getDireccion()
+            estado='alert alert-success'
+        else:
+            if operacion == "descontarStock":
+                tupla = actualizarStocks(request)
+                mensaje = tupla[0]
+                estado = tupla[1]
+            else:
+                mensaje='Ops! al parecer no se ha podido completar la Accion solicitada'
+                estado='alert alert-danger'   
         
     return render_to_response('cargarStock.html',{'mensaje':mensaje, 'estado':estado, 'productos':productos,'depositos':depositos},context_instance=RequestContext(request)) 
 
@@ -462,11 +473,11 @@ def bajaProducto(request):
     if request.is_ajax():
         producto = Producto.objects.get(pk =request.GET.get("pkProducto") )
         if producto.puedeBorrarse():
-            mensaje="Producto Eliminado"
+            mensaje='Producto '+producto.getNombre()+', ha sido Eliminado'
             estado='alert alert-success'
             producto.delete()
         else:
-            mensaje="No se pudo Eliminar porque tiene stocks relacionados"
+            mensaje="No se puede Eliminar porque tiene stocks relacionados"
             estado='alert alert-error'
         return HttpResponse(str(estado)+"/"+str(mensaje))
     return render_to_response('gstProducto/bajaProducto.html',{'estado':estado, 'mensaje':mensaje, 'productos':productos},context_instance=RequestContext(request)) 
@@ -488,7 +499,7 @@ def modificarProducto(request):
             producto= Producto.objects.get(pk = request.POST.get("pkProducto"))
             producto.inicializar(request.POST.get("nombreProducto"),request.POST.get("descripcionProducto"), TipoProducto.objects.get(pk = request.POST.get("tipoProducto")),request.POST.get("precioProducto"),NoFraccionable.objects.get(pk = 0))
             producto.save()
-            mensaje='Producto dado de alta con nombre: ' + producto.nombre
+            mensaje='Producto '+producto.nombre+', ha sido modificado'
             estado='alert alert-success'
         except ErrorProducto:
             mensaje='Error al cargar los datos, por favor verifique el correcto ingreso de los mismos'

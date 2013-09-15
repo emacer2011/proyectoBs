@@ -9,9 +9,8 @@
 
 
 {% block mensaje %}
-    <div class="{{estado}}">
-        {{mensaje}}
-    </div>
+    <div id="mensaje" class="{{estado}}">{{mensaje}}</div>
+    <script type="text/javascript">verificarCarga();</script>
 {% endblock %}
 
 
@@ -62,6 +61,10 @@
                     <th class="table-head" id="Producto-Titulo-Nombre">Producto</th>
                     <th class="table-head" id="Producto-Titulo-Descripcion">Descripci&oacuten</th>
                     <th class="table-head" id="Producto-Titulo-TipoProducto">T.Producto</th>
+                    <!--------------------------------------------- 
+                    <th class="table-head" id="Producto-Titulo-MedidaMinima">Medida Minima</th>
+                    <th class="table-head" id="Producto-Titulo-Medida">Medida</th>
+<!--------------------------------------------- -->
                     <th class="table-head" id="Producto-Titulo-Precio">$</th>
                     <th class="table-head" id="Producto-Titulo-Cargar">Cargar</th>
                 </tr>    
@@ -79,6 +82,10 @@
                 <td id="Producto-Nombre">{{producto.getNombre}}</td>
                 <td id="Producto-Descripcion">{{producto.getDescripcion}}</td>
                 <td id="Producto-TipoProducto">{{producto.getTipoProducto}}</td>
+                <!--------------------------------------------
+            <td id="Producto-Minima">{{producto.obtenerEstrategiaDeVenta.getMinimo}}</td>
+            <td id="Producto-Medida">{{producto.obtenerEstrategiaDeVenta.getMedida}}</td>
+<!--------------------------------------------- -->
                 <td id="Producto-Precio">{{producto.getPrecio}}</td>
                 <td id="Producto-Cargar"><button onClick="popPropio('{{producto.pk}}','{{producto.getNombre}}','{{producto.getDescripcion}}','{{producto.getTipoProducto}}','{{producto.getPrecio}}')" class="btn btn-success" data-toggle="modal">
                     <i class="icon-plus icon-white"></i>

@@ -8,7 +8,9 @@
 {% endblock %}
 
 {% block mensaje %}
-<button onClick="imprimirPDF()" class="btn btn-success" data-toggle="modal"><i class="icon-print icon-white"></i> Imprimir PDF </button></td>
+<button onClick="imprimirPDF()" class="btn btn-success" data-toggle="modal"><i class="icon-print icon-white"></i> Imprimir PDF 
+<script type="text/javascript">limpiarCampo();</script>
+</button></td>
 
 {% endblock %}
 
@@ -25,7 +27,10 @@
                     <th class="table-head" id="Producto-Titulo-Nombre">Producto</th>
                     <th class="table-head" id="Producto-Titulo-Descripcion">Descripci&oacuten</th>
                     <th class="table-head" id="Producto-Titulo-TipoProducto">T.Producto</th>
-                    <!--<th class="table-head" id="CargaStock-Categoria">Categoria</th>-->
+<!--------------------------------------------- 
+                    <th class="table-head" id="Producto-Titulo-MedidaMinima">Medida Minima</th>
+                    <th class="table-head" id="Producto-Titulo-Medida">Medida</th>
+<!--------------------------------------------- -->
                     <th class="table-head" id="Producto-Titulo-Cantidad">Cant.</th>
                     <th class="table-head" id="Producto-Titulo-Precio">$</th>
                 </tr>    
@@ -44,7 +49,10 @@
             <td id="Producto-Nombre">{{producto.getNombre}}</td>
             <td id="Producto-Descripcion">{{producto.getDescripcion}}</td>
             <td id="Producto-TipoProducto">{{producto.getTipoProducto}}</td>
-            <!-- <td id="Producto-Categoria">como se vende</td> -->
+<!--------------------------------------------
+            <td id="Producto-Minima">{{producto.obtenerEstrategiaDeVenta.getMinimo}}</td>
+            <td id="Producto-Medida">{{producto.obtenerEstrategiaDeVenta.getMedida}}</td>
+<!--------------------------------------------- -->
             <td id="Producto-Cantidad">{{producto.getCantidad}}</td>
             <td id="Producto-Precio">{{producto.getPrecio}}</td>
         </tr>

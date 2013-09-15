@@ -1,4 +1,16 @@
     
+    function verificarCarga(){
+        var div = document.getElementById("mensaje")
+        var mensaje=div.innerHTML;
+        if(mensaje != ""){
+          setTimeout("location.href=location.href",2000);
+  }
+}
+
+  function limpiarCampo(){
+        var filtro = document.getElementById("filtro").innerHTML = "";
+  }
+
     function bajaDeposito(pk){
            $.get ("/bajaDeposito",{ pkDeposito: pk },function(estado){
                var div = document.getElementById("mensajes")
@@ -13,10 +25,8 @@
     
     function imprimirPDF(){
       var filtro = document.getElementById("filtro").value;
-       
-      
       ventana = window.open("/listarDepositoPDF/?filtro="+filtro, this.target, 'width=600,hei ght=400,top=100px,left=100px');
-      
+      location.href=location.href;
     }
     
     function validarTelefono(campo) {
@@ -94,7 +104,7 @@ function buscar(texto,idTabla){
           if(rta != -1){
                 elemento.style.display='';
             }
-          aComparar2 = (elemento.cells[1].textContent).toUpperCase();
+          aComparar2 = (elemento.cells[2].textContent).toUpperCase();
           rtaTel= aComparar2.indexOf(txt);
           if(rtaTel != -1){
             elemento.style.display='';

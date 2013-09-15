@@ -187,13 +187,13 @@ class EstrategiaVenta(models.Model):
         try:
             return self.fraccionable.getMedida()
         except ObjectDoesNotExist as ex:
-            return 0
+            return '-'
 
     def getMinimo(self):
         try:
             return self.fraccionable.getMinimo()
         except ObjectDoesNotExist as ex:
-            return 0
+            return '-'
 
     def stocksAfectados (self, producto, cantidad):
         listaStocks = []

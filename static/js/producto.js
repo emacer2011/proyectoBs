@@ -11,9 +11,23 @@
 
 
 
+    function verificarCarga(){
+        var div = document.getElementById("mensaje")
+        var mensaje=div.innerHTML;
+        if(mensaje != ""){
+          setTimeout("location.href=location.href",2000);
+  }
+}
+
+    function limpiarCampo(){
+        var filtro = document.getElementById("filtro").innerHTML = "";
+    }
+
+
      function imprimirPDF(){
       var filtro = document.getElementById("filtro").value;
       ventana = window.open("/listarProductoPDF/?filtro="+filtro, this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
       
     }
 
@@ -31,9 +45,9 @@
     }
     
     function validarDescripcion(campo) {
-        var RegExPattern = /^\w*$/;
+     
         var errorMessage = 'Descripcion invalida';
-        if (campo.value.match(RegExPattern)){
+        if (campo.value.length <= 20){
             return true;
         } else {
             alert(errorMessage);
@@ -42,9 +56,29 @@
         } 
     }
 
+    
+   function valoresConComa(medida){
+    var coma = ',';
+    var punto = '.';
+    var cadena = "";
+    for (var i = 0; i < medida.length; i++) {
+        
+        if (medida[i] == coma){
+            cadena = cadena+punto;
+        }else{
+            cadena= cadena+medida[i];
+        }
+    }
+    return cadena;
+}
+
+
+
     function validarPrecio(campo){
         var valor = campo.value;
-        var entero = parseFloat(valor)
+        valor = valoresConComa(valor);
+        campo.value= valor;
+        var entero = parseFloat(valor);
         if (entero != "" && !isNaN(entero)){
                 if (entero>0){
                     return true;
@@ -53,6 +87,9 @@
         alert("Error en el Precio");
         return false; 
     }
+
+ 
+
 
     function validaProducto(producto)
 		{
@@ -63,6 +100,7 @@
       if(!validarPrecio(document.getElementById('precioProducto'))){
 				return false;
 			}	
+
       if ((document.getElementById("fraccionable").checked)){
         if (!validarDatosFraccionables()) {
           return false;

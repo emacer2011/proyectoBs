@@ -7,6 +7,15 @@ function cargar(){
     }
 }
 
+   function verificarCarga(){
+        var div = document.getElementById("mensaje")
+        var mensaje=div.innerHTML;
+        if(mensaje != ""){
+          setTimeout("location.href=location.href",2000);
+  }
+}
+
+
 function enviar() {
     var producto;
     var productos =document.getElementById("productos");

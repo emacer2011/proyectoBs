@@ -6,9 +6,8 @@
 {% endblock %}
 
 {% block mensaje %}
-    <div class="{{estado}}" id="mensajes">
-        {{mensaje}}
-    </div>
+<div id="mensaje" class="{{estado}}">{{mensaje}}</div>
+    <script type="text/javascript">verificarCarga();</script>
 {% endblock %}
 
 

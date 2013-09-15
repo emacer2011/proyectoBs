@@ -10,7 +10,7 @@
 
 {% block mensaje %}
 <button onClick="imprimirPDF()" class="btn btn-success" data-toggle="modal"><i class="icon-print icon-white"></i> Imprimir PDF </button></td>
-
+<script type="text/javascript">limpiarCampo();</script>
 {% endblock %}
 
 {% block contenedor %}
@@ -40,7 +40,7 @@
                 <td id="Deposito-Direccion">{{deposito.getDireccion}}</td>
                 <td id="Deposito-Rubro">{{deposito.getRubro}}</td>
                 <td id="Deposito-Telefono">{{deposito.getTelefono}}</td>
-                <td id="Deposito-Pk">{{deposito.pk}}</td>
+                <td style="display:none" id="Deposito-Pk">{{deposito.pk}}</td>
             </tr>
         {% endfor %}
     </tbody>

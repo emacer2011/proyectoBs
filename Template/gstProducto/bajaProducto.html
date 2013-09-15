@@ -29,6 +29,11 @@
                     <th class="table-head" id="Producto-Titulo-Descripcion">Descripci&oacuten</th>
                     <th class="table-head" id="Producto-Titulo-TipoProducto">T.Producto</th>
                     <th class="table-head" id="Producto-Titulo-Cantidad">Cant.</th>
+                    <!--
+                    <th class="table-head" id="Producto-Titulo-MedidaMinima">Medida Minima</th>
+                    <th class="table-head" id="Producto-Titulo-Medida">Medida</th>-->
+
+
                     <th class="table-head" id="Producto-Titulo-Precio">$</th>
                     <th class="table-head" id="Producto-Titulo-Cargar">Eliminar</th>
                 </tr>    
@@ -47,7 +52,10 @@
             <td id="Producto-Nombre">{{producto.getNombre}}</td>
             <td id="Producto-Descripcion">{{producto.getDescripcion}}</td>
             <td id="Producto-TipoProducto">{{producto.getTipoProducto}}</td>
-            <!-- <td id="Producto-Categoria">como se vende</td> -->
+            <!---------------------------------------------
+            <td id="Producto-Minima">{{producto.obtenerEstrategiaDeVenta.getMinimo}}</td>
+            <td id="Producto-Medida">{{producto.obtenerEstrategiaDeVenta.getMedida}}</td>
+            <!--------------------------------------------- -->
             <td id="Producto-Cantidad">{{producto.getCantidad}}</td>
             <td id="Producto-Precio">{{producto.getPrecio}}</td>
             <td id="Producto-Cargar"> <button class="btn btn-danger" onClick="bajaProducto('{{producto.pk}}')" type="submit"> <i class="icon-trash icon-white"></i> Eliminar </button> 
