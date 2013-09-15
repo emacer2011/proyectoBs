@@ -539,8 +539,6 @@ class Fraccionable(EstrategiaVenta):
             for stock in stocks:
                 stockNuevo = Stock()
                 stockNuevo.setReservadoNoconfirmados(depositosAfectados[stock][0])
-                import pdb
-                pdb.set_trace()
                 stockNuevo.setReservadoConfirmados(0)
                 stockNuevo.setDisponibles(0)
                 stockNuevo.setDeposito(stock.getDeposito())
