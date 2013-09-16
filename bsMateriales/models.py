@@ -452,6 +452,9 @@ class Fraccionable(EstrategiaVenta):
                     """
                     VERIFICO SI EL PRODUCTO EXISTENTE TIENE STOCK EN EL MISMO DEPOSITO
                     """
+                    import pdb
+                    pdb.set_trace()
+                    
                     qs1 = Stock.objects.filter(deposito = stock.getDeposito(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=medidaNueva)
                     if (qs1.count() != 0):
                         stockExistente = qs1[0]
