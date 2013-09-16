@@ -127,7 +127,7 @@
         <div id="divDescripcionDescuento" class="modal-footerDescuento" style="display:none">
             <div style="float:left">
                 <div style="float:auto">
-                    <select id="motivoDescuento" name="motivoDescuento">
+                    <select id="motivoDescuento" name="motivoDescuento" onchange="ocultarBeneficiario();">
                         <option value="Averia">Averia</option>
                         <option value="Extravio">Extravio</option>
                         <option value="Robo">Robo</option>
@@ -150,10 +150,10 @@
 
                 <div class="control-group">
                     <div>
-                        <label for="beneficiarioDescuento" > Beneficiario </label>
+                        <label id="labelBeneficionario" style="display:none" for="beneficiarioDescuento" > Beneficiario </label>
                     </div>
                     <div>
-                        <input id="beneficiarioDescuento" name="beneficiarioDescuento" type="text"></input>
+                        <input id="beneficiarioDescuento" style="display:none" name="beneficiarioDescuento" type="text"></input>
                     </div>
 
                 </div>

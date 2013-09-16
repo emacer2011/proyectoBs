@@ -79,6 +79,7 @@ function mostrarDetalles(fila){
   }else{
     div.style.display = "none";
   }
+  ocultarBeneficiario()
 }
 
 
@@ -150,12 +151,58 @@ function buscar(texto,idTabla){
       }
 }
 
+function validarCantidadDescuento(){
+  
+  cantidad = document.getElementById("cantidadDescuento").value;
+    //elemento = document.getElementById('s'+String(pk));
+   if(parseInt(cantidad) > 0){ //&& parseInt(elemento.cells[2].innerHTML) >= parseInt(cantidad)){
+      return true;
+    }
+    alert("Cantidad a descontar incorrecta");
+    return false;
+
+}
+
+function ocultarBeneficiario(){
+  motivoObj=document.getElementById("motivoDescuento");
+  motivo = motivoObj.value;
+  beneficiario = document.getElementById("beneficiarioDescuento");
+  beneficiarioLabel = document.getElementById("labelBeneficionario");
+  if (motivo == "Donacion") {
+      beneficiario.style.display='';
+      beneficiarioLabel.style.display='';
+  }  
+  else{beneficiario.style.display='none';
+  beneficiarioLabel.style.display='none';}
+}
+
+function validarBeneficiario(){
+
+  motivo = document.getElementById("motivoDescuento").value;
+  if (motivo == "Donacion") {
+    beneficiario = document.getElementById("beneficiarioDescuento").value;
+    if (beneficiario=="") {
+        alert("Si el motivo es 'Donacion' el beneficiario no puede ser vacio");
+        return false;
+    }
+  }
+  return true;
+
+}
+
 function verificarEnvio(){
   div = document.getElementById("divDescripcionDescuento");
   if(div.style.display == "none"){
     volver2();
     return false;
   }
+  if (!validarCantidadDescuento()) {
+      return false;
+
+  };
+  if (!validarBeneficiario()) {
+      return false;
+  };
   return true;
 
 }
