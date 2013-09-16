@@ -38,7 +38,7 @@ function enviar() {
     var elArray = new Array();
     for (var i=0; i < tabla.rows.length; i++) {
         producto = tabla.rows[i];
-        productos.value = productos.value + producto.cells[4].innerHTML + "=" + producto.cells[2].innerHTML + "=" + producto.cells[5].innerHTML + ","
+        productos.value = productos.value + producto.cells[4].innerHTML + "=" + producto.cells[3].innerHTML + "=" + producto.cells[2].innerHTML + ","
     }
     productos.value = productos.value.substring(0, productos.value.length-1);
 }
@@ -89,7 +89,7 @@ function cargarDatosProducto(nombre, cantidad, precio, pk){
 
 
 function devolverProducto(fila) {
-    if (fila.cells[5].innerHTML == "-") {
+    if (fila.cells[2].innerHTML == "-") {
         retorno =  devolverProductoNoFraccionables(fila);
 
     }else{
@@ -101,7 +101,7 @@ function devolverProducto(fila) {
 
 
 function devolverProductoNoFraccionables(fila) {
-    var cantidad= parseInt(fila.cells[2].innerHTML);
+    var cantidad= parseInt(fila.cells[3].innerHTML);
     var celda = document.getElementById(fila.cells[4].innerHTML);
     var cantidadDevuelta = prompt('Cantidad a Devolver:',cantidad);
     cantidadDevuelta = parseInt(cantidadDevuelta);
@@ -109,9 +109,9 @@ function devolverProductoNoFraccionables(fila) {
         alert('No se Devuelven Productos');
         return false;}
     celda.innerHTML = parseInt(cantidadDevuelta) + parseInt(celda.innerHTML);
-    fila.cells[2].innerHTML = parseInt(fila.cells[2].innerHTML) - parseInt(cantidadDevuelta);
-    fila.cells[6].innerHTML = (parseFloat(fila.cells[3].innerHTML) *parseInt(fila.cells[2].innerHTML).toFixed(2));
-    if(parseInt(fila.cells[2].innerHTML) == 0){ 
+    fila.cells[3].innerHTML = parseInt(fila.cells[3].innerHTML) - parseInt(cantidadDevuelta);
+    fila.cells[6].innerHTML = (parseFloat(fila.cells[3].innerHTML) *parseInt(fila.cells[5].innerHTML).toFixed(2));
+    if(parseInt(fila.cells[3].innerHTML) == 0){ 
         fila.parentNode.deleteRow(fila.rowIndex);
     }
 }
@@ -121,19 +121,19 @@ function devolverProductoNoFraccionables(fila) {
 // 4 = Pk; 5 = medida; 6 = Total; 7 = Stock Afectado
 
 function devolverProductoFraccionables(fila) {
-    var cantidad= parseInt(fila.cells[2].innerHTML);
+    var cantidad= parseInt(fila.cells[3].innerHTML);
     var productoOriginal = document.getElementById("p"+fila.cells[4].innerHTML);
     var cantidadDevuelta = prompt('Cantidad a Devolver:',cantidad);
     cantidadDevuelta = parseInt(cantidadDevuelta);
     if((isNaN(cantidadDevuelta)) || (cantidadDevuelta < 1) || (cantidadDevuelta > cantidad)){
         alert('No se Devuelven Productos');
         return false;}
-    var stock = parseInt(productoOriginal.cells[2].innerHTML) + parseInt(fila.cells[7].innerHTML);
+    var stock = parseInt(productoOriginal.cells[3].innerHTML) + parseInt(fila.cells[7].innerHTML);
     var medida = parseFloat(productoOriginal.cells[6].innerHTML);
     var medidaMinima = parseFloat(productoOriginal.cells[7].innerHTML);
-    var unidades = parseInt(fila.cells[2].innerHTML) - parseInt(cantidadDevuelta);
+    var unidades = parseInt(fila.cells[3].innerHTML) - parseInt(cantidadDevuelta);
     if (unidades == 0) {
-        productoOriginal.cells[2].innerHTML = stock;    
+        productoOriginal.cells[3].innerHTML = stock;    
         fila.parentNode.deleteRow(fila.rowIndex);
         return true;
     };
@@ -242,19 +242,25 @@ function agregarProductoFraccionable(fila){
             var indice = tabla.rows.length;
             var nuevaFila = tabla.insertRow(indice);
             var celda = nuevaFila.insertCell(0);
-            celda.innerHTML = fila.cells[0].innerHTML;  
+            celda.innerHTML = fila.cells[0].innerHTML;
+            celda.id = "ventaProducto-Nombre3";
             celda = nuevaFila.insertCell(1);
             celda.innerHTML = fila.cells[1].innerHTML;
+            celda.id = "ventaProducto-Descripcion3";
             celda = nuevaFila.insertCell(2);
-            celda.innerHTML = unidades;
-            fila.cells[2].innerHTML = parseInt(fila.cells[3].innerHTML) - stockARestar;
+            celda.innerHTML = cantidadComprada;
+            fila.cells[3].innerHTML = parseInt(fila.cells[3].innerHTML) - stockARestar;
+            celda.id = "ventaProducto-Medida3";
             celda = nuevaFila.insertCell(3);
-            celda.innerHTML = fila.cells[4].innerHTML;
+//            celda.innerHTML = fila.cells[4].innerHTML;
+            celda.innerHTML = unidades;
+            celda.id = "ventaProducto-Cantidad3";
             celda = nuevaFila.insertCell(4);
             celda.innerHTML = pk;
             celda.style.display="none";
             celda = nuevaFila.insertCell(5);
-            celda.innerHTML = cantidadComprada;
+            celda.innerHTML = fila.cells[4].innerHTML;
+            celda.id = "ventaProducto-Precio3";
             celda = nuevaFila.insertCell(6);
             celda.innerHTML = ((cantidadComprada * parseFloat(fila.cells[4].innerHTML))*unidades).toFixed(2);
             nuevaFila.id=-parseInt(pk);
@@ -305,25 +311,29 @@ function verificarMedida(medidaMinima, medidaMaxima, medidaSolicitada){
         var indice = tabla.rows.length;
         var nuevaFila = tabla.insertRow(indice);
         var celda = nuevaFila.insertCell(0);
+        celda.id="8";
+//        celda.setAttribute("width","30");
         celda.innerHTML = fila.cells[0].innerHTML;
         celda = nuevaFila.insertCell(1);
+        celda.style.width="15";
         celda.innerHTML = fila.cells[1].innerHTML;
         celda = nuevaFila.insertCell(2);
-        celda.innerHTML = cantidadComprada;
+        celda.innerHTML = fila.cells[3].innerHTML;
+//        celda.innerHTML = cantidadComprada;
         fila.cells[2].innerHTML = cantidad-cantidadComprada;
         celda = nuevaFila.insertCell(3);
-        celda.innerHTML = fila.cells[3].innerHTML;
+        celda.innerHTML = cantidadComprada;
+//        celda.innerHTML = fila.cells[3].innerHTML;
         celda = nuevaFila.insertCell(4);
         celda.innerHTML = pk;
         celda.style.display="none";
-        //celda = nuevaFila.insertCell(5);
         celda = document.createElement("td");
         celda.innerHTML = '-';
-        celda.setAttribute("width","30%");
         celda = nuevaFila.insertCell(6);
         celda.innerHTML = (cantidadComprada * parseFloat(fila.cells[3].innerHTML)).toFixed(2);
         nuevaFila.id=-parseInt(pk);
         nuevaFila.onclick = function(){devolverProducto(nuevaFila)};
+        document.getElementById("8").setAttribute("width","30");
     }else{
         existente.cells[2].innerHTML = parseInt(existente.cells[2].innerHTML) + cantidadComprada;
         existente.cells[6].innerHTML = (parseInt(existente.cells[2].innerHTML) * parseInt(existente.cells[3].innerHTML).toFixed(2));
@@ -440,19 +450,24 @@ function verificarMedida(medidaMinima, medidaMaxima, medidaSolicitada){
         var indice = tabla.rows.length;
         var nuevaFila = tabla.insertRow(indice);
         var celda = nuevaFila.insertCell(0);
+        celda.id = "ventaProducto-Nombre3";
         celda.innerHTML = fila.cells[0].innerHTML;
         celda = nuevaFila.insertCell(1);
         celda.innerHTML = fila.cells[1].innerHTML;
+        celda.id = "ventaProducto-Descripcion3";
         celda = nuevaFila.insertCell(2);
-        celda.innerHTML = cantidadComprada;
-        fila.cells[2].innerHTML = cantidad-cantidadComprada;
+        celda.innerHTML = "-";
+        fila.cells[3].innerHTML = cantidad-cantidadComprada;
+        celda.id = "ventaProducto-Medida3";
         celda = nuevaFila.insertCell(3);
-        celda.innerHTML = fila.cells[4].innerHTML;
+        celda.innerHTML = cantidadComprada;
+        celda.id = "ventaProducto-Cantidad3";
         celda = nuevaFila.insertCell(4);
         celda.innerHTML = pk;
         celda.style.display="none";
         celda = nuevaFila.insertCell(5);
-        celda.innerHTML = '-';
+        celda.innerHTML = fila.cells[4].innerHTML;
+        celda.id = "ventaProducto-Precio3";
         celda = nuevaFila.insertCell(6);
         celda.innerHTML = (cantidadComprada * parseFloat(fila.cells[4].innerHTML)).toFixed(2);
         nuevaFila.id=-parseInt(pk);

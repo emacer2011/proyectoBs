@@ -419,14 +419,21 @@ form {
 #ventaProducto-Nombre2{
     width:18%;
 }
+#ventaProducto-Nombre3{
+    width:18%;
+}
 
 #ventaProducto-Descripcion{
     width:36%;
 }
 
 #ventaProducto-Descripcion2{
-    width:19%;
+    width:25%;
 }
+#ventaProducto-Descripcion3{
+    width:25%;
+}
+
 #ventaProducto-Medida{
     width:9%;
 }
@@ -434,14 +441,27 @@ form {
     width:20%;
 }
 #ventaProducto-Medida2{
+    width:10%;
+}
+#ventaProducto-Medida3{
+    width:10%;
+}
+
+#ventaProducto-Cantidad2{
     width:13%;
 }
-#ventaProducto-Cantidad2{
-    width:16%;
+#ventaProducto-Cantidad3{
+    width:13%;
 }
 
 #ventaProducto-Precio{
     width:20%;
+}
+#ventaProducto-Precio2{
+    width:15%;
+}
+#ventaProducto-Precio3{
+    width:15%;
 }
 
 #Deposito-Titulo-Rubro{
