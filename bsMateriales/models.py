@@ -445,6 +445,8 @@ class Fraccionable(EstrategiaVenta):
                 qs = Producto.objects.filter(nombre=producto.getNombre(),estrategiaVenta__fraccionable__medida=medidaNueva)
             else:
                 qs = Producto.objects.filter(nombre=producto.getNombre(),estrategiaVenta__nofraccionable__isnull=False)
+            import pdb
+            pdb.set_trace()
             if (qs.count() != 0):
                 productoExistente = qs[0]
                 stocks = depositosAfectados.keys()
@@ -452,7 +454,8 @@ class Fraccionable(EstrategiaVenta):
                     """
                     VERIFICO SI EL PRODUCTO EXISTENTE TIENE STOCK EN EL MISMO DEPOSITO
                     """
-                    qs1 = Stock.objects.filter(deposito = stock.getDeposito(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=medidaNueva)
+                    qs1 = Stock.objects.filter(deposito__direccion = stock.getDeposito().getDireccion(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=medidaNueva)
+                    pdb.set_trace()
                     if (qs1.count() != 0):
                         stockExistente = qs1[0]
                         stockExistente.setDisponibles(stockExistente.getDisponibles() + cantidadProductos)
@@ -510,7 +513,7 @@ class Fraccionable(EstrategiaVenta):
                 """
                 VERIFICO SI EL PRODUCTO EXISTENTE TIENE STOCK EN EL MISMO DEPOSITO
                 """
-                qs1 = Stock.objects.filter(deposito = stock.getDeposito(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=fraccion)
+                qs1 = Stock.objects.filter(deposito__direccion = stock.getDeposito().getDireccion(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=fraccion)
                 if (qs1.count() != 0):
                     stockExistente = qs1[0]
                     stockExistente.setReservadoNoconfirmados(stockExistente.getReservadoNoconfirmados() + depositosAfectados[stock][0])
