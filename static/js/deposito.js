@@ -122,3 +122,24 @@ function buscar(texto,idTabla){
                 elemento.style.display='';
 }
       }
+
+
+function ayudaAltaPDF(){
+      ventana = window.open("/ayudaAltaDeposito", this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
+}
+
+function ayudaBajaPDF(){
+      ventana = window.open("/ayudaBajaDeposito", this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
+}
+
+function ayudaModificarPDF(){
+      ventana = window.open("/ayudaModificarDeposito", this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
+}
+
+function ayudaListarPDF(){
+      ventana = window.open("/ayudaListarDepositos", this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
+}

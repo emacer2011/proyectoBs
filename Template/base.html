@@ -5,7 +5,19 @@
          <link rel="stylesheet" href="{{STATIC_URL}}css/estilosPrincipal.css" type="text/css">
          <script language="javascript" type="text/javascript" src="/static/js/jquery.js"></script>
          <script language="javascript" type="text/javascript" src="{{STATIC_URL}}bootstrap/js/bootstrap.js"></script>
-         <script language="javascript" type="text/javascript" src="{{STATIC_URL}}bootstrap/js/bootstrap.min.js"></script>
+         <script language="javascript" type="text/javascript" src="{{STATIC_URL}}bootstrap/js/bootstrap.min.js">
+         </script>
+         <script type="text/javascript">
+         function capturarf1(e){
+            var code = (e.keyCode ? e.keyCode : e.which);
+                if(code == 112) {
+                    {% block ayuda %}
+                        ayudaPDF()
+                    {% endblock %}
+                }
+         }
+         document.onkeydown=capturarf1;
+         </script>
 </head>
 <body id="Cuerpo"> 
     

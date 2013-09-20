@@ -100,3 +100,8 @@ function buscar(texto,idTabla){
                 elemento.style.display='';
       }
 }
+
+function ayudaPDF(){
+      ventana = window.open("/ayudaEntregaMateriales", this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
+}
