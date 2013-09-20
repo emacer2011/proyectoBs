@@ -406,9 +406,9 @@ class Fraccionable(EstrategiaVenta):
                 if (stock.disponibles >= cantidad):
                     stock.disponibles -= cantidad
                     stock.save()
-                    try:
+                    if depositosAfectados.has_key(stock):
                         depositosAfectados[stock] += (cantidad * cantidadXunidad,None)
-                    except KeyError as ex:
+                    else:
                         depositosAfectados[stock] = (cantidad * cantidadXunidad, None)
                     cantidad = 0
                 else:
@@ -416,9 +416,9 @@ class Fraccionable(EstrategiaVenta):
                     cantidadTemporal = stock.disponibles
                     stock.disponibles = 0
                     stock.save()
-                    try:
+                    if depositosAfectados.has_key(stock):
                         depositosAfectados[stock] += (cantidadTemporal * cantidadXunidad,None)
-                    except KeyError as ex:
+                    else:
                         depositosAfectados[stock] = (cantidadTemporal * cantidadXunidad,None)
             else:
                 break
@@ -441,25 +441,23 @@ class Fraccionable(EstrategiaVenta):
             """
             CONSULTA PARA BUSCAR SI YA EXISTE EL NUEVO PRODUCTO
             """
+
             if (isinstance(estrategia,Fraccionable)):
                 qs = Producto.objects.filter(nombre=producto.getNombre(),estrategiaVenta__fraccionable__medida=medidaNueva)
             else:
                 qs = Producto.objects.filter(nombre=producto.getNombre(),estrategiaVenta__nofraccionable__isnull=False)
-            import pdb
-            pdb.set_trace()
+          
             if (qs.count() != 0):
                 productoExistente = qs[0]
                 stocks = depositosAfectados.keys()
                 for stock in stocks:
                     """
                     VERIFICO SI EL PRODUCTO EXISTENTE TIENE STOCK EN EL MISMO DEPOSITO
-                    """
-
-                    qs1 = Stock.objects.filter(deposito__direccion = stock.getDeposito().getDireccion(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=medidaNueva)
-                    pdb.set_trace()                    
-                    qs1 = Stock.objects.filter(deposito = stock.getDeposito(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=medidaNueva)
+                    qs1 = Stock.objects.filter(deposito__direccion = stock.getDeposito().getDireccion(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=medidaNueva)                    """
+                 #   qs1 = Stock.objects.filter(deposito__direccion = stock.getDeposito().getDireccion(),producto__nombre=productoExistente.getNombre(),producto__estrategiaVenta__fraccionable__medida=medidaNueva)
+                    qs1 = Stock.objects.filter(deposito= stock.getDeposito(),producto=productoExistente)
                     if (qs1.count() != 0):
-                        stockExistente = qs1[0]
+                        stockExistente = qs1[0] # no estara generando uno nuevo aca =
                         stockExistente.setDisponibles(stockExistente.getDisponibles() + cantidadProductos)
                         stockExistente.save()
                     else:
@@ -470,6 +468,7 @@ class Fraccionable(EstrategiaVenta):
                         stockNuevo.setDeposito(stock.getDeposito())
                         stockNuevo.setProducto(productoExistente)
                         stockNuevo.save()    
+                
                 productoExistente.setCantidad(productoExistente.getCantidad() + cantidadProductos)
                 productoExistente.save()
             else:
@@ -515,7 +514,8 @@ class Fraccionable(EstrategiaVenta):
                 """
                 VERIFICO SI EL PRODUCTO EXISTENTE TIENE STOCK EN EL MISMO DEPOSITO
                 """
-                qs1 = Stock.objects.filter(deposito__direccion = stock.getDeposito().getDireccion(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=fraccion)
+                #qs1 = Stock.objects.filter(deposito__direccion = stock.getDeposito().getDireccion(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=fraccion)
+                qs1 = Stock.objects.filter(deposito = stock.getDeposito(),producto=productoExistente)
                 if (qs1.count() != 0):
                     stockExistente = qs1[0]
                     stockExistente.setReservadoNoconfirmados(stockExistente.getReservadoNoconfirmados() + depositosAfectados[stock][0])

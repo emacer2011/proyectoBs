@@ -17,6 +17,33 @@ import relatorio
 import subprocess
 from utiles import AdaptadorFactura
 
+
+
+def listadoProductoEstadistico(request):
+    
+
+    detallesFacturas = DetalleFactura.objects.all()
+    
+    af = AdaptadorFactura()
+    af.setDetalles(detallesFacturas)
+
+    repos = relatorio.ReportRepository()
+    basic = Template(source="", filepath=TEMPLATE_DIRS+'/estadisticaBase.ods')
+    file(TEMPLATE_DIRS+'/estadistica.ods', 'wb').write(basic.generate(detalles=af.detalles).render().getvalue())        
+    
+    return HttpResponseRedirect("/")    
+
+
+
+
+
+
+
+
+
+
+
+
 @user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
 @user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')

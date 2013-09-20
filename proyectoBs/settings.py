@@ -10,7 +10,7 @@ ADMINS = (
 import os
 MANAGERS = ADMINS
 
-from local_settings import DATABASES
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -121,6 +121,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bsMateriales',
+    'webodt',
    #'bsMateriales.dajax',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
@@ -162,3 +163,8 @@ LOGGING = {
         },
     }
 }
+
+try:
+    from local_settings import DATABASES
+except ImportError:
+    pass
