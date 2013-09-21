@@ -155,6 +155,7 @@ class TipoProducto(models.Model):
 ESTRATEGIA_NOFRACCIONABLE = 0
 
 class EstrategiaVenta(models.Model):
+    medida = models.FloatField(default=0.0) # TODO: medidas a float
 
     def vender(self, producto, cantidad, fraccion = None):
         try:
@@ -178,7 +179,7 @@ class EstrategiaVenta(models.Model):
 
     def setMinimo(self,minimo):
         try:
-            self.nofraccionable.setMinimo(minimo)
+            self.nofraccionable.setMinimo(minimo)#TODO: revisar!
         except ObjectDoesNotExist as ex:
             pass
 
@@ -187,7 +188,8 @@ class EstrategiaVenta(models.Model):
         try:
             return self.fraccionable.getMedida()
         except ObjectDoesNotExist as ex:
-            return '-'
+            medida = self.nofraccionable.getMedida()
+            return medida
 
     def getMinimo(self):
         try:
@@ -324,6 +326,18 @@ class NoFraccionable(EstrategiaVenta):
     def instance(cls):
         return NoFraccionable.objects.get(pk = ESTRATEGIA_NOFRACCIONABLE)    
 
+
+    def setMedida(self,medida):
+        if medida > 0:
+            self.medida = medida
+        else:
+            raise ErrorProducto()
+
+    def getMedida(self):
+        if  self.medida == 0.0:
+            return '-'
+        return self.medida
+
     def vender(self, producto, cantidad, fraccion = None):
 
         cantidad = int(cantidad)
@@ -359,7 +373,6 @@ class NoFraccionable(EstrategiaVenta):
 # =================
 
 class Fraccionable(EstrategiaVenta):
-    medida = models.FloatField() # TODO: medidas a float
     minimo = models.FloatField()
 
 
@@ -369,15 +382,14 @@ class Fraccionable(EstrategiaVenta):
         else:
             raise ErrorProducto()
 
+    def getMedida(self):
+        return self.medida
+
     def setMinimo(self,minimo):
         if minimo > 0:
             self.minimo = minimo
         else:
             raise ErrorProducto()
-
-
-    def getMedida(self):
-        return self.medida
 
     def getMinimo(self):
         return self.minimo
@@ -437,7 +449,9 @@ class Fraccionable(EstrategiaVenta):
                 estrategia.setMinimo(self.getMinimo())
                 estrategia.save()
             else:
-                estrategia = EstrategiaVenta.objects.get(pk = 0)
+                estrategia = NoFraccionable()
+                estrategia.setMedida(medidaNueva)
+                estrategia.save()
             """
             CONSULTA PARA BUSCAR SI YA EXISTE EL NUEVO PRODUCTO
             """
@@ -499,7 +513,9 @@ class Fraccionable(EstrategiaVenta):
             estrategia.setMinimo(self.getMinimo())
             estrategia.save()
         else:
-            estrategia = EstrategiaVenta.objects.get(pk = 0)
+            estrategia = NoFraccionable()
+            estrategia.setMedida(fraccion)
+            estrategia.save()
         """
         CONSULTA PARA BUSCAR SI YA EXISTE EL PRODUCTO QUE SE GENERO AL VENDER
         """
