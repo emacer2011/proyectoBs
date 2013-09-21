@@ -205,28 +205,22 @@ function validarDatosFraccionables(){
 }
 
 
+function ayudaAltaPDF(){
+      ventana = window.open("/ayudaAltaProducto", this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
+}
 
+function ayudaBajaPDF(){
+      ventana = window.open("/ayudaBajaProducto", this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
+}
 
+function ayudaModificarPDF(){
+      ventana = window.open("/ayudaModificarProducto", this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function ayudaListarPDF(){
+      ventana = window.open("/ayudaListarProducto", this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
+}

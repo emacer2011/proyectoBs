@@ -480,3 +480,8 @@ function verificarMedida(medidaMinima, medidaMaxima, medidaSolicitada){
         fila.cells[3].innerHTML = cantidad-cantidadComprada;
      }
 }
+
+function ayudaPDF(){
+      ventana = window.open("/ayudaVenta", this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
+}

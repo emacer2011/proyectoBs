@@ -34,7 +34,7 @@ function cerrar(){
             debugger;
     for(i=1; i < filas.length; i++){
         filaActual = filas[i];
-        check = filaActual.cells[3].children[0];
+        check = filaActual.cells[4].children[0];
         if((check.checked) && !(check.hasAttribute("disabled"))){
             cargarEntregados(filaActual.cells[0].innerHTML);
         }
@@ -99,4 +99,9 @@ function buscar(texto,idTabla){
                 elemento = filas[i];
                 elemento.style.display='';
       }
+}
+
+function ayudaPDF(){
+      ventana = window.open("/ayudaEntregaMateriales", this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      location.href=location.href;
 }
