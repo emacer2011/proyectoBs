@@ -26,7 +26,9 @@
 
      function imprimirPDF(){
       var filtro = document.getElementById("filtro").value;
-      ventana = window.open("/listarProductoPDF/?filtro="+filtro, this.target, 'width=600,hei ght=400,top=100px,left=100px');
+      var selector = document.getElementById("depoPk");
+      selector = selector.options[selector.selectedIndex].value;
+      ventana = window.open("/listarProductoPDF/?filtro="+filtro+"&deposito="+selector, this.target, 'width=600,hei ght=400,top=100px,left=100px');
       location.href=location.href;
       
     }
@@ -223,4 +225,15 @@ function ayudaModificarPDF(){
 function ayudaListarPDF(){
       ventana = window.open("/ayudaListarProducto", this.target, 'width=600,hei ght=400,top=100px,left=100px');
       location.href=location.href;
+}
+
+
+
+function listarConDepo(valor){
+  var filtro = document.getElementById("filtro").value;
+  location.href = "/listarProducto/?filtro="+filtro+"&deposito="+valor;
+}
+
+function ValorSelect(valor){
+  document.getElementById("depositoMostrado").innerHTML = valor;
 }

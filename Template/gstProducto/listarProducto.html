@@ -23,17 +23,21 @@
     <div id="CabeceraLDTablas">
         <form class="navbar-search pull-left" style="padding-left:20px">
             <input id="filtro" type="text" class="search-query" style="height:27px" placeholder="Dirección o Telefono" onKeyUp='buscar(this.value,"tablaProducto");' ><br>
-        </form><br>
-        <table class="table table-striped" style="margin-top:20px">
+        </form>
+        <select style="margin-top:5px; margin-left:10px" onClick="listarConDepo(this.value)" value={{depo}}>
+            <option id="depoPk" value="ALL"> Mostrar Todos</option>
+            {% for deposito in depositos%}
+                <option value={{deposito.pk}}> {{deposito.direccion}}</option>
+            {% endfor %}
+        </select>
+        <div id="depositoListado">{{deposito}}</div>
+
+        <table class="table table-striped" style="margin-top:-5px">
             <thead>
                 <tr><th style="display:none" >pk</th>
                     <th class="table-head" id="Producto-Titulo-Nombre">Producto</th>
                     <th class="table-head" id="Producto-Titulo-Descripcion">Descripci&oacuten</th>
                     <th class="table-head" id="Producto-Titulo-TipoProducto">T.Producto</th>
-<!--------------------------------------------- 
-                    <th class="table-head" id="Producto-Titulo-MedidaMinima">Medida Minima</th>
-                    <th class="table-head" id="Producto-Titulo-Medida">Medida</th>
-<!--------------------------------------------- -->
                     <th class="table-head" id="Producto-Titulo-Cantidad">Cant.</th>
                     <th class="table-head" id="Producto-Titulo-Precio">$</th>
                 </tr>    
@@ -46,22 +50,19 @@
 <table id="tablaProducto" cellpadding="0" cellspacing="0" class="table table-striped">
     </thead>
     <tbody>
-        {% for producto in productos %}
+        {% for stock in stocks %}
 
         <tr>        
-            <td id="Producto-Nombre">{{producto.getNombre}}</td>
-            <td id="Producto-Descripcion">{{producto.getDescripcion}}</td>
-            <td id="Producto-TipoProducto">{{producto.getTipoProducto}}</td>
-<!--------------------------------------------
-            <td id="Producto-Minima">{{producto.obtenerEstrategiaDeVenta.getMinimo}}</td>
-            <td id="Producto-Medida">{{producto.obtenerEstrategiaDeVenta.getMedida}}</td>
-<!--------------------------------------------- -->
-            <td id="Producto-Cantidad">{{producto.getCantidad}}</td>
-            <td id="Producto-Precio">{{producto.getPrecio}}</td>
+            <td id="Producto-Nombre">{{stock.getProducto.getNombre}}</td>
+            <td id="Producto-Descripcion">{{stock.getProducto.getDescripcion}}</td>
+            <td id="Producto-TipoProducto">{{stock.getProducto.getTipoProducto}}</td>
+            <td id="Producto-Cantidad">{{stock.getDisponibles}}</td>
+            <td id="Producto-Precio">{{stock.getProducto.getPrecio}}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 </div>
+
 
 {% endblock %}

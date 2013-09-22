@@ -531,8 +531,19 @@ def modificarProducto(request):
 @login_required(login_url='/login')
 def listarProducto(request):
     """docstring for listarProducto"""
-    productos = Producto.objects.all()
-    return render_to_response('gstProducto/listarProducto.html',{'productos':productos},context_instance=RequestContext(request)) 
+    depositos = Deposito.objects.all()
+    depo = "Listando stock en Todos los Depositos"
+    try:
+        from django.db.models import Q
+        filtro = request.GET.get("filtro")
+        productos = Producto.objects.filter(Q(nombre__contains=filtro) | Q(descripcion__contains=filtro))
+        stocks = list(Stock.objects.filter(producto__icontains=productos,deposito=request.GET.get("deposito")))
+        depo = Deposito.objects.get(pk=request.GET.get("deposito"))
+    except ValueError:
+        stocks = Stock.objects.all()
+    #import pdb
+    #pdb.set_trace() 
+    return render_to_response('gstProducto/listarProducto.html',{'stocks':stocks, 'depositos':depositos, 'deposito':depo},context_instance=RequestContext(request)) 
 
 # ======================
 # = Entrega Materiales =
