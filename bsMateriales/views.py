@@ -15,6 +15,7 @@ import os
 from relatorio.templates.opendocument import Template
 import relatorio
 import subprocess
+from django.db.models import Q
 from utiles import AdaptadorFactura
 
 
@@ -102,28 +103,38 @@ def listarDepositoPDF(request):
 @login_required(login_url='/login')
 def listarProductoPDF(request):
     """docstring for listarProducto"""
-    listasProducto=[]
+    listasProducto = []
+    productos = []
+
+    depositos = Deposito.objects.all()
     filtro = request.GET.get("filtro")
-
+    filtroDeposito = request.GET.get("deposito")
+    filtroDeposito = Deposito.objects.get(pk=filtroDeposito)
     if filtro == "":
-        listasProducto = Producto.objects.all()
+        if filtroDeposito == "ALL":
+            stocks = Stock.objects.all()
+        else:
+            stocks = Stock.objects.filter(deposito=filtroDeposito)
     else:
-        listasProductoNom = list(Producto.objects.filter(nombre__contains=filtro))
-        listasProductoDes = list(Producto.objects.filter(descripcion__contains=filtro))
-        listasProducto = set(listasProductoNom + listasProductoDes)
-    productos= listasProducto
-
+        listasProducto = list(Producto.objects.filter(Q(nombre__contains=filtro) | Q(descripcion__contains=filtro)))
+        if filtroDeposito == "ALL":
+            stocks = Stock.objects.filter(producto__icontains=listasProducto)
+        else:
+            stocks = Stock.objects.filter(Q(producto__icontains=listasProducto) , Q(deposito=filtroDeposito))
+    
     repos = relatorio.ReportRepository()
-    basic = Template(source="", filepath=TEMPLATE_DIRS+'/gstProducto/listarProductoBase.odt')
+    import pdb
+    pdb.set_trace()
+    basic = Template(source="",filepath=TEMPLATE_DIRS+'/gstProducto/listarProductoBase.odt')
 
-    file(TEMPLATE_DIRS+'/gstProducto/listarProducto.odt', 'wb').write(basic.generate(productos=productos).render().getvalue())
+    file(TEMPLATE_DIRS+'/gstProducto/listarProducto.odt', 'wb').write(basic.generate(stocks=stocks).render().getvalue())
     #    p = subprocess.Popen('unoconv -f pdf '+TEMPLATE_DIRS+'/gstDeposito/listarDeposito.odt', shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
     os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/gstProducto/listarProducto.odt')
     with open(TEMPLATE_DIRS+'/gstProducto/listarProducto.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
-        return response
+    return response
 
 
 
@@ -534,15 +545,12 @@ def listarProducto(request):
     depositos = Deposito.objects.all()
     depo = "Listando stock en Todos los Depositos"
     try:
-        from django.db.models import Q
         filtro = request.GET.get("filtro")
         productos = Producto.objects.filter(Q(nombre__contains=filtro) | Q(descripcion__contains=filtro))
         stocks = list(Stock.objects.filter(producto__icontains=productos,deposito=request.GET.get("deposito")))
         depo = Deposito.objects.get(pk=request.GET.get("deposito"))
     except ValueError:
         stocks = Stock.objects.all()
-    #import pdb
-    #pdb.set_trace() 
     return render_to_response('gstProducto/listarProducto.html',{'stocks':stocks, 'depositos':depositos, 'deposito':depo},context_instance=RequestContext(request)) 
 
 # ======================

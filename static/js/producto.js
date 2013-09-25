@@ -27,7 +27,7 @@
      function imprimirPDF(){
       var filtro = document.getElementById("filtro").value;
       var selector = document.getElementById("depoPk");
-      selector = selector.options[selector.selectedIndex].value;
+      selector = selector.innerHTML;
       ventana = window.open("/listarProductoPDF/?filtro="+filtro+"&deposito="+selector, this.target, 'width=600,hei ght=400,top=100px,left=100px');
       location.href=location.href;
       
