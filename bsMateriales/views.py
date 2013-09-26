@@ -126,7 +126,11 @@ def listarProductoPDF(request):
     else:
         listasProducto = list(Producto.objects.filter(Q(nombre__contains=filtro) | Q(descripcion__contains=filtro)))
         if filtroDeposito == "ALL":
-            stocks = Stock.objects.filter(producto__icontains=listasProducto)
+            stocks = []
+            for producto in listasProducto:
+                listaStock=Stock.objects.filter(producto=producto)
+                stocks = stocks+list(listaStock)
+            #stocks = Stock.objects.filter(producto__icontains=listasProducto)
         else:
             stocks = []
             for producto in listasProducto:
