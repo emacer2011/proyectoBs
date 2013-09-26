@@ -21,7 +21,6 @@ from utiles import AdaptadorFactura
 
 
 def listadoProductoEstadistico(request):
-    
 
     detallesFacturas = DetalleFactura.objects.all()
     
@@ -129,7 +128,13 @@ def listarProductoPDF(request):
         if filtroDeposito == "ALL":
             stocks = Stock.objects.filter(producto__icontains=listasProducto)
         else:
-            stocks = Stock.objects.filter(Q(producto__icontains=listasProducto) , Q(deposito=filtroDeposito))
+            stocks = []
+            for producto in listasProducto:
+                try:
+                    stocks.append(Stock.objects.get(producto=producto, deposito=filtroDeposito))
+                except ObjectDoesNotExist:
+                    pass
+            #stocks = Stock.objects.filter(Q(producto__icontains=listasProducto) , Q(deposito=filtroDeposito))
     
     stocks = list(stocks)
     stocks.sort()
