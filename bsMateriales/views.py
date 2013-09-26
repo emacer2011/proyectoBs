@@ -32,7 +32,13 @@ def listadoProductoEstadistico(request):
     basic = Template(source="", filepath=TEMPLATE_DIRS+'/estadisticaBase.ods')
     file(TEMPLATE_DIRS+'/estadistica.ods', 'wb').write(basic.generate(detalles=af.detalles).render().getvalue())        
     
-    return HttpResponseRedirect("/")    
+    with open(TEMPLATE_DIRS+'/estadistica.ods', 'r') as odt:
+        response = HttpResponse(odt.read(), mimetype='application/vnd.oasis.opendocument.text')
+        response['Content-Disposition'] = 'inline;filename=some_file.ods'
+        odt.close()
+    return response
+    #return HttpResponseRedirect("/")
+
 
 
 @user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
@@ -109,7 +115,10 @@ def listarProductoPDF(request):
     depositos = Deposito.objects.all()
     filtro = request.GET.get("filtro")
     filtroDeposito = request.GET.get("deposito")
-    filtroDeposito = Deposito.objects.get(pk=filtroDeposito)
+    if filtroDeposito != "":
+        filtroDeposito = Deposito.objects.get(pk=filtroDeposito)
+    else:
+        filtroDeposito = "ALL"
     if filtro == "":
         if filtroDeposito == "ALL":
             stocks = Stock.objects.all()
@@ -122,9 +131,12 @@ def listarProductoPDF(request):
         else:
             stocks = Stock.objects.filter(Q(producto__icontains=listasProducto) , Q(deposito=filtroDeposito))
     
+    stocks = list(stocks)
+    stocks.sort()
+
+
     repos = relatorio.ReportRepository()
-    import pdb
-    pdb.set_trace()
+
     basic = Template(source="",filepath=TEMPLATE_DIRS+'/gstProducto/listarProductoBase.odt')
 
     file(TEMPLATE_DIRS+'/gstProducto/listarProducto.odt', 'wb').write(basic.generate(stocks=stocks).render().getvalue())
@@ -547,10 +559,19 @@ def listarProducto(request):
     try:
         filtro = request.GET.get("filtro")
         productos = Producto.objects.filter(Q(nombre__contains=filtro) | Q(descripcion__contains=filtro))
-        stocks = list(Stock.objects.filter(producto__icontains=productos,deposito=request.GET.get("deposito")))
+        
+        #stocks = list(Stock.objects.filter(producto__icontains=productos,deposito=request.GET.get("deposito")))
+        stocks = []
+        for producto in productos:
+            try:
+                stocks.append(Stock.objects.get(producto=producto, deposito=request.GET.get("deposito")))
+            except ObjectDoesNotExist:
+                pass
         depo = Deposito.objects.get(pk=request.GET.get("deposito"))
     except ValueError:
         stocks = Stock.objects.all()
+    stocks = list(stocks)
+    stocks.sort()
     return render_to_response('gstProducto/listarProducto.html',{'stocks':stocks, 'depositos':depositos, 'deposito':depo},context_instance=RequestContext(request)) 
 
 # ======================

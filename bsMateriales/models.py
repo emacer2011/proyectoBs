@@ -651,7 +651,13 @@ class Stock(models.Model):
     
     def __unicode__(self):
         return "%d en deposito: %s" % (self.getDisponibles(), self.getDeposito())
-
+    
+    def __cmp__(self,other):
+        if self.producto.pk > other.producto.pk:
+            return 1
+        if self.producto.pk < other.producto.pk:
+            return -1 
+        return 0
 # ===========
 # = Detalle =
 # ===========

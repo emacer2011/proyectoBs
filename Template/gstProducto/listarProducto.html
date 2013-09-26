@@ -13,7 +13,9 @@
 {% block mensaje %}
 <button onClick="imprimirPDF()" class="btn btn-success" data-toggle="modal"><i class="icon-print icon-white"></i> Imprimir PDF 
 <script type="text/javascript">limpiarCampo();</script>
-</button></td>
+</button>
+
+<button onClick="descargarEstadisticas()" class="btn btn-primary" data-toggle="modal"><i class="icon-download-alt icon-white"></i> Descargar Estad&iacutesticas </button>
 
 {% endblock %}
 
@@ -53,7 +55,7 @@
     <tbody>
         {% for stock in stocks %}
 
-        <tr>        
+        <tr onmouseover='mostrarDescripcion("{{stock.deposito.direccion}}");'>
             <td id="Producto-Nombre">{{stock.getProducto.getNombre}}</td>
             <td id="Producto-Descripcion">{{stock.getProducto.getDescripcion}}</td>
             <td id="Producto-TipoProducto">{{stock.getProducto.getTipoProducto}}</td>

@@ -9,6 +9,9 @@
   );    
  }
 
+function mostrarDescripcion(descripcion){
+  $(descripcion).tooltip('show');
+}
 
 
     function verificarCarga(){
@@ -236,4 +239,9 @@ function listarConDepo(valor){
 
 function ValorSelect(valor){
   document.getElementById("depositoMostrado").innerHTML = valor;
+}
+
+function descargarEstadisticas(){
+  location.href="/estadistico";
+
 }
