@@ -24,10 +24,10 @@
 
     <div id="CabeceraLDTablas">
         <form class="navbar-search pull-left" style="padding-left:20px">
-            <input id="filtro" type="text" class="search-query" style="height:27px" placeholder="Dirección o Telefono" onKeyUp='buscar(this.value,"tablaProducto");' ><br>
+            <input id="filtro" type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='buscar(this.value,"tablaProducto");' ><br>
         </form>
         <div id="depoPk" style="display:none">{{deposito.pk}}</div>
-        <select style="margin-top:5px; margin-left:10px" onClick="listarConDepo(this.value)" value={{depo}}>
+        <select style="margin-top:5px; margin-left:10px" onChange="listarConDepo(this.value)" value={{depo}}>
             <option value="ALL"> Mostrar Todos</option>
             {% for deposito in depositos%}
                 <option value={{deposito.pk}}> {{deposito.direccion}}</option>

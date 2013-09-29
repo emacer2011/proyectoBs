@@ -241,7 +241,7 @@ def cargarDepositos(request):
                 mensaje = mensaje + '<td style="visibility:hidden">'+ str(stock.getDeposito().pk)+'</td>'
                 mensaje = mensaje + "<td title='Tel: "+str(stock.getDeposito().getTelefono())+"'>" + stock.getDeposito().getDireccion()+ "</td>"
                 mensaje = mensaje + "<td>" + stock.getDeposito().getTelefono()+ "</td>"
-                mensaje = mensaje + "<td>"+str(stock.getDisponibles())+ "</td>"
+                mensaje = mensaje + "<td id=d"+ str(stock.getDeposito().pk)+">"+str(stock.getDisponibles())+ "</td>"
                 pk = str(stock.pk)
                 mensaje = mensaje +"</tr>"
         mensaje = mensaje+"</table>"
@@ -255,7 +255,7 @@ def cargarDepositos(request):
 @user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 def actualizarStocks(request):
     pkProducto = request.POST.get('pkProductoDescuento')
-    deposito = Deposito.objects.get(pk=request.POST.get('pkDeposito').split('s')[1])
+    deposito = Deposito.objects.get(pk=request.POST.get('pkDeposito'))#.split('s')[1])
     producto = Producto.objects.get(pk = pkProducto)
     cantidad = request.POST.get('cantidadDescuento')
     descripcion = request.POST.get('descripcionDescuento')

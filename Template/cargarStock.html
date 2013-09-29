@@ -125,6 +125,9 @@
 
 <form method="POST" onSubmit="return verificarEnvio()">
         <div id="divDescripcionDescuento" class="modal-footerDescuento" style="display:none">
+            <div><label id="depositoSeleccionado">Deposito seleccionado:</label> <div>
+                <br>
+                <div><label>Motivo del Descuento:</label> <div>
             <div style="float:left">
                 <div style="float:auto">
                     <select id="motivoDescuento" name="motivoDescuento" onchange="ocultarBeneficiario();">
@@ -150,10 +153,10 @@
 
                 <div class="control-group">
                     <div>
-                        <label id="labelBeneficionario" style="display:none" for="beneficiarioDescuento" > Beneficiario </label>
+                        <label id="labelBeneficionario"  for="beneficiarioDescuento" > Beneficiario </label>
                     </div>
                     <div>
-                        <input id="beneficiarioDescuento" style="display:none" name="beneficiarioDescuento" type="text"></input>
+                        <input id="beneficiarioDescuento" disabled="disabled" name="beneficiarioDescuento" type="text"></input>
                     </div>
 
                 </div>
