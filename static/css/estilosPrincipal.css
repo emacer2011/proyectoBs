@@ -2,6 +2,7 @@
     background-color:#1c1e22;
     padding-top: 30px;    
     }
+
 #CuerpoLogin{
     background-color: #333;
     }
@@ -640,4 +641,37 @@ form {
   text-align: center;
   font-family: Helvetica;
   font-size: 15;
+}
+
+.imgNotFound404{
+  background-image: url(/static/img/lupa.jpg);
+  width: 346px;
+  height: 346px;
+  float:left;
+  border-top-left-radius: 25px;
+}
+
+.Error{
+  float:auto;
+  padding-top: 5cm;
+  height: 310px;
+  margin-top: -1px;
+  text-transform: capitalize;
+  padding-left: 40px;
+  text-align: left;
+  border-radius: 20px;
+  background: -moz-linear-gradient(left,  rgba(255,255,255,1) 0%, rgba(255,255,255,1) 31%, rgba(255,255,255,1) 53%, rgba(255,255,255,0) 100%);
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(255,255,255,1)), color-stop(31%,rgba(255,255,255,1)), color-stop(53%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,0)));
+  background: -webkit-linear-gradient(left,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 31%,rgba(255,255,255,1) 53%,rgba(255,255,255,0) 100%);
+  background: -o-linear-gradient(left,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 31%,rgba(255,255,255,1) 53%,rgba(255,255,255,0) 100%);
+  background: -ms-linear-gradient(left,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 31%,rgba(255,255,255,1) 53%,rgba(255,255,255,0) 100%);
+  background: linear-gradient(to right,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 31%,rgba(255,255,255,1) 53%,rgba(255,255,255,0) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=1 );
+}
+.imgInternalError500{
+  background-image: url(/static/img/engranajes.jpg);
+  width: 467px;
+  height: 467px;
+  float:left;
+  border-top-left-radius: 25px;
 }
