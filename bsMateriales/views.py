@@ -33,7 +33,7 @@ def listadoProductoEstadistico(request):
     
     with open(TEMPLATE_DIRS+'/estadistica.ods', 'r') as odt:
         response = HttpResponse(odt.read(), mimetype='application/vnd.oasis.opendocument.text')
-        response['Content-Disposition'] = 'inline;filename=some_file.ods'
+        response['Content-Disposition'] = 'inline;filename=Estadistica.ods'
         odt.close()
     return response
     #return HttpResponseRedirect("/")
@@ -58,9 +58,7 @@ def generarFactura(request):
         basic = Template(source="", filepath=TEMPLATE_DIRS+'/facturaBase.odt')
 
         file(TEMPLATE_DIRS+'/factura.odt', 'wb').write(basic.generate(factura=af, detalles=af.detalles).render().getvalue())        
-        #os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/factura.odt')
-        import commands
-        foo = commands.getoutput( 'unoconv -f pdf '+TEMPLATE_DIRS+'/factura.odt') # executed as 2 > &1
+        os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/factura.odt')
         with open(TEMPLATE_DIRS+'/factura.pdf', 'r') as pdf:
             response = HttpResponse(pdf.read(), mimetype='application/pdf')
             response['Content-Disposition'] = 'inline;filename=some_file.pdf'
@@ -110,6 +108,8 @@ def listarProductoPDF(request):
     """docstring for listarProducto"""
     listasProducto = []
     productos = []
+    
+    productoSinStock = []
 
     depositos = Deposito.objects.all()
     filtro = request.GET.get("filtro")
@@ -130,7 +130,7 @@ def listarProductoPDF(request):
             for producto in listasProducto:
                 listaStock=Stock.objects.filter(producto=producto)
                 stocks = stocks+list(listaStock)
-            #stocks = Stock.objects.filter(producto__icontains=listasProducto)
+            productoSinStock = filter(lambda x: x.cantidad == 0 , listasProducto)
         else:
             stocks = []
             for producto in listasProducto:
@@ -142,13 +142,13 @@ def listarProductoPDF(request):
     
     stocks = list(stocks)
     stocks.sort()
-
+    stocks = filter(lambda x: x.disponibles != 0 , stocks)
 
     repos = relatorio.ReportRepository()
 
     basic = Template(source="",filepath=TEMPLATE_DIRS+'/gstProducto/listarProductoBase.odt')
 
-    file(TEMPLATE_DIRS+'/gstProducto/listarProducto.odt', 'wb').write(basic.generate(stocks=stocks).render().getvalue())
+    file(TEMPLATE_DIRS+'/gstProducto/listarProducto.odt', 'wb').write(basic.generate(stocks=stocks, productos=productoSinStock).render().getvalue())
     #    p = subprocess.Popen('unoconv -f pdf '+TEMPLATE_DIRS+'/gstDeposito/listarDeposito.odt', shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
     os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/gstProducto/listarProducto.odt')
     with open(TEMPLATE_DIRS+'/gstProducto/listarProducto.pdf', 'r') as pdf:
@@ -565,6 +565,7 @@ def listarProducto(request):
     """docstring for listarProducto"""
     depositos = Deposito.objects.all()
     depo = "Listando stock en Todos los Depositos"
+    productoSinStock =[]
     try:
         filtro = request.GET.get("filtro")
         productos = Producto.objects.filter(Q(nombre__contains=filtro) | Q(descripcion__contains=filtro))
@@ -579,9 +580,11 @@ def listarProducto(request):
         depo = Deposito.objects.get(pk=request.GET.get("deposito"))
     except ValueError:
         stocks = Stock.objects.all()
+        productoSinStock = Producto.objects.filter(cantidad = 0)
     stocks = list(stocks)
     stocks.sort()
-    return render_to_response('gstProducto/listarProducto.html',{'stocks':stocks, 'depositos':depositos, 'deposito':depo},context_instance=RequestContext(request)) 
+    stocks = filter(lambda x: x.disponibles != 0 , stocks)
+    return render_to_response('gstProducto/listarProducto.html',{'stocks':stocks, 'depositos':depositos, 'deposito':depo, 'productoSinStock':productoSinStock},context_instance=RequestContext(request)) 
 
 # ======================
 # = Entrega Materiales =
