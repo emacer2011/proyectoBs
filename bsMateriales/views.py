@@ -174,20 +174,22 @@ def cargarDetalles(request):
         mensaje = mensaje + "<th></th>"
         mensaje = mensaje + "<th>Producto</th>"
         mensaje = mensaje + "<th>Cantidad</th>"
-        mensaje = mensaje + "<th>Medida solicitada</th>"
+        mensaje = mensaje + "<th>Med.Solicitada</th>"
+        mensaje = mensaje + "<th>Med.Origen</th>"
         mensaje = mensaje + "<th>Entregado</th>"
         for detalle in detalles:
             mensaje = mensaje + "<tr>"
             mensaje = mensaje + '<td style="visibility:hidden" id = "pkDetalle">'+ str(detalle.pk)+'</td>'
-            mensaje = mensaje + "<td>" + detalle.producto.getNombre()+ "</td>"
-            mensaje = mensaje + "<td>" + str(detalle.cantidad)+ "</td>"
-            mensaje = mensaje + "<td>" + str(detalle.producto.obtenerEstrategiaDeVenta().getMedida())+ "</td>"
+            mensaje = mensaje + "<td class=detalleMateriales>" + detalle.producto.getNombre()+ "</td>"
+            mensaje = mensaje + "<td class=detalleMateriales>" + str(detalle.cantidad)+ "</td>"
+            mensaje = mensaje + "<td class=detalleMateriales>" + str(detalle.producto.obtenerEstrategiaDeVenta().getMedida())+ "</td>"
+            mensaje = mensaje + "<td class=detalleMateriales>" + str(detalle.medidaOrigen)+ "</td>"
             if detalle.entregado:
                 entregado = "checked DISABLED"
             else:
                 entregado = ""
             pk = str(detalle.pk)
-            mensaje = mensaje + '<td><input type="checkbox" onClick="cargarEntregados('+pk+')" name="entregado'+str(detalle.pk)+'" '+str(entregado)+'> </td>'
+            mensaje = mensaje + '<td class=detalleMateriales><input type="checkbox" onClick="cargarEntregados('+pk+')" name="entregado'+str(detalle.pk)+'" '+str(entregado)+'> </td>'
             mensaje = mensaje +"</tr>"
         mensaje = mensaje+"</table>"
         return HttpResponse(mensaje)
@@ -416,28 +418,28 @@ def venta(request):
         palabra = request.POST.get("productos")
         palabraParse = str(palabra).split(",")
         dic =  {}
-        #try:
-        for i in palabraParse :    
-            claveValor = i.split("=")
-            
-            producto = Producto.objects.get(pk = claveValor[0])
-            listaStock=producto.vender(cantidad= claveValor[1], fraccion = claveValor[2])
-            stocks = listaStock.keys()
-            for stock in stocks:
-                detalle = DetalleNotaVenta()
-                if (producto.esFraccionable()):
-                    detalle.inicializar(listaStock[stock][1],listaStock[stock][0],((producto.getPrecio() * listaStock[stock][0])*float(claveValor[2])), stock.getDeposito(),notaVenta)
-                else:
-                    detalle.inicializar(listaStock[stock][1],listaStock[stock][0],(producto.getPrecio() * listaStock[stock][0]), stock.getDeposito(),notaVenta)
-                detalle.save()
-                notaVenta.incrementarTotal(detalle.getSubTotal())
-                mensaje ="Venta Realizada Con Exito" 
-                estado = 'alert alert-success'
-        notaVenta.save()
-        productos = filter(lambda x: x.getCantidad() != 0 , productos)
-        #except ErrorVenta:
-         #       mensaje ="La venta no se pudo realizar" 
-          #      estado = 'alert alert-danger'
+        try:
+            for i in palabraParse :    
+                claveValor = i.split("=")
+                
+                producto = Producto.objects.get(pk = claveValor[0])
+                listaStock=producto.vender(cantidad= claveValor[1], fraccion = claveValor[2])
+                stocks = listaStock.keys()
+                for stock in stocks:
+                    detalle = DetalleNotaVenta()
+                    if (producto.esFraccionable()):
+                        detalle.inicializar(listaStock[stock][1],listaStock[stock][0],((producto.getPrecio() * listaStock[stock][0])*float(claveValor[2])), stock.getDeposito(),notaVenta, listaStock[stock][2])
+                    else:
+                        detalle.inicializar(listaStock[stock][1],listaStock[stock][0],(producto.getPrecio() * listaStock[stock][0]), stock.getDeposito(),notaVenta, listaStock[stock][2])
+                    detalle.save()
+                    notaVenta.incrementarTotal(detalle.getSubTotal())
+                    mensaje ="Venta Realizada Con Exito" 
+                    estado = 'alert alert-success'
+            notaVenta.save()
+            productos = filter(lambda x: x.getCantidad() != 0 , productos)
+        except ErrorVenta:
+                mensaje ="La venta no se pudo realizar" 
+                estado = 'alert alert-danger'
     return render_to_response('venta.html',{'productos':productos,'estado': estado, 'mensaje':mensaje},context_instance=RequestContext(request)) 
 
 # ================
@@ -625,7 +627,7 @@ def cobro(request):
         detalles  = DetalleNotaVenta.objects.filter(nota = notaVenta)
         for detalle in detalles:
             detalleFactura = DetalleFactura()
-            detalleFactura.inicializar(detalle,factura,detalle.producto, detalle.cantidad, detalle.subtotal)
+            detalleFactura.inicializar(detalle,factura,detalle.producto, detalle.cantidad, detalle.subtotal, detalle.medidaOrigen)
             detalleFactura.save()
             try:
                 remito = Remito.objects.get(factura = factura, deposito = detalle.deposito )
@@ -634,7 +636,7 @@ def cobro(request):
                 remito.inicializar(factura, detalle.deposito)   
                 remito.save()
             detalleRemito = DetalleRemito()
-            detalleRemito.inicializar(detalleFactura.cantidad,detalleFactura,remito,detalleFactura.producto)
+            detalleRemito.inicializar(detalleFactura.cantidad,detalleFactura,remito,detalleFactura.producto, detalle.medidaOrigen)
             detalleRemito.save()
             stock= Stock.objects.get(producto=detalle.getProducto(), deposito=detalle.getDeposito())
             stock.reservadosNoConfirmados -= detalle.getCantidad()

@@ -163,7 +163,7 @@ ESTRATEGIA_NOFRACCIONABLE = 0
 
 class EstrategiaVenta(models.Model):
     medida = models.FloatField(default=0.0) # TODO: medidas a float
-
+    
     def vender(self, producto, cantidad, fraccion = None):
         try:
             return self.fraccionable.vender(producto, cantidad, fraccion)
@@ -177,7 +177,7 @@ class EstrategiaVenta(models.Model):
         except ObjectDoesNotExist as ex:
             return self.nofraccionable
     
-
+    
     def setMedida(self, medida):
         try:
             self.fraccionable.setMedida(medida)
@@ -317,7 +317,7 @@ class Producto(models.Model):
         return
 
     def vender(self, cantidad = None, fraccion = None):
-        if (int(cantidad) <= 0) or (int(cantidad) > self.obtenerEstrategiaDeVenta().verificarCantidadStock(self, float(fraccion))):
+        if (int(cantidad) <= 0) or (int(cantidad) > self.obtenerEstrategiaDeVenta().verificarCantidadStock(self, fraccion)):
             raise ErrorVenta()
         else:
             return self.obtenerEstrategiaDeVenta().vender(self, cantidad, fraccion)
@@ -358,7 +358,7 @@ class NoFraccionable(EstrategiaVenta):
 
         cantidad = int(cantidad)
         depositosAfectados = {}
-        if producto.verificarCantidadStock() >= cantidad:
+        if self.verificarCantidadStock(producto) >= cantidad:
             stocks = self.stocksAfectados(producto, cantidad)
 
             producto.setCantidad(producto.getCantidad() - cantidad)
@@ -369,7 +369,7 @@ class NoFraccionable(EstrategiaVenta):
                         stock.setDisponibles(stock.getDisponibles() - cantidad)
                         stock.setReservadoNoConfirmados(stock.getReservadoNoConfirmados() + cantidad)
                         stock.save()
-                        depositosAfectados[stock] = (cantidad, producto)
+                        depositosAfectados[stock] = (cantidad, producto, producto.obtenerEstrategiaDeVenta().getMedida())
                         cantidad = 0
                         return depositosAfectados
                     else:
@@ -378,7 +378,7 @@ class NoFraccionable(EstrategiaVenta):
                         cantidadTemporal= stock.getDisponibles()
                         stock.setDisponibles(0)
                         stock.save()
-                        depositosAfectados[stock]= (cantidadTemporal, producto)
+                        depositosAfectados[stock]= (cantidadTemporal, producto, producto.obtenerEstrategiaDeVenta().getMedida())
             return depositosAfectados
         else:
             raise ErrorVenta()
@@ -411,6 +411,7 @@ class Fraccionable(EstrategiaVenta):
         return self.minimo
 
     def verificarCantidadStock(self, producto, fraccion):
+        fraccion = float(fraccion)
         cantidadXunidad = math.floor(self.getMedida()/fraccion)
         resto =(self.getMedida() % fraccion)
         if ((resto<self.getMinimo()) and (resto != 0)):
@@ -443,9 +444,9 @@ class Fraccionable(EstrategiaVenta):
                     stock.setDisponibles(stock.getDisponibles() - cantidad)
                     stock.save()
                     if depositosAfectados.has_key(stock):
-                        depositosAfectados[stock] = (cantidad * cantidadXunidad,None)
+                        depositosAfectados[stock] = (cantidad * cantidadXunidad,None,producto.obtenerEstrategiaDeVenta().getMedida())
                     else:
-                        depositosAfectados[stock] = (cantidad * cantidadXunidad, None)
+                        depositosAfectados[stock] = (cantidad * cantidadXunidad, None,producto.obtenerEstrategiaDeVenta().getMedida())
                     cantidad = 0
                 else:
                     cantidad -= stock.disponibles
@@ -453,9 +454,9 @@ class Fraccionable(EstrategiaVenta):
                     stock.setDisponibles(0)
                     stock.save()
                     if depositosAfectados.has_key(stock):
-                        depositosAfectados[stock] = (cantidadTemporal * cantidadXunidad,None)
+                        depositosAfectados[stock] = (cantidadTemporal * cantidadXunidad,None,producto.obtenerEstrategiaDeVenta().getMedida())
                     else:
-                        depositosAfectados[stock] = (cantidadTemporal * cantidadXunidad,None)
+                        depositosAfectados[stock] = (cantidadTemporal * cantidadXunidad,None,producto.obtenerEstrategiaDeVenta().getMedida())
             else:
                 break
         producto.setCantidad(producto.getCantidad() - cantidadProductos)
@@ -554,7 +555,6 @@ class Fraccionable(EstrategiaVenta):
                 """
                 VERIFICO SI EL PRODUCTO EXISTENTE TIENE STOCK EN EL MISMO DEPOSITO
                 """
-                #qs1 = Stock.objects.filter(deposito__direccion = stock.getDeposito().getDireccion(),producto__nombre=producto.getNombre(),producto__estrategiaVenta__fraccionable__medida=fraccion)
                 qs1 = Stock.objects.filter(deposito = stock.getDeposito(),producto=productoExistente)
                 if (qs1.count() != 0):
                     stockExistente = qs1[0]
@@ -568,7 +568,7 @@ class Fraccionable(EstrategiaVenta):
                     stockNuevo.setDeposito(stock.getDeposito())
                     stockNuevo.setProducto(productoExistente)
                     stockNuevo.save()
-                depositosAfectados[stock] = (depositosAfectados[stock][0], productoExistente)
+                depositosAfectados[stock] = (depositosAfectados[stock][0], productoExistente,producto.obtenerEstrategiaDeVenta().getMedida())
             productoExistente.save()
         else:
             productoNuevo = Producto()
@@ -589,7 +589,7 @@ class Fraccionable(EstrategiaVenta):
                 stockNuevo.setDeposito(stock.getDeposito())
                 stockNuevo.setProducto(productoNuevo)
                 stockNuevo.save()
-                depositosAfectados[stock] = (depositosAfectados[stock][0], productoNuevo)
+                depositosAfectados[stock] = (depositosAfectados[stock][0], productoNuevo,producto.obtenerEstrategiaDeVenta().getMedida())
         return depositosAfectados
         
 
@@ -694,6 +694,7 @@ class Detalle(models.Model):
     cantidad = models.IntegerField()
     subtotal = models.FloatField()
     producto = models.ForeignKey(Producto)
+    medidaOrigen = models.CharField(max_length = 11)
 
 
     def getCantidad(self):
@@ -742,12 +743,13 @@ class DetalleNotaVenta(Detalle):
     def getDeposito(self):
         return self.deposito
 
-    def inicializar(self, producto, cantidad, subTotal, deposito, notaVenta):
+    def inicializar(self, producto, cantidad, subTotal, deposito, notaVenta, medidaOrigen):
         self.setProducto(producto)
         self.setCantidad(cantidad)
         self.setSubTotal(subTotal)
         self.setDeposito(deposito)
         self.setNota(notaVenta)
+        self.medidaOrigen = medidaOrigen
         
 
 
@@ -771,12 +773,13 @@ class DetalleFactura(Detalle):
     def setFactura(self, factura):
         self.factura = factura
 
-    def inicializar(self, detalle, factura, producto, cantidad, subTotal):
+    def inicializar(self, detalle, factura, producto, cantidad, subTotal, medidaOrigen):
         self.setDetalleNotaVenta(detalle)
         self.setFactura(factura)
         self.setProducto(producto)
         self.setCantidad(cantidad)
         self.setSubTotal(subTotal)
+        self.medidaOrigen = medidaOrigen
 
 
 # ==============
@@ -953,6 +956,7 @@ class DetalleRemito(models.Model):
     detalleFactura = models.ForeignKey(DetalleFactura)
     remito = models.ForeignKey(Remito)
     producto = models.ForeignKey(Producto)
+    medidaOrigen = models.CharField(max_length = 11)
 
     def setCantidad(self, cantidad):
         self.cantidad = cantidad
@@ -993,11 +997,12 @@ class DetalleRemito(models.Model):
               stock.setReservadoConfirmados(int(stock.getReservadoConfirmados()) + int(self.cantidad))
         stock.save()
 
-    def inicializar(self, cantidad, detalle, remito, producto):
+    def inicializar(self, cantidad, detalle, remito, producto, medidaOrigen):
         self.setCantidad(cantidad)
         self.setDetalleFactura(detalle)
         self.setRemito(remito)
         self.setProducto(producto)
+        self.medidaOrigen = medidaOrigen
         
 # =============
 # = Descuento =

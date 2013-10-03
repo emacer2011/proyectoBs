@@ -34,7 +34,7 @@ function cerrar(){
             debugger;
     for(i=1; i < filas.length; i++){
         filaActual = filas[i];
-        check = filaActual.cells[4].children[0];
+        check = filaActual.cells[5].children[0];
         if((check.checked) && !(check.hasAttribute("disabled"))){
             cargarEntregados(filaActual.cells[0].innerHTML);
         }
