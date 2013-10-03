@@ -71,17 +71,26 @@ function cargarTabla(pk){
 function mostrarDetalles(fila){
   Deposito = fila.cells[0].innerHTML;
   Producto = fila.id;
+  limpiarCamposDescuento()
+  document.getElementById("depositoSeleccionado").innerHTML= "Deposito seleccionado: "+fila.cells[1].innerHTML;
   div = document.getElementById("divDescripcionDescuento");
   if(div.style.display == "none"){
     div.style.display="block";
     deposito = document.getElementById("pkDeposito");
-    deposito.value = fila.id;
+    deposito.value = Deposito;
   }else{
     div.style.display = "none";
   }
   ocultarBeneficiario()
 }
 
+function limpiarCamposDescuento(){
+  cantidad = document.getElementById("cantidadDescuento").value = "";
+  beneficiario = document.getElementById("beneficiarioDescuento").value= "";
+  document.getElementById("descripcionDescuento").value= "";
+  document.getElementById("pkDeposito").value = "";
+  document.getElementById("depositoSeleccionado").innerHTML= "";
+}
 
 function volver(){
         var elemento=document.getElementById("modalPropio");
@@ -94,6 +103,10 @@ function volver(){
 }
 
 function volver2(){
+        var div = document.getElementById("divDescripcionDescuento");
+        div.style.display ="none";
+        limpiarCamposDescuento()
+
         var elemento=document.getElementById("modalPropio2");
         elemento.className="modal hide fade";
         elemento.style.display="none";
@@ -155,7 +168,19 @@ function validarCantidadDescuento(){
   
   cantidad = document.getElementById("cantidadDescuento").value;
     //elemento = document.getElementById('s'+String(pk));
-   if(parseInt(cantidad) > 0){ //&& parseInt(elemento.cells[2].innerHTML) >= parseInt(cantidad)){
+  
+//pkProductoDescuento
+
+  pkDeposito = document.getElementById("pkDeposito").value;
+
+  cantidadTotal = document.getElementById("d"+pkDeposito);
+
+  cantidadTotal = parseInt(cantidadTotal.innerHTML);
+
+  cantidad = parseInt(cantidad);
+
+   if(cantidad > 0 & cantidad <= cantidadTotal){ //&& parseInt(elemento.cells[2].innerHTML) >= parseInt(cantidad)){
+      document.getElementById("cantidadDescuento").value = cantidad
       return true;
     }
     alert("Cantidad a descontar incorrecta");
@@ -167,13 +192,12 @@ function ocultarBeneficiario(){
   motivoObj=document.getElementById("motivoDescuento");
   motivo = motivoObj.value;
   beneficiario = document.getElementById("beneficiarioDescuento");
-  beneficiarioLabel = document.getElementById("labelBeneficionario");
   if (motivo == "Donacion") {
-      beneficiario.style.display='';
-      beneficiarioLabel.style.display='';
+    beneficiario.disabled = false;
   }  
-  else{beneficiario.style.display='none';
-  beneficiarioLabel.style.display='none';}
+  else{
+    beneficiario.disabled = true;
+  }
 }
 
 function validarBeneficiario(){
