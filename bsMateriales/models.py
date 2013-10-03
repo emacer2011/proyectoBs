@@ -74,11 +74,18 @@ class Deposito(models.Model):
     def getRubro(self):
         return self.rubro
 
-    def puedoEliminarlo(self): 
+    def limpiarStockVacio(self):
+        stocks = Stock.objects.filter(deposito = self)
+        for stock in stocks:
+            if ((stock.getDisponibles() == 0) and (stock.getReservadoNoConfirmados() == 0) and (stock.getReservadoConfirmados() == 0)):
+                stock.delete()
+
+    def puedoEliminarlo(self):
+        self.limpiarStockVacio() 
         stocks = Stock.objects.filter(deposito = self)
         if (stocks.count() != 0):
             for stock in stocks:
-                if (stock.getDisponibles() == 0) and (stock.getReservadoConfirmados() == 0) and (stock.getReservadoNoconfirmados() == 0):
+                if (stock.getDisponibles() == 0) and (stock.getReservadoConfirmados() == 0) and (stock.getReservadoNoConfirmados() == 0):
                     return True
             return False
         else:
@@ -188,14 +195,19 @@ class EstrategiaVenta(models.Model):
         try:
             return self.fraccionable.getMedida()
         except ObjectDoesNotExist as ex:
-            medida = self.nofraccionable.getMedida()
-            return medida
+            return self.nofraccionable.getMedida()
 
     def getMinimo(self):
         try:
             return self.fraccionable.getMinimo()
         except ObjectDoesNotExist as ex:
             return '-'
+
+    def verificarCantidadStock(self, producto, fraccion = None):
+        try:
+            return self.fraccionable.verificarCantidadStock(producto,fraccion)
+        except ObjectDoesNotExist as ex:
+            return self.nofraccionable.verificarCantidadStock(producto,fraccion)
 
     def stocksAfectados (self, producto, cantidad):
         listaStocks = []
@@ -238,6 +250,7 @@ class Producto(models.Model):
 
     def puedeBorrarse(self):
         try:
+            self.limpiarStock()
             stock = Stock.objects.get(producto = self)
             return False
         except ObjectDoesNotExist:
@@ -296,15 +309,15 @@ class Producto(models.Model):
     def setEstrategiaDeVenta(self, estrategiaVenta):
         self.estrategiaVenta= estrategiaVenta
 
-    def verificarCantidadStock(self):
-        stockList = self.stock_set.all()
-        cantidad = 0
-        for stock in stockList:
-            cantidad += stock.getDisponibles()
-        return cantidad            
+    def limpiarStock(self):
+        stocks = Stock.objects.filter(producto = self)
+        for stock in stocks:
+            if ((stock.getDisponibles() == 0) and (stock.getReservadoNoConfirmados() == 0) and (stock.getReservadoConfirmados() == 0)):
+                stock.delete()
+        return
 
-    def vender(self, cantidad = None, fraccion = 5):
-        if (int(cantidad) <= 0) or (int(cantidad) > self.verificarCantidadStock()):
+    def vender(self, cantidad = None, fraccion = None):
+        if (int(cantidad) <= 0) or (int(cantidad) > self.obtenerEstrategiaDeVenta().verificarCantidadStock(self, float(fraccion))):
             raise ErrorVenta()
         else:
             return self.obtenerEstrategiaDeVenta().vender(self, cantidad, fraccion)
@@ -338,6 +351,9 @@ class NoFraccionable(EstrategiaVenta):
             return '-'
         return self.medida
 
+    def verificarCantidadStock(self, producto, fraccion = None):
+        return producto.getCantidad()
+
     def vender(self, producto, cantidad, fraccion = None):
 
         cantidad = int(cantidad)
@@ -349,18 +365,18 @@ class NoFraccionable(EstrategiaVenta):
             producto.save()
             for stock in stocks:
                 if cantidad > 0:
-                    if stock.disponibles >= cantidad:
-                        stock.disponibles = stock.disponibles - cantidad
-                        stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + cantidad
+                    if stock.getDisponibles() >= cantidad:
+                        stock.setDisponibles(stock.getDisponibles() - cantidad)
+                        stock.setReservadoNoConfirmados(stock.getReservadoNoConfirmados() + cantidad)
                         stock.save()
                         depositosAfectados[stock] = (cantidad, producto)
                         cantidad = 0
                         return depositosAfectados
                     else:
                         cantidad = cantidad - stock.disponibles
-                        stock.reservadosNoConfirmados = stock.reservadosNoConfirmados + stock.disponibles
-                        cantidadTemporal= stock.disponibles
-                        stock.disponibles = 0
+                        stock.setReservadoNoConfirmados(stock.getReservadoNoConfirmados() + stock.getDisponibles())
+                        cantidadTemporal= stock.getDisponibles()
+                        stock.setDisponibles(0)
                         stock.save()
                         depositosAfectados[stock]= (cantidadTemporal, producto)
             return depositosAfectados
@@ -394,6 +410,14 @@ class Fraccionable(EstrategiaVenta):
     def getMinimo(self):
         return self.minimo
 
+    def verificarCantidadStock(self, producto, fraccion):
+        cantidadXunidad = math.floor(self.getMedida()/fraccion)
+        resto =(self.getMedida() % fraccion)
+        if ((resto<self.getMinimo()) and (resto != 0)):
+            cantidadXunidad = cantidadXunidad -1
+        cantidad = cantidadXunidad * producto.getCantidad()
+        return cantidad            
+
     def vender(self, producto, cantidad, fraccion):
         depositosAfectados = {}        
         cantidad = int(cantidad)
@@ -415,21 +439,21 @@ class Fraccionable(EstrategiaVenta):
         cantidad = cantidadProductos
         for stock in stocks:
             if cantidad > 0:
-                if (stock.disponibles >= cantidad):
-                    stock.disponibles -= cantidad
+                if (stock.getDisponibles() >= cantidad):
+                    stock.setDisponibles(stock.getDisponibles() - cantidad)
                     stock.save()
                     if depositosAfectados.has_key(stock):
-                        depositosAfectados[stock] += (cantidad * cantidadXunidad,None)
+                        depositosAfectados[stock] = (cantidad * cantidadXunidad,None)
                     else:
                         depositosAfectados[stock] = (cantidad * cantidadXunidad, None)
                     cantidad = 0
                 else:
                     cantidad -= stock.disponibles
-                    cantidadTemporal = stock.disponibles
-                    stock.disponibles = 0
+                    cantidadTemporal = stock.getDisponibles()
+                    stock.setDisponibles(0)
                     stock.save()
                     if depositosAfectados.has_key(stock):
-                        depositosAfectados[stock] += (cantidadTemporal * cantidadXunidad,None)
+                        depositosAfectados[stock] = (cantidadTemporal * cantidadXunidad,None)
                     else:
                         depositosAfectados[stock] = (cantidadTemporal * cantidadXunidad,None)
             else:
@@ -476,7 +500,7 @@ class Fraccionable(EstrategiaVenta):
                         stockExistente.save()
                     else:
                         stockNuevo = Stock()
-                        stockNuevo.setReservadoNoconfirmados(0)
+                        stockNuevo.setReservadoNoConfirmados(0)
                         stockNuevo.setReservadoConfirmados(0)
                         stockNuevo.setDisponibles(cantidadProductos)
                         stockNuevo.setDeposito(stock.getDeposito())
@@ -498,7 +522,7 @@ class Fraccionable(EstrategiaVenta):
                 stocks = depositosAfectados.keys()
                 for stock in stocks:
                     stockNuevo = Stock()
-                    stockNuevo.setReservadoNoconfirmados(0)
+                    stockNuevo.setReservadoNoConfirmados(0)
                     stockNuevo.setReservadoConfirmados(0)
                     stockNuevo.setDisponibles(cantidadProductos)
                     stockNuevo.setDeposito(stock.getDeposito())
@@ -534,11 +558,11 @@ class Fraccionable(EstrategiaVenta):
                 qs1 = Stock.objects.filter(deposito = stock.getDeposito(),producto=productoExistente)
                 if (qs1.count() != 0):
                     stockExistente = qs1[0]
-                    stockExistente.setReservadoNoconfirmados(stockExistente.getReservadoNoconfirmados() + depositosAfectados[stock][0])
+                    stockExistente.setReservadoNoConfirmados(stockExistente.getReservadoNoConfirmados() + depositosAfectados[stock][0])
                     stockExistente.save()
                 else:
                     stockNuevo = Stock()
-                    stockNuevo.setReservadoNoconfirmados(depositosAfectados[stock][0])
+                    stockNuevo.setReservadoNoConfirmados(depositosAfectados[stock][0])
                     stockNuevo.setReservadoConfirmados(0)
                     stockNuevo.setDisponibles(0)
                     stockNuevo.setDeposito(stock.getDeposito())
@@ -559,7 +583,7 @@ class Fraccionable(EstrategiaVenta):
             stocks = depositosAfectados.keys()
             for stock in stocks:
                 stockNuevo = Stock()
-                stockNuevo.setReservadoNoconfirmados(depositosAfectados[stock][0])
+                stockNuevo.setReservadoNoConfirmados(depositosAfectados[stock][0])
                 stockNuevo.setReservadoConfirmados(0)
                 stockNuevo.setDisponibles(0)
                 stockNuevo.setDeposito(stock.getDeposito())
@@ -602,13 +626,13 @@ class Stock(models.Model):
     def getReservadoConfirmados(self):
         return self.reservadosConfirmados
 
-    def getReservadoNoconfirmados(self):
+    def getReservadoNoConfirmados(self):
         return self.reservadosNoConfirmados
 
     def setReservadoConfirmados(self, reservadosConfirmados):
         self.reservadosConfirmados = reservadosConfirmados
 
-    def setReservadoNoconfirmados(self, reservadosNoConfirmados):
+    def setReservadoNoConfirmados(self, reservadosNoConfirmados):
         self.reservadosNoConfirmados = reservadosNoConfirmados
 
     def getDisponibles(self):
@@ -964,9 +988,9 @@ class DetalleRemito(models.Model):
         """docstring for confirmarStock"""
         stock = Stock.objects.get(producto = self.producto, deposito= self.remito.deposito)
         if self.entregado:
-                stock.reservadosConfirmados= int(stock.reservadosConfirmados)-int(self.cantidad)
+                stock.setReservadoConfirmados(int(stock.getReservadoConfirmados()) - int(self.cantidad))
         else: 
-              stock.reservadosConfirmados= int(stock.reservadosConfirmados)+int(self.cantidad)
+              stock.setReservadoConfirmados(int(stock.getReservadoConfirmados()) + int(self.cantidad))
         stock.save()
 
     def inicializar(self, cantidad, detalle, remito, producto):
@@ -997,7 +1021,7 @@ class Descuento(models.Model):
         return self.cantidad
 
     def setCantidad(self, cantidad):
-        if (int(cantidad) > 0) and (self.producto.getCantidad() > cantidad):
+        if (int(cantidad) > 0) and (self.producto.getCantidad() >= cantidad):
             self.cantidad = cantidad
         else:
             raise ErrorDescuento()
@@ -1041,6 +1065,7 @@ class Descuento(models.Model):
             stock.setDisponibles(stock.getDisponibles() - self.cantidad)
             self.getProducto().setCantidad(self.getProducto().getCantidad() - self.cantidad)
             stock.save()
+            self.getProducto().limpiarStock()
             self.getProducto().save()
         except ObjectDoesNotExist:
             raise ErrorDescuento() 
