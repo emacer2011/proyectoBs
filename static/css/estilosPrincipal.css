@@ -696,6 +696,7 @@ form {
 
 .ContenedorPP {
   position: relative;
+  width:100%;
   color:white;
   z-index: 2;
   float:left;
@@ -721,5 +722,5 @@ form {
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  height:500px; 
+  height:500px;
 }
