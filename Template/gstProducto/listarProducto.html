@@ -56,9 +56,9 @@
         {% for stock in stocks %}
 
         <tr onmouseover='mostrarDescripcion("{{stock.deposito.direccion}}");'>
-            <td id="Producto-Nombre">{{stock.getProducto.getNombre}}</td>
-            <td id="Producto-Descripcion">{{stock.getProducto.getDescripcion}}</td>
-            <td id="Producto-TipoProducto">{{stock.getProducto.getTipoProducto}}</td>
+            <td title="Deposito:'{{stock.getDeposito.getDireccion}}'" id="Producto-Nombre">{{stock.getProducto.getNombre}}</td>
+            <td title="Deposito:'{{stock.getDeposito.getDireccion}}'" id="Producto-Descripcion">{{stock.getProducto.getDescripcion}}</td>
+            <td title="Deposito:'{{stock.getDeposito.getDireccion}}'" id="Producto-TipoProducto">{{stock.getProducto.getTipoProducto}}</td>
             <td id="Producto-Cantidad">{{stock.getDisponibles}}</td>
             <td id="Producto-Precio">{{stock.getProducto.getPrecio}}</td>
         </tr>

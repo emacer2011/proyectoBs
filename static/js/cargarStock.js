@@ -117,14 +117,15 @@ function volver2(){
 }
 
 function validarDisponibles(valor){ 
-     valor = parseInt(valor)  
-     	if (isNaN(valor)) {
+    var patron = /^[0-9]+$/;
+    	if (!valor.match(patron)) {
      	     alert("El valor del Campo Disponibles debe ser numeros mayores a 0") 
            	 return false
      	}else{ 
-           	 if (valor>0){
-           	    return true
-           	 }
+            valor = parseInt(valor)
+           	if (valor>0){
+           	   return true
+           	}
             alert("El valor del Campo Disponibles debe ser numeros mayores a 0") 
             return false
      	} 
@@ -164,27 +165,23 @@ function buscar(texto,idTabla){
       }
 }
 
+
 function validarCantidadDescuento(){
-  
+  var patron = /^[0-9]+$/;
   cantidad = document.getElementById("cantidadDescuento").value;
-    //elemento = document.getElementById('s'+String(pk));
-  
-//pkProductoDescuento
-
   pkDeposito = document.getElementById("pkDeposito").value;
-
   cantidadTotal = document.getElementById("d"+pkDeposito);
-
-  cantidadTotal = parseInt(cantidadTotal.innerHTML);
-
-  cantidad = parseInt(cantidad);
-
-   if(cantidad > 0 & cantidad <= cantidadTotal){ //&& parseInt(elemento.cells[2].innerHTML) >= parseInt(cantidad)){
+  cantidad = valores
+  if (cantidad.match(patron) && cantidadTotal.match(patron)){
+    cantidadTotal = parseInt(cantidadTotal.innerHTML);
+    cantidad = parseInt(cantidad);
+    if(cantidad > 0 & cantidad <= cantidadTotal){
       document.getElementById("cantidadDescuento").value = cantidad
       return true;
     }
-    alert("Cantidad a descontar incorrecta");
-    return false;
+  }
+  alert("Cantidad a descontar incorrecta");
+  return false;
 
 }
 

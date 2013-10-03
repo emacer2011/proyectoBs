@@ -62,7 +62,7 @@ function mostrarDescripcion(descripcion){
     }
 
     
-   function valoresConComa(medida){
+  function valoresConComa(medida){
     var coma = ',';
     var punto = '.';
     var cadena = "";
@@ -75,14 +75,14 @@ function mostrarDescripcion(descripcion){
         }
     }
     return cadena;
-}
+  }
 
 
     function validarPrecio(campo){
         var valor = campo.value;
-        //var patron = /\d+(\.\d{1,2})?$/;
         var patron = /^[0-9]+(\.[0-9]+)?$/;
         valor = valoresConComa(valor);
+        campo.value = valor;
         if (valor.match(patron) && valor != ""){
           return true;
         }   
@@ -205,16 +205,24 @@ function mostrarDatosFraccionable(){
 }
 
 function validarDatosFraccionables(){
-  var patron = /\d+|(\d+.\d\d)/;
+  var patron = /^[0-9]+(\.[0-9]+)?$/;
   var medidaMinima = valoresConComa(document.getElementById("medidaMinimaProducto").value);
-  document.getElementById("medidaMinimaProducto").value = medidaMinima;
-  var medida = valoresConComa(parseFloat(document.getElementById("medidaProducto").value));
-  parseFloat(document.getElementById("medidaProducto").value) = medida;
-  if (patron.match(medidaMinima) && patron.match(medida)){
-      medidaMinima = parseFloat(medidaMinima.value);
+  var medida = valoresConComa(document.getElementById("medidaProducto").value);
+  medida = valoresConComa(medida);
+  medidaMinima = valoresConComa(medidaMinima);
+  if (medidaMinima.match(patron) && medida.match(patron)){
+      medidaMinima = parseFloat(medidaMinima);
       medida = parseFloat(medida);
-      if (medidaMinima != "" && (medidaMinima>0 && medida > 0)){
-          return true;
+      document.getElementById("medidaMinimaProducto").value = medidaMinima;
+      document.getElementById("medidaProducto").value = medida;
+      if (medidaMinima != "" && medida != "" && (medidaMinima>0 && medida > 0)){
+          if (medidaMinima<medida) {
+            return true;
+          }else{
+            alert("medida minima debe ser menor que la medida estandar del producto");          
+            return false;
+          }
+          
       }   
   }
   alert("Error en Medidas (no pueden ser nulas ni menores a '0')");

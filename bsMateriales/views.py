@@ -17,6 +17,7 @@ import relatorio
 import subprocess
 from django.db.models import Q
 from utiles import AdaptadorFactura
+import re
 
 
 
