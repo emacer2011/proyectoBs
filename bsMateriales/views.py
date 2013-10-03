@@ -416,28 +416,28 @@ def venta(request):
         palabra = request.POST.get("productos")
         palabraParse = str(palabra).split(",")
         dic =  {}
-        try:
-            for i in palabraParse :    
-                claveValor = i.split("=")
-                
-                producto = Producto.objects.get(pk = claveValor[0])
-                listaStock=producto.vender(cantidad= claveValor[1], fraccion = claveValor[2])
-                stocks = listaStock.keys()
-                for stock in stocks:
-                    detalle = DetalleNotaVenta()
-                    if (producto.esFraccionable()):
-                        detalle.inicializar(listaStock[stock][1],listaStock[stock][0],((producto.getPrecio() * listaStock[stock][0])*float(claveValor[2])), stock.getDeposito(),notaVenta)
-                    else:
-                        detalle.inicializar(listaStock[stock][1],listaStock[stock][0],(producto.getPrecio() * listaStock[stock][0]), stock.getDeposito(),notaVenta)
-                    detalle.save()
-                    notaVenta.incrementarTotal(detalle.getSubTotal())
-                    mensaje ="Venta Realizada Con Exito" 
-                    estado = 'alert alert-success'
-            notaVenta.save()
-            productos = filter(lambda x: x.getCantidad() != 0 , productos)
-        except ErrorVenta:
-                mensaje ="La venta no se pudo realizar" 
-                estado = 'alert alert-danger'
+        #try:
+        for i in palabraParse :    
+            claveValor = i.split("=")
+            
+            producto = Producto.objects.get(pk = claveValor[0])
+            listaStock=producto.vender(cantidad= claveValor[1], fraccion = claveValor[2])
+            stocks = listaStock.keys()
+            for stock in stocks:
+                detalle = DetalleNotaVenta()
+                if (producto.esFraccionable()):
+                    detalle.inicializar(listaStock[stock][1],listaStock[stock][0],((producto.getPrecio() * listaStock[stock][0])*float(claveValor[2])), stock.getDeposito(),notaVenta)
+                else:
+                    detalle.inicializar(listaStock[stock][1],listaStock[stock][0],(producto.getPrecio() * listaStock[stock][0]), stock.getDeposito(),notaVenta)
+                detalle.save()
+                notaVenta.incrementarTotal(detalle.getSubTotal())
+                mensaje ="Venta Realizada Con Exito" 
+                estado = 'alert alert-success'
+        notaVenta.save()
+        productos = filter(lambda x: x.getCantidad() != 0 , productos)
+        #except ErrorVenta:
+         #       mensaje ="La venta no se pudo realizar" 
+          #      estado = 'alert alert-danger'
     return render_to_response('venta.html',{'productos':productos,'estado': estado, 'mensaje':mensaje},context_instance=RequestContext(request)) 
 
 # ================
@@ -498,8 +498,13 @@ def altaProducto(request):
         else:
             print "Fraccionable"
             estrategiaVenta = Fraccionable()
-            estrategiaVenta.setMedida(request.POST.get("medidaProducto"))
-            estrategiaVenta.setMinimo(request.POST.get("medidaMinimaProducto"))
+            medidaProducto = request.POST.get("medidaProducto")
+            medidaMinima = request.POST.get("medidaMinimaProducto")
+            if (medidaProducto > medidaMinima):
+                estrategiaVenta.setMedida(medidaProducto)
+                estrategiaVenta.setMinimo(medidaMinima)
+            else:
+                raise ErrorProducto()
             estrategiaVenta.save()
 
         producto.inicializar(request.POST.get("nombreProducto"),request.POST.get("descripcionProducto"), TipoProducto.objects.get(pk = request.POST.get("tipoProducto")),request.POST.get("precioProducto"),estrategiaVenta)
