@@ -40,15 +40,15 @@
                     {% endif %}
                     <!-- COBRO -->
                     {% if perms.bsMateriales.cobrar%} <!-- PERMISOS PARA COBRAR -->
-                    <li><a href="/cobro" accesskey="v">Cobro</a></li>
+                    <li><a href="/cobro" accesskey="c">Cobro</a></li>
                     {% endif %}
                     <!-- CARGA DE STOCK -->
                     {% if perms.bsMateriales.stock%} <!-- PERMISOS PARA CARGAR STOCK -->
-                    <li><a href="/cargarStock" accesskey="c">Gestionar Stock</a></li>
+                    <li><a href="/cargarStock" accesskey="g">Gestionar Stock</a></li>
                     {% endif %}
                     <!-- ENTREGA DE MATERIALES -->
                     {% if perms.bsMateriales.entregaMateriales%} <!-- PERMISOS PARA ENTREGAR MATERIALES -->
-                    <li><a href="/entregaMateriales" accesskey="m">Entrega de Materiales</a></li>
+                    <li><a href="/entregaMateriales" accesskey="e">Entrega de Materiales</a></li>
                     {% endif %}
                     <!-- GESTION PRODUCTO -->
                     {% if perms.bsMateriales.producto%} <!-- PERMISOS PARA ABM PRODUCTO -->
@@ -59,7 +59,7 @@
                         <li><a href="/altaProducto">Alta Producto</a></li>
                         <li><a href="/bajaProducto">Baja Producto</a></li>
                         <li><a href="/modificarProducto">Modificar Producto</a></li>
-                        <li><a href="/listarProducto">Listar Producto</a></li>
+                        <li><a href="/listarProducto" accesskey="p">Listar Producto</a></li>
                     </ul>
                     </li>
                     {% endif %}
@@ -76,14 +76,13 @@
                             <li><a href="/altaDeposito">Alta Deposito</a></li>
                             <li><a href="/bajaDeposito">Baja Depósito</a></li>
                             <li><a href="/modificarDeposito">Modificacion Depósito</a></li>
-                            <li><a href="/listarDeposito">Listar Depósitos</a></li>
+                            <li><a href="/listarDeposito" accesskey="d">Listar Depósitos</a></li>
                         </ul>
                         </li>
                     </ul>
                     {% endif %}
                     <!-- DESLOGEO-->
                     <ul class="nav pull-right">
-                        <!-- <a class="btn btn-info" onclick="return mostrar_ayuda(this);" href="/ayuda/"><i class="icon-question-sign icon-white"></i>Ayuda </a>-->
                             <li><a href="/deslogear">Cerrar Sesion({{user}})</a></li>
                     </ul>
                 </div>

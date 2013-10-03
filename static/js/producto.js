@@ -78,8 +78,20 @@ function mostrarDescripcion(descripcion){
 }
 
 
-
     function validarPrecio(campo){
+        var valor = campo.value;
+        //var patron = /\d+(\.\d{1,2})?$/;
+        var patron = /^[0-9]+(\.[0-9]+)?$/;
+        valor = valoresConComa(valor);
+        if (valor.match(patron) && valor != ""){
+          return true;
+        }   
+        alert("Error en el Precio");
+        return false;
+    }
+
+
+function validarPrecioResguardo(campo){
         var valor = campo.value;
         valor = valoresConComa(valor);
         campo.value= valor;
@@ -92,7 +104,6 @@ function mostrarDescripcion(descripcion){
         alert("Error en el Precio");
         return false; 
     }
-
  
 
 
@@ -194,17 +205,18 @@ function mostrarDatosFraccionable(){
 }
 
 function validarDatosFraccionables(){
-
-  var medidaMinima = document.getElementById("medidaMinimaProducto").value;
-  document.getElementById("medidaMinimaProducto").value = valoresConComa(medidaMinima);
-  var medidaMinima = document.getElementById("medidaMinimaProducto");
-  medidaMinima = parseFloat(medidaMinima.value);
-  var medida = parseFloat(document.getElementById("medidaProducto").value);
-  if ((medida != "" && !isNaN(medida)) && (medidaMinima != "" && !isNaN(medidaMinima))){
-    if (medidaMinima>0 && medida > 0){
-      return true;
-    }
-  }   
+  var patron = /\d+|(\d+.\d\d)/;
+  var medidaMinima = valoresConComa(document.getElementById("medidaMinimaProducto").value);
+  document.getElementById("medidaMinimaProducto").value = medidaMinima;
+  var medida = valoresConComa(parseFloat(document.getElementById("medidaProducto").value));
+  parseFloat(document.getElementById("medidaProducto").value) = medida;
+  if (patron.match(medidaMinima) && patron.match(medida)){
+      medidaMinima = parseFloat(medidaMinima.value);
+      medida = parseFloat(medida);
+      if (medidaMinima != "" && (medidaMinima>0 && medida > 0)){
+          return true;
+      }   
+  }
   alert("Error en Medidas (no pueden ser nulas ni menores a '0')");
   return false; 
 }

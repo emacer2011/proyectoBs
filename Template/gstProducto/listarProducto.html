@@ -27,7 +27,7 @@
             <input id="filtro" type="text" class="search-query" style="height:27px" placeholder="Nombre o Descripción" onKeyUp='buscar(this.value,"tablaProducto");' ><br>
         </form>
         <div id="depoPk" style="display:none">{{deposito.pk}}</div>
-        <select style="margin-top:5px; margin-left:10px" onChange="listarConDepo(this.value)" value={{depo}}>
+        <select style="margin-top:5px; margin-left:10px" onclick="listarConDepo(this.value)" value={{depo}}>
             <option value="ALL"> Mostrar Todos</option>
             {% for deposito in depositos%}
                 <option value={{deposito.pk}}> {{deposito.direccion}}</option>
@@ -61,6 +61,16 @@
             <td id="Producto-TipoProducto">{{stock.getProducto.getTipoProducto}}</td>
             <td id="Producto-Cantidad">{{stock.getDisponibles}}</td>
             <td id="Producto-Precio">{{stock.getProducto.getPrecio}}</td>
+        </tr>
+        {% endfor %}
+        {% for stock in productoSinStock %}
+
+        <tr>
+            <td id="Producto-Nombre">{{stock.getNombre}}</td>
+            <td id="Producto-Descripcion">{{stock.getDescripcion}}</td>
+            <td id="Producto-TipoProducto">{{stock.getTipoProducto}}</td>
+            <td id="Producto-Cantidad">{{stock.cantidad}}</td>
+            <td id="Producto-Precio">{{stock.getPrecio}}</td>
         </tr>
         {% endfor %}
     </tbody>
