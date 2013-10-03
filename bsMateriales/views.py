@@ -121,6 +121,7 @@ def listarProductoPDF(request):
     if filtro == "":
         if filtroDeposito == "ALL":
             stocks = Stock.objects.all()
+            productoSinStock = Producto.objects.filter(cantidad = 0)
         else:
             stocks = Stock.objects.filter(deposito=filtroDeposito)
     else:
