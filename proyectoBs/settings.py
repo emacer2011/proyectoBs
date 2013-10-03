@@ -1,6 +1,6 @@
 # Django settings for proyectoBs project.
 import os
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -9,6 +9,19 @@ ADMINS = (
 
 import os
 MANAGERS = ADMINS
+
+ALLOWED_HOSTS = ['proyectobs.com']
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '/var/www/proyectoBs/BdDatos.db',          # Or path to database file if using sqlite3.
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}
 
 
 # Local time zone for this installation. Choices can be found here:
@@ -47,7 +60,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-#STATIC_ROOT = ""#os.path.join(os.path.abspath('.'), 'static')
+STATIC_ROOT = 'var/www/proyectoBs/static/'
 #ADMIN_MEDIA_PREFIX = STA
 #print STATIC_ROOT
 
@@ -96,7 +109,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 # IPs habilitadas para la debug toolbar
@@ -107,7 +120,7 @@ ROOT_URLCONF = 'proyectoBs.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'proyectoBs.wsgi.application'
 
-TEMPLATE_DIRS = (os.path.join(os.path.abspath('.'), 'Template') 
+TEMPLATE_DIRS = ('var/www/proyectoBs/Template/' 
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -129,7 +142,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     
     
-    'debug_toolbar',
+    #'debug_toolbar',
 )
 
 DEBUG_TOOLBAR_CONFIG = dict(
@@ -163,8 +176,3 @@ LOGGING = {
         },
     }
 }
-
-try:
-    from local_settings import DATABASES
-except ImportError:
-    pass

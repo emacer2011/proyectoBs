@@ -225,7 +225,12 @@ function agregarProductoFraccionable(fila){
     var medida = fila.cells[2].innerHTML;
     var medidaMinima = fila.cells[7].innerHTML;
     var cantidadComprada = prompt('Medida:'+medida+'\t Medida Minima:'+ medidaMinima+'\nMedida Deseada:',medidaMinima);
+    var patron = /^[0-9]+(\.[0-9]+)?$/;
     cantidadComprada = validarPrompt(cantidadComprada);
+    if (!cantidadComprada.match(patron)) {
+        alert("Error en medida seleccionada");
+        return false;
+    };
     cantidadComprada = parseFloat(cantidadComprada);
     if(verificarMedida(medidaMinima, medida, cantidadComprada)){
         var stock = parseInt(fila.cells[3].innerHTML);

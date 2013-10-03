@@ -17,6 +17,7 @@ import relatorio
 import subprocess
 from django.db.models import Q
 from utiles import AdaptadorFactura
+import re
 
 
 
@@ -121,6 +122,7 @@ def listarProductoPDF(request):
     if filtro == "":
         if filtroDeposito == "ALL":
             stocks = Stock.objects.all()
+            productoSinStock = Producto.objects.filter(cantidad = 0)
         else:
             stocks = Stock.objects.filter(deposito=filtroDeposito)
     else:
@@ -650,110 +652,134 @@ def cobro(request):
 # =====================================
 # = Funciones para la ayuda en linea  =
 # =====================================
-
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaVenta(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/venta.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/venta.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
     return response
-
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaAltaProducto(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/altaProducto.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/altaProducto.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
     return response
-
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaBajaProducto(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/bajaProducto.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/bajaProducto.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
     return response
-
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaModificarProducto(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/modificarProducto.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/modificarProducto.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
     return response
-
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaListarProductos(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/listarProductos.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/listarProductos.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
     return response
-
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaAltaDeposito(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/altaDeposito.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/altaDeposito.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
     return response
-
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaBajaDeposito(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/bajaDeposito.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/bajaDeposito.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
     return response
-
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaModificarDeposito(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/modificarDeposito.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/modificarDeposito.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
     return response
-
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaListarDepositos(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/listarDepositos.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/listarDepositos.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
     return response
 
-
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaManejoStock(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/manejoStock.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/manejoStock.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
     return response
-
+@user_passes_test(lambda u: u.groups.filter(name='CAJERO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaEntregaMateriales(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/entregaMateriales.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/entregaMateriales.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         pdf.close()
     return response
-
+@user_passes_test(lambda u: u.groups.filter(name='VENDEDORES').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ADMINISTRATIVO').count() == 0, login_url='/')
+@user_passes_test(lambda u: u.groups.filter(name='ENCARGADO-DEPOSITO').count() == 0, login_url='/')
 @login_required(login_url='/login')
 def ayudaCobro(request):
-    os.system('unoconv -f pdf '+TEMPLATE_DIRS+'/ayuda/cobro.odt')
+    
     with open(TEMPLATE_DIRS+'/ayuda/cobro.pdf', 'r') as pdf:
         response = HttpResponse(pdf.read(), mimetype='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'

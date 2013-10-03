@@ -14,7 +14,8 @@ framework.
 
 """
 import os
-
+import sys
+sys.path.append('/var/www/proyectoBs')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "proyectoBs.settings")
 
 # This application object is used by any WSGI server configured to use this
